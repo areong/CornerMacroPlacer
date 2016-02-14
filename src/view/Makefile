@@ -8,13 +8,12 @@ HEADERS_FLOORPLANWINDOW = \
 	./../view/Window.h
 
 HEADERS_TILEPLANEVIEW = \
+	./../view/Window.h\
 	./../cornerstitching/TilePlane.h\
 	./../view/TilePlaneView.h\
-	./../cornerstitching/Tile.h\
 	./../view/View.h\
-	./../cornerstitching/TraversalTaskCollectAllTiles.h\
-	./../view/Window.h\
-	./../cornerstitching/TraversalTask.h
+	./../cornerstitching/Corner.h\
+	./../cornerstitching/Tile.h\
 
 HEADERS_VIEW = \
 	./../view/View.h

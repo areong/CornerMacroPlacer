@@ -17,12 +17,18 @@ public:
     Check if there is any solid block overlapping the area.
     @param  startTile
         startTile and area overlap in x direction.
+        startTile contain area's yStart.
         startTile is an empty Tile.
-    @param  startFromBottom
-        If true, assume startTile contain area's bottom side;
-           else, assume startTile contain area's top side.
     */
-    bool isAreaEmpty(int xStart, int yStart, int xEnd, int yEnd, Tile *startTile, bool startFromBottom);
+    bool checkAreaEmptyCheckFromBottom(int xStart, int yStart, int xEnd, int yEnd, Tile *startTile);
+    /*
+    Check if there is any solid block overlapping the area.
+    @param  startTile
+        startTile and area overlap in x direction.
+        startTile contain area's yEnd.
+        startTile is an empty Tile.
+    */
+    bool checkAreaEmptyCheckFromTop(int xStart, int yStart, int xEnd, int yEnd, Tile *startTile);
     /*
     Assume startTile->xStart <= tile->xStart, and
            startTile->xEnd   >= tile->xEnd.
@@ -31,11 +37,11 @@ public:
     Assume tile does not overlap with existing solid Tiles.
     @param tile the inserted Tile
     */
-    void placeSolidTile(Tile *tile, Tile *startTile);
+    virtual void placeSolidTile(Tile *tile, Tile *startTile);
 
 protected:
     /*
-    Split into a bottom Tile and a top Tile at y.
+    Split startTile into a bottom Tile and a top Tile at y.
     The input Tile becomes the top Tile,
     and a new Tile becomes the bottom Tile.
     Assume tile->yStart < y < tile->yEnd.
@@ -46,7 +52,19 @@ protected:
         The default value is 0.
     @return the bottom Tile.
     */
-    virtual Tile *splitTileVertically(Tile *tile, int y, Tile *lowerRightTile = 0);
+    virtual Tile *splitStartTileVertically(Tile *tile, int y);
+    /*
+    Split endTile into a bottom Tile and a top Tile at y.
+    The input Tile becomes the top Tile,
+    and a new Tile becomes the bottom Tile.
+    Assume tile->yStart < y < tile->yEnd.
+    @param  lowerRightTile
+        The solid Tile has already be placed into the Tiles below.
+        As a result, not all lower Tiles can be accessed
+        by traversing from bottomTile->lb, and thus lowerRightTile is needed.
+    @return the bottom Tile.
+    */
+    virtual Tile *splitEndTileVertically(Tile *tile, int y, Tile *lowerRightTile);
     /*
     Used in placeSolidTile().
     Separate into a left Tile and a right Tile by insertedTile.

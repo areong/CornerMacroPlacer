@@ -28,46 +28,46 @@ Tile *HorizontalTilePlane::findTile(int x, int y, Tile *startTile) {
     }
 }
 
-bool HorizontalTilePlane::isAreaEmpty(int xStart, int yStart, int xEnd, int yEnd, Tile *startTile, bool startFromBottom) {
-    if (startFromBottom) {
-        if (startTile->getXEnd() < xEnd) {
-            return false;
-        }
-        Tile *currentTile = startTile;
-        while (true) {
-            int currentTileXStart = currentTile->getXStart();
-            if (currentTileXStart < xEnd) {
-                // currentTile overlaps the area.
-                if (currentTile->isSolid() || currentTileXStart > xStart) {
-                    return false;
-                }
-                if (currentTile->getYEnd() >= yEnd) {
-                    return true;
-                }
-                currentTile = currentTile->getRt();
-            } else {
-                currentTile = currentTile->getBl();
+bool HorizontalTilePlane::checkAreaEmptyCheckFromBottom(int xStart, int yStart, int xEnd, int yEnd, Tile *startTile) {
+    if (startTile->getXEnd() < xEnd) {
+        return false;
+    }
+    Tile *currentTile = startTile;
+    while (true) {
+        int currentTileXStart = currentTile->getXStart();
+        if (currentTileXStart < xEnd) {
+            // currentTile overlaps the area.
+            if (currentTile->isSolid() || currentTileXStart > xStart) {
+                return false;
             }
-        }
-    } else {
-        if (startTile->getXStart() < xStart) {
-            return false;
-        }
-        Tile *currentTile = startTile;
-        while (true) {
-            int currentTileXEnd = currentTile->getXEnd();
-            if (currentTileXEnd > xStart) {
-                // currentTile overlaps the area.
-                if (currentTile->isSolid() || currentTileXEnd < xEnd) {
-                    return false;
-                }
-                if (currentTile->getYStart() <= yStart) {
-                    return true;
-                }
-                currentTile = currentTile->getLb();
-            } else {
-                currentTile = currentTile->getTr();
+            if (currentTile->getYEnd() >= yEnd) {
+                return true;
             }
+            currentTile = currentTile->getRt();
+        } else {
+            currentTile = currentTile->getBl();
+        }
+    }
+}
+
+bool HorizontalTilePlane::checkAreaEmptyCheckFromTop(int xStart, int yStart, int xEnd, int yEnd, Tile *startTile) {
+    if (startTile->getXStart() < xStart) {
+        return false;
+    }
+    Tile *currentTile = startTile;
+    while (true) {
+        int currentTileXEnd = currentTile->getXEnd();
+        if (currentTileXEnd > xStart) {
+            // currentTile overlaps the area.
+            if (currentTile->isSolid() || currentTileXEnd < xEnd) {
+                return false;
+            }
+            if (currentTile->getYStart() <= yStart) {
+                return true;
+            }
+            currentTile = currentTile->getLb();
+        } else {
+            currentTile = currentTile->getTr();
         }
     }
 }
@@ -82,7 +82,7 @@ void HorizontalTilePlane::placeSolidTile(Tile *tile, Tile *startTile) {
         // Split vertically into two tiles.
         // startTile is the topTile after splitting.
         // Though splitting into three tiles is faster, more code is needed.
-        splitTileVertically(startTile, yStart); // The top tile is startTile.
+        splitStartTileVertically(startTile, yStart); // The top tile is startTile.
     }
     Tile *currentTile = startTile;
     // Find the initial lowerRightTile.
@@ -103,7 +103,7 @@ void HorizontalTilePlane::placeSolidTile(Tile *tile, Tile *startTile) {
                 if (currentTileYEnd > yEnd) {
                     // Split the end Tile.
                     // currentTile becomes the bottomTile after splitting.
-                    currentTile = splitTileVertically(currentTile, yEnd, lowerRightTile);
+                    currentTile = splitEndTileVertically(currentTile, yEnd, lowerRightTile);
                 }
             }
             // Modify currentTile and update lowerRightTile.
@@ -175,7 +175,7 @@ void HorizontalTilePlane::placeSolidTile(Tile *tile, Tile *startTile) {
     }
 }
 
-Tile *HorizontalTilePlane::splitTileVertically(Tile *tile, int y, Tile *lowerRightTile) {
+Tile *HorizontalTilePlane::splitStartTileVertically(Tile *tile, int y) {
     int xEnd = tile->getXEnd();
     int yStart = tile->getYStart();
     Tile *bottomTile = new Tile(tile->getXStart(), yStart, xEnd, y, false);
@@ -215,16 +215,63 @@ Tile *HorizontalTilePlane::splitTileVertically(Tile *tile, int y, Tile *lowerRig
             break;
         }
     }
-    if (lowerRightTile != 0) {
-        // Tiles on the bottom side is separated by the solid Tile.
-        // Update the Tiles right of the solid Tile.
-        currentTile = lowerRightTile;
-        while (currentTile->getXEnd() <= xEnd) {
-            currentTile->setRt(bottomTile);
-            currentTile = currentTile->getTr();
+
+    return bottomTile;
+}
+
+Tile *HorizontalTilePlane::splitEndTileVertically(Tile *tile, int y, Tile *lowerRightTile) {
+    // < Start of copied code from splitStartTileVertically() >
+
+    int xEnd = tile->getXEnd();
+    int yStart = tile->getYStart();
+    Tile *bottomTile = new Tile(tile->getXStart(), yStart, xEnd, y, false);
+    tile->setYStart(y);
+
+    // Update links of these two Tiles.
+    bottomTile->setBl(tile->getBl());
+    bottomTile->setLb(tile->getLb());
+    bottomTile->setRt(tile);
+    tile->setLb(bottomTile);
+
+    // Update tile->bl, bottomTile->tr and links of neighbors.
+    // Right side
+    Tile *currentTile = tile->getTr();
+    while (currentTile->getYStart() >= y) {
+        currentTile = currentTile->getLb();
+    }
+    bottomTile->setTr(currentTile);
+    while (currentTile->getYStart() >= yStart) {
+        currentTile->setBl(bottomTile);
+        currentTile = currentTile->getLb();
+    }
+    // Left side
+    currentTile = bottomTile->getBl();
+    while (currentTile->getYEnd() <= y) {
+        currentTile->setTr(bottomTile);
+        currentTile = currentTile->getRt();
+    }
+    tile->setBl(currentTile);
+    // Bottom side
+    currentTile = bottomTile->getLb();
+    while (currentTile->getXEnd() <= xEnd) {
+        currentTile->setRt(bottomTile);
+        currentTile = currentTile->getTr();
+        // Break if currentTile is the placed solid Tile.
+        if (currentTile->getYEnd() > yStart) {
+            break;
         }
     }
 
+    // < End of copied code >
+
+    // Tiles on the bottom side is separated by the solid Tile.
+    // Update the Tiles right of the solid Tile.
+    currentTile = lowerRightTile;
+    while (currentTile->getXEnd() <= xEnd) {
+        currentTile->setRt(bottomTile);
+        currentTile = currentTile->getTr();
+    }
+    
     return bottomTile;
 }
 

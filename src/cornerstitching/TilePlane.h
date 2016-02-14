@@ -12,8 +12,19 @@ public:
     ~TilePlane();
     Tile *getTopLeftMostTile();
     Tile *getBottomRightMostTile();
-    void traverse(Tile *startTile, int maxX, int minY, TraversalTask *task);
+    /*
+    Traverse Tiles that overlap with the area.
+    Assume startTile overlaps the area and
+    the point (xStart, yEnd) is inside startTile, not on the Tile's boundary.
+    */
+    void traverse(Tile *startTile, int xStart, int yStart, int xEnd, int yEnd, TraversalTask *task);
     void traverseAll(TraversalTask *task);
+    /*
+    Return a vector of all Tiles overlapping the area.
+    Please delete the returned vector.
+    */
+    std::vector<Tile *> *collectTiles(Tile *startTile, int xStart, int yStart, int xEnd, int yEnd);
+    std::vector<Tile *> *collectAllTiles();
 
 protected:
     int tilePlaneXStart;

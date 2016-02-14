@@ -50,7 +50,7 @@ Tile *TilePlane::getBottomRightMostTile() {
     return rightBoundaryTile->getBl();
 }
 
-void TilePlane::traverse(Tile *startTile, int maxX, int minY, TraversalTask *task) {
+void TilePlane::traverse(Tile *startTile, int xStart, int yStart, int xEnd, int yEnd, TraversalTask *task) {
     std::vector<Tile *> *discoveredTiles = new std::vector<Tile *>();
     discoveredTiles->push_back(startTile);
     Tile *currentTile;
@@ -61,23 +61,30 @@ void TilePlane::traverse(Tile *startTile, int maxX, int minY, TraversalTask *tas
         // Get neighbors at right.
         std::vector<Tile *> *rightTiles = new std::vector<Tile *>();
         int currentTileYStart = currentTile->getYStart();
-        if (currentTile->getXEnd() < maxX) {
+        if (currentTile->getXEnd() < xEnd) {
             Tile *currentNeighbor = currentTile->getTr();
-            if (currentTileYStart > minY){
+            while (currentNeighbor->getYStart() >= yEnd) {
+                currentNeighbor = currentNeighbor->getLb();
+            }
+            if (currentTileYStart > yStart) {
                 while (currentNeighbor->getYStart() >= currentTileYStart) {
                     rightTiles->push_back(currentNeighbor);
                     currentNeighbor = currentNeighbor->getLb();
                 }
             } else {
-                while (currentNeighbor->getYEnd() > minY) {
+                while (currentNeighbor->getYEnd() > yStart) {
                     rightTiles->push_back(currentNeighbor);
                     currentNeighbor = currentNeighbor->getLb();
                 }
             }
         }
         // Push currentTile->lb to discoveredTiles.
-        if (discoveredTiles->size() == 0 && currentTileYStart > minY) {
-            discoveredTiles->push_back(currentTile->getLb());
+        if (discoveredTiles->size() == 0 && currentTileYStart > yStart) {
+            Tile *currentNeighbor = currentTile->getLb();
+            while (currentNeighbor->getXEnd() <= xStart) {
+                currentNeighbor = currentNeighbor->getTr();
+            }
+            discoveredTiles->push_back(currentNeighbor);
         }
         // Push rightTiles to discoveredTiles in inverse order.
         for (int i = rightTiles->size() - 1; i >= 0; --i) {
@@ -89,5 +96,17 @@ void TilePlane::traverse(Tile *startTile, int maxX, int minY, TraversalTask *tas
 }
 
 void TilePlane::traverseAll(TraversalTask *task) {
-    traverse(leftBoundaryTile->getTr(), tilePlaneXEnd, tilePlaneYStart, task);
+    traverse(leftBoundaryTile->getTr(), tilePlaneXStart, tilePlaneYStart, tilePlaneXEnd, tilePlaneYEnd, task);
+}
+
+std::vector<Tile *> *TilePlane::collectTiles(Tile *startTile, int xStart, int yStart, int xEnd, int yEnd) {
+    TraversalTaskCollectAllTiles *task = new TraversalTaskCollectAllTiles();
+    traverse(startTile, xStart, yStart, xEnd, yEnd, task);
+    std::vector<Tile *> *collectedTiles = new std::vector<Tile *>(*(task->getTiles()));
+    delete task;
+    return collectedTiles;
+}
+
+std::vector<Tile *> *TilePlane::collectAllTiles() {
+    return collectTiles(leftBoundaryTile->getTr(), tilePlaneXStart, tilePlaneYStart, tilePlaneXEnd, tilePlaneYEnd);
 }
