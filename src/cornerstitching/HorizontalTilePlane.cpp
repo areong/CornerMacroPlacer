@@ -12,12 +12,12 @@ HorizontalTilePlane::~HorizontalTilePlane() {
 Tile *HorizontalTilePlane::findTile(int x, int y, Tile *startTile) {
     Tile *currentTile = startTile;
     while (true) {
-        if (currentTile->getYEnd() < y) {
+        if (currentTile->getYEnd() <= y) {
             currentTile = currentTile->getRt();
         } else if (currentTile->getYStart() > y) {
             currentTile = currentTile->getLb();
         } else {
-            if (currentTile->getXEnd() < x) {
+            if (currentTile->getXEnd() <= x) {
                 currentTile = currentTile->getTr();
             } else if (currentTile->getXStart() > x) {
                 currentTile = currentTile->getBl();

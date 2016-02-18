@@ -11,6 +11,9 @@ public:
     ~HorizontalTilePlane();
     /*
     Find the Tile where (x, y) is in.
+    @return The Tile such that
+            tile->xStart <= x < tile->xEnd and
+            tile->yStart <= y < tile->yEnd.
     */
     Tile *findTile(int x, int y, Tile *startTile);
     /*
