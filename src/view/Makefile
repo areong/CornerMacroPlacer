@@ -1,27 +1,27 @@
 CC = g++ -std=c++11
 INC = -I ./../
 HEADERS_FLOORPLANWINDOW = \
+	./../view/Window.h\
 	./../view/TilePlaneView.h\
 	./../view/FloorplanWindow.h\
-	./../view/FloorplanView.h\
 	./../view/View.h\
-	./../view/Window.h
+	./../view/FloorplanView.h
 
 HEADERS_TILEPLANEVIEW = \
 	./../view/Window.h\
-	./../cornerstitching/TilePlane.h\
-	./../view/TilePlaneView.h\
-	./../view/View.h\
 	./../cornerstitching/Corner.h\
 	./../cornerstitching/Tile.h\
+	./../view/TilePlaneView.h\
+	./../cornerstitching/TilePlane.h\
+	./../view/View.h
 
 HEADERS_VIEW = \
 	./../view/View.h
 
 HEADERS_FLOORPLANVIEW = \
+	./../view/Window.h\
 	./../view/FloorplanView.h\
-	./../view/View.h\
-	./../view/Window.h
+	./../view/View.h
 
 HEADERS_WINDOW = \
 	./../view/Window.h

@@ -2,41 +2,41 @@ CC = g++ -std=c++11
 INC = -I ./../
 HEADERS_TILEPLANE = \
 	./../cornerstitching/TilePlane.h\
-	./../cornerstitching/TraversalTaskCollectAllTiles.h\
 	./../cornerstitching/Tile.h\
-	./../cornerstitching/TraversalTask.h
+	./../cornerstitching/TraversalTask.h\
+	./../cornerstitching/TraversalTaskCollectAllTiles.h
 
 HEADERS_TILE = \
-	./../cornerstitching/Corner.h\
-	./../cornerstitching/Tile.h
+	./../cornerstitching/Tile.h\
+	./../cornerstitching/Corner.h
 
 HEADERS_TILEPLANE_TEST = \
+	./../view/Window.h\
 	./../cornerstitching/HorizontalTilePlane.h\
 	./../cornerstitching/CornerHorizontalTilePlane.h\
 	./../cornerstitching/Tile.h\
-	./../cornerstitching/TilePlane.h\
 	./../view/FloorplanWindow.h\
-	./../cornerstitching/TilePlane_test.h\
-	./../view/Window.h
+	./../cornerstitching/TilePlane.h\
+	./../cornerstitching/TilePlane_test.h
 
 HEADERS_HORIZONTALTILEPLANE = \
-	./../cornerstitching/HorizontalTilePlane.h\
 	./../cornerstitching/TilePlane.h\
-	./../cornerstitching/Tile.h
+	./../cornerstitching/Tile.h\
+	./../cornerstitching/HorizontalTilePlane.h
 
 HEADERS_CORNER = \
 	./../cornerstitching/Corner.h
 
 HEADERS_TRAVERSALTASKCOLLECTALLTILES = \
-	./../cornerstitching/TraversalTaskCollectAllTiles.h\
-	./../cornerstitching/TraversalTask.h
+	./../cornerstitching/TraversalTask.h\
+	./../cornerstitching/TraversalTaskCollectAllTiles.h
 
 HEADERS_CORNERHORIZONTALTILEPLANE = \
-	./../cornerstitching/HorizontalTilePlane.h\
 	./../cornerstitching/TilePlane.h\
+	./../cornerstitching/Tile.h\
+	./../cornerstitching/HorizontalTilePlane.h\
 	./../cornerstitching/CornerHorizontalTilePlane.h\
-	./../cornerstitching/Corner.h\
-	./../cornerstitching/Tile.h
+	./../cornerstitching/Corner.h
 
 all:
 	make TilePlane.o
