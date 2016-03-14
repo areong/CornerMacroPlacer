@@ -17,7 +17,7 @@ public:
     */
     Tile *findTile(int x, int y, Tile *startTile);
     /*
-    Check if there is any solid block overlapping the area.
+    Check if there is any solid Tile overlapping the area.
     @param  startTile
         startTile and area overlap in x direction.
         startTile contain area's yStart.
@@ -25,7 +25,7 @@ public:
     */
     bool checkAreaEmptyCheckFromBottom(int xStart, int yStart, int xEnd, int yEnd, Tile *startTile);
     /*
-    Check if there is any solid block overlapping the area.
+    Check if there is any solid Tile overlapping the area.
     @param  startTile
         startTile and area overlap in x direction.
         startTile contain area's yEnd.
@@ -48,11 +48,6 @@ protected:
     The input Tile becomes the top Tile,
     and a new Tile becomes the bottom Tile.
     Assume tile->yStart < y < tile->yEnd.
-    @param  lowerRightTile
-        If tile is the endTile, the solid Tile has already be placed
-        into the Tiles below. As a result, not all lower Tiles can be accessed
-        by traversing from bottomTile->lb, and thus lowerRightTile is needed.
-        The default value is 0.
     @return the bottom Tile.
     */
     virtual Tile *splitStartTileVertically(Tile *tile, int y);
@@ -111,7 +106,7 @@ protected:
     virtual void shrinkTileToLeft(Tile *tile, Tile *insertedTile);
     /*
     Assume (tile->xStart == insertedTile->xStart and
-            tile->xEnd   ==  insertedTile->xEnd).
+            tile->xEnd   == insertedTile->xEnd).
     Assume tile->yStart >= insertedTile->yStart, and
            tile->yEnd   <= insertedTile->yEnd.
     This method does not delete tile.
@@ -120,8 +115,8 @@ protected:
     /*
     Delete tile.
     The method can be overriden.
-        Update tiles sorted list in TilePlaneWithCorners.
-    Used in placeSolidTile() after coverTile...().
+        Update tiles sorted list in CornerHorizontalTilePlane.
+    Used in placeSolidTile() after coverTileWithSameWidthTile().
     Assume the original neighbors' pointers are all updated.
         Assume no corner pointing to tile.
     */

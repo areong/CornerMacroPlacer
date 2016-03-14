@@ -7,18 +7,18 @@ HEADERS_MAIN = \
 
 OBJECTS = \
 	./*.o\
-	./view/*.o\
-	./utils/*.o\
 	./cornerstitching/*.o\
-	./quadtree/*.o
+	./quadtree/*.o\
+	./utils/*.o\
+	./view/*.o
 
 LIBS = -lGL -lglut
 
 all:
-	cd view/; make all
-	cd utils/; make all
 	cd cornerstitching/; make all
 	cd quadtree/; make all
+	cd utils/; make all
+	cd view/; make all
 	make main.o
 	make placer
 placer: ${OBJECTS}
@@ -26,8 +26,8 @@ placer: ${OBJECTS}
 main.o: main.cpp ${HEADERS_MAIN}
 	${CC} -c main.cpp ${INC}
 clean:
-	cd view/; make clean
-	cd utils/; make clean
 	cd cornerstitching/; make clean
 	cd quadtree/; make clean
+	cd utils/; make clean
+	cd view/; make clean
 	rm *.o placer

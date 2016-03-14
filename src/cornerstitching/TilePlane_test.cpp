@@ -3,6 +3,7 @@
 #include "cornerstitching/CornerHorizontalTilePlane.h"
 #include "cornerstitching/HorizontalTilePlane.h"
 #include "cornerstitching/Tile.h"
+#include "cornerstitching/VerticalTilePlane.h"
 #include "view/FloorplanWindow.h"
 
 #include <iostream>
@@ -28,24 +29,28 @@ void testTilePlane_CornerHorizontalTilePlane() {
 }
 
 void testTilePlane_HorizontalTilePlane() {
-    HorizontalTilePlane *horizontalTilePlane = new HorizontalTilePlane(0, 0, 100, 100);
+    //HorizontalTilePlane *tilePlane = new HorizontalTilePlane(0, 0, 100, 100);
+    VerticalTilePlane *tilePlane = new VerticalTilePlane(0, 0, 100, 100);
     std::vector<Tile *> *tiles = new std::vector<Tile *>();
     tiles->push_back(new Tile(0, 40, 50, 90, true));
     tiles->push_back(new Tile(80, 50, 90, 100, true));
     tiles->push_back(new Tile(60, 40, 70, 60, true));
     tiles->push_back(new Tile(50, 50, 60, 90, true));
+    //tiles->push_back(new Tile(20, 0, 60, 30, true));
     for (int i = 0; i < tiles->size(); ++i) {
-        horizontalTilePlane->placeSolidTile(tiles->at(i), 
-            horizontalTilePlane->findTile(tiles->at(i)->getXStart(),
+        tilePlane->placeSolidTile(tiles->at(i), 
+            tilePlane->findTile(tiles->at(i)->getXStart(),
                 tiles->at(i)->getYStart(),
-                horizontalTilePlane->getTopLeftMostTile()));
+                tilePlane->getTopLeftMostTile()));
     }
 
-    bool isAreaEmpty = horizontalTilePlane->checkAreaEmptyCheckFromBottom(50, 30, 65, 100,
-        horizontalTilePlane->findTile(51, 31, horizontalTilePlane->getTopLeftMostTile()));
+    //bool isAreaEmpty = tilePlane->checkAreaEmptyCheckFromBottom(50, 30, 65, 100,
+    //    tilePlane->findTile(51, 31, tilePlane->getTopLeftMostTile()));
+    bool isAreaEmpty = tilePlane->checkAreaEmptyCheckFromLeft(0, 0, 65, 10,
+        tilePlane->findTile(51, 31, tilePlane->getTopLeftMostTile()));
     std::cout << "isAreaEmpty: " << isAreaEmpty << "\n";
 
-    displayTilePlane(horizontalTilePlane);
+    displayTilePlane(tilePlane);
 }
 
 void displayTilePlane(TilePlane *tilePlane) {
@@ -58,6 +63,6 @@ void displayTilePlane(TilePlane *tilePlane) {
 }
 
 void testTilePlane() {
-    //testTilePlane_HorizontalTilePlane();
-    testTilePlane_CornerHorizontalTilePlane();
+    testTilePlane_HorizontalTilePlane();
+    //testTilePlane_CornerHorizontalTilePlane();
 }

@@ -1,64 +1,73 @@
 CC = g++ -std=c++11
 INC = -I ./../
-HEADERS_TILEPLANE = \
-	./../cornerstitching/TilePlane.h\
+HEADERS_CORNER = \
+	./../cornerstitching/Corner.h
+
+HEADERS_CORNERHORIZONTALTILEPLANE = \
+	./../cornerstitching/Corner.h\
+	./../cornerstitching/CornerHorizontalTilePlane.h\
+	./../cornerstitching/HorizontalTilePlane.h\
 	./../cornerstitching/Tile.h\
+	./../cornerstitching/TilePlane.h
+
+HEADERS_HORIZONTALTILEPLANE = \
+	./../cornerstitching/HorizontalTilePlane.h\
+	./../cornerstitching/Tile.h\
+	./../cornerstitching/TilePlane.h
+
+HEADERS_TILE = \
+	./../cornerstitching/Corner.h\
+	./../cornerstitching/Tile.h
+
+HEADERS_TILEPLANE = \
+	./../cornerstitching/Tile.h\
+	./../cornerstitching/TilePlane.h\
 	./../cornerstitching/TraversalTask.h\
 	./../cornerstitching/TraversalTaskCollectAllTiles.h
 
-HEADERS_TILE = \
-	./../cornerstitching/Tile.h\
-	./../cornerstitching/Corner.h
-
 HEADERS_TILEPLANE_TEST = \
-	./../view/Window.h\
-	./../cornerstitching/HorizontalTilePlane.h\
 	./../cornerstitching/CornerHorizontalTilePlane.h\
+	./../cornerstitching/HorizontalTilePlane.h\
 	./../cornerstitching/Tile.h\
+	./../cornerstitching/TilePlane.h\
+	./../cornerstitching/TilePlane_test.h\
+	./../cornerstitching/VerticalTilePlane.h\
 	./../view/FloorplanWindow.h\
-	./../cornerstitching/TilePlane.h\
-	./../cornerstitching/TilePlane_test.h
-
-HEADERS_HORIZONTALTILEPLANE = \
-	./../cornerstitching/TilePlane.h\
-	./../cornerstitching/Tile.h\
-	./../cornerstitching/HorizontalTilePlane.h
-
-HEADERS_CORNER = \
-	./../cornerstitching/Corner.h
+	./../view/Window.h
 
 HEADERS_TRAVERSALTASKCOLLECTALLTILES = \
 	./../cornerstitching/TraversalTask.h\
 	./../cornerstitching/TraversalTaskCollectAllTiles.h
 
-HEADERS_CORNERHORIZONTALTILEPLANE = \
-	./../cornerstitching/TilePlane.h\
+HEADERS_VERTICALTILEPLANE = \
 	./../cornerstitching/Tile.h\
-	./../cornerstitching/HorizontalTilePlane.h\
-	./../cornerstitching/CornerHorizontalTilePlane.h\
-	./../cornerstitching/Corner.h
+	./../cornerstitching/TilePlane.h\
+	./../cornerstitching/VerticalTilePlane.h
 
 all:
-	make TilePlane.o
-	make Tile.o
-	make TilePlane_test.o
-	make HorizontalTilePlane.o
 	make Corner.o
-	make TraversalTaskCollectAllTiles.o
 	make CornerHorizontalTilePlane.o
-TilePlane.o: TilePlane.cpp ${HEADERS_TILEPLANE}
-	${CC} -c TilePlane.cpp ${INC}
-Tile.o: Tile.cpp ${HEADERS_TILE}
-	${CC} -c Tile.cpp ${INC}
-TilePlane_test.o: TilePlane_test.cpp ${HEADERS_TILEPLANE_TEST}
-	${CC} -c TilePlane_test.cpp ${INC}
-HorizontalTilePlane.o: HorizontalTilePlane.cpp ${HEADERS_HORIZONTALTILEPLANE}
-	${CC} -c HorizontalTilePlane.cpp ${INC}
+	make HorizontalTilePlane.o
+	make Tile.o
+	make TilePlane.o
+	make TilePlane_test.o
+	make TraversalTaskCollectAllTiles.o
+	make VerticalTilePlane.o
 Corner.o: Corner.cpp ${HEADERS_CORNER}
 	${CC} -c Corner.cpp ${INC}
-TraversalTaskCollectAllTiles.o: TraversalTaskCollectAllTiles.cpp ${HEADERS_TRAVERSALTASKCOLLECTALLTILES}
-	${CC} -c TraversalTaskCollectAllTiles.cpp ${INC}
 CornerHorizontalTilePlane.o: CornerHorizontalTilePlane.cpp ${HEADERS_CORNERHORIZONTALTILEPLANE}
 	${CC} -c CornerHorizontalTilePlane.cpp ${INC}
+HorizontalTilePlane.o: HorizontalTilePlane.cpp ${HEADERS_HORIZONTALTILEPLANE}
+	${CC} -c HorizontalTilePlane.cpp ${INC}
+Tile.o: Tile.cpp ${HEADERS_TILE}
+	${CC} -c Tile.cpp ${INC}
+TilePlane.o: TilePlane.cpp ${HEADERS_TILEPLANE}
+	${CC} -c TilePlane.cpp ${INC}
+TilePlane_test.o: TilePlane_test.cpp ${HEADERS_TILEPLANE_TEST}
+	${CC} -c TilePlane_test.cpp ${INC}
+TraversalTaskCollectAllTiles.o: TraversalTaskCollectAllTiles.cpp ${HEADERS_TRAVERSALTASKCOLLECTALLTILES}
+	${CC} -c TraversalTaskCollectAllTiles.cpp ${INC}
+VerticalTilePlane.o: VerticalTilePlane.cpp ${HEADERS_VERTICALTILEPLANE}
+	${CC} -c VerticalTilePlane.cpp ${INC}
 clean: 
 	rm *.o

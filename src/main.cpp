@@ -4,7 +4,7 @@
 
 int main() {
     Utils::run_srand();
-    //testTilePlane();
-    testQuadtree();
+    testTilePlane();
+    //testQuadtree();
     return 0;
 }

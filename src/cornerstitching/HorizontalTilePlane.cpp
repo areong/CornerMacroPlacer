@@ -78,11 +78,13 @@ void HorizontalTilePlane::placeSolidTile(Tile *tile, Tile *startTile) {
     int yStart = tile->getYStart();
     int yEnd = tile->getYEnd();
     // Split the startTile
+    bool doNotCheckMerging = false;
     if (startTile->getYStart() < yStart) {
         // Split vertically into two tiles.
         // startTile is the topTile after splitting.
         // Though splitting into three tiles is faster, more code is needed.
-        splitStartTileVertically(startTile, yStart); // The top tile is startTile.
+        splitStartTileVertically(startTile, yStart);    // The top tile is startTile.
+        doNotCheckMerging = true;
     }
     Tile *currentTile = startTile;
     // Find the initial lowerRightTile.
@@ -91,7 +93,6 @@ void HorizontalTilePlane::placeSolidTile(Tile *tile, Tile *startTile) {
         lowerRightTile = lowerRightTile->getTr();
     }
     // Update overlapping Tiles.
-    bool atStartTile = true;    // If true, do not merge any Tile.
     while (true) {
         if (currentTile->getXStart() <= xStart) {
             // It is an empty Tile under the placed Tile.
@@ -135,9 +136,9 @@ void HorizontalTilePlane::placeSolidTile(Tile *tile, Tile *startTile) {
                 }
             }
             // Check whether to merge Tiles.
-            if (atStartTile) {
-                // If at startTile, no need to merge Tiles.
-                atStartTile = false;
+            if (doNotCheckMerging) {
+                // Check merging next time.
+                doNotCheckMerging = false;
             } else {
                 if (finalRightTile != 0) {
                     Tile *lb = finalRightTile->getLb();
@@ -472,7 +473,7 @@ void HorizontalTilePlane::coverTileWithSameWidthTile(Tile *tile, Tile *insertedT
         currentTile->setTr(insertedTile);
         currentTile = currentTile->getRt();
     }
-    if (insertedTile->getXStart() == xStart) {
+    if (insertedTile->getYStart() == yStart) {
         insertedTile->setBl(bl);
         // Bottom side
         insertedTile->setLb(lb);
