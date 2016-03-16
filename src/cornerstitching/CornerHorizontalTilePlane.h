@@ -5,6 +5,7 @@
 #include <vector>
 
 class Corner;
+class CornerVerticalTilePlane;
 
 /*
 It is a subclass of HorizontalTilePlane which manages Corners of Tiles.
@@ -13,6 +14,15 @@ class CornerHorizontalTilePlane : public HorizontalTilePlane {
 public:
     CornerHorizontalTilePlane(int xStart, int yStart, int xEnd, int yEnd);
     ~CornerHorizontalTilePlane();
+    /*
+    IMPORTANT: Call this method after creation.
+    A CornerHorizontalTilePlane must be coupled with a just-created CornerVerticalTilePlane
+    or it cannot operate without throwing errors.
+    Assume cornerVerticalTilePlane did not call any method including placeSolidTile()
+    after it is created.
+    There is no counterpart method in CornerVerticalTilePlane because it is unnecessary.
+    */
+    void coupleWithCornerVerticalTilePlane(CornerVerticalTilePlane *cornerVerticalTilePlane);
     /*
     After calling placeSolidTile(), please call deleteRemovedCorners()
     to delete the Corners removed during placing the Tile.
@@ -27,8 +37,8 @@ private:
 
     /*
     These two vectors record created and removed Corners
-    when the TilePlane is contructed, or when a solid Tile is placed.
-    The sets are automatically cleared before placing solid Tiles.
+    when the TilePlane is constructed, or when a solid Tile is placed.
+    The vectors are automatically cleared before placing solid Tiles.
     However, Corners in removedCorners are not automatically deleted.
     Call CornerHorizontalTilePlane::deleteRemovedCorners() to delete them.
     */

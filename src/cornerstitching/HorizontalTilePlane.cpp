@@ -78,13 +78,13 @@ void HorizontalTilePlane::placeSolidTile(Tile *tile, Tile *startTile) {
     int yStart = tile->getYStart();
     int yEnd = tile->getYEnd();
     // Split the startTile
-    bool doNotCheckMerging = false;
+    bool checkMergingAtStartTile = true;
     if (startTile->getYStart() < yStart) {
         // Split vertically into two tiles.
         // startTile is the topTile after splitting.
         // Though splitting into three tiles is faster, more code is needed.
         splitStartTileVertically(startTile, yStart);    // The top tile is startTile.
-        doNotCheckMerging = true;
+        checkMergingAtStartTile = false;
     }
     Tile *currentTile = startTile;
     // Find the initial lowerRightTile.
@@ -93,18 +93,21 @@ void HorizontalTilePlane::placeSolidTile(Tile *tile, Tile *startTile) {
         lowerRightTile = lowerRightTile->getTr();
     }
     // Update overlapping Tiles.
+    bool atStartTile = true;
     while (true) {
         if (currentTile->getXStart() <= xStart) {
             // It is an empty Tile under the placed Tile.
             // Check if it is the end Tile.
-            bool atEnd = false;
+            bool atEndTile = false;
+            bool checkMergingAtEndTile = true;
             int currentTileYEnd = currentTile->getYEnd();
             if (currentTileYEnd >= yEnd) {
-                atEnd = true;
+                atEndTile = true;
                 if (currentTileYEnd > yEnd) {
                     // Split the end Tile.
                     // currentTile becomes the bottomTile after splitting.
                     currentTile = splitEndTileVertically(currentTile, yEnd, lowerRightTile);
+                    checkMergingAtEndTile = false;
                 }
             }
             // Modify currentTile and update lowerRightTile.
@@ -136,9 +139,30 @@ void HorizontalTilePlane::placeSolidTile(Tile *tile, Tile *startTile) {
                 }
             }
             // Check whether to merge Tiles.
-            if (doNotCheckMerging) {
-                // Check merging next time.
-                doNotCheckMerging = false;
+            if (atStartTile) {
+                if (checkMergingAtStartTile) {
+                    if (finalRightTile != 0) {
+                        Tile *lb = finalRightTile->getLb();
+                        if (lb->isEmpty()) {
+                            if (xEnd == lb->getXStart() &&
+                                finalRightTile->getXEnd() == lb->getXEnd()) {
+                                mergeTileWithBottomTile(finalRightTile, lb);
+                                removeEmptyTile(lb);
+                            }
+                        }
+                    }
+                    if (finalLeftTile != 0) {
+                        Tile *lb = finalLeftTile->getLb();
+                        if (lb->isEmpty()) {
+                            if (finalLeftTile->getXStart() == lb->getXStart() &&
+                                lb->getXEnd() == xStart) {
+                                mergeTileWithBottomTile(finalLeftTile, lb);
+                                removeEmptyTile(lb);
+                            }
+                        }
+                    }
+                }
+                atStartTile = false;
             } else {
                 if (finalRightTile != 0) {
                     Tile *lb = finalRightTile->getLb();
@@ -160,9 +184,32 @@ void HorizontalTilePlane::placeSolidTile(Tile *tile, Tile *startTile) {
                     }
                 }
             }
-            // Terminate or go to the next Tile.
-            if (atEnd) {
-                // Reached endTile.
+            if (atEndTile) {
+                // Check merging Tiles at top to endTile.
+                // It is separated from the above checkings which check Tiles at bottom.
+                if (checkMergingAtEndTile) {
+                    if (finalRightTile != 0) {
+                        Tile *rt = finalRightTile->getRt();
+                        if (rt->isEmpty()) {
+                            if (xEnd == rt->getXStart() &&
+                                finalRightTile->getXEnd() == rt->getXEnd()) {
+                                mergeTileWithBottomTile(rt, finalRightTile);
+                                removeEmptyTile(finalRightTile);
+                            }
+                        }
+                    }
+                    if (finalLeftTile != 0) {
+                        Tile *rt = finalLeftTile->getRt();
+                        if (rt->isEmpty()) {
+                            if (finalLeftTile->getXStart() == rt->getXStart() &&
+                                rt->getXEnd() == xStart) {
+                                mergeTileWithBottomTile(rt, finalLeftTile);
+                                removeEmptyTile(finalLeftTile);
+                            }
+                        }
+                    }
+                }
+                // Terminate.
                 break;
             } else {
                 // Go to rt.

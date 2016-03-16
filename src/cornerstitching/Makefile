@@ -6,9 +6,18 @@ HEADERS_CORNER = \
 HEADERS_CORNERHORIZONTALTILEPLANE = \
 	./../cornerstitching/Corner.h\
 	./../cornerstitching/CornerHorizontalTilePlane.h\
+	./../cornerstitching/CornerVerticalTilePlane.h\
 	./../cornerstitching/HorizontalTilePlane.h\
 	./../cornerstitching/Tile.h\
-	./../cornerstitching/TilePlane.h
+	./../cornerstitching/TilePlane.h\
+	./../cornerstitching/VerticalTilePlane.h
+
+HEADERS_CORNERVERTICALTILEPLANE = \
+	./../cornerstitching/Corner.h\
+	./../cornerstitching/CornerVerticalTilePlane.h\
+	./../cornerstitching/Tile.h\
+	./../cornerstitching/TilePlane.h\
+	./../cornerstitching/VerticalTilePlane.h
 
 HEADERS_HORIZONTALTILEPLANE = \
 	./../cornerstitching/HorizontalTilePlane.h\
@@ -27,6 +36,7 @@ HEADERS_TILEPLANE = \
 
 HEADERS_TILEPLANE_TEST = \
 	./../cornerstitching/CornerHorizontalTilePlane.h\
+	./../cornerstitching/CornerVerticalTilePlane.h\
 	./../cornerstitching/HorizontalTilePlane.h\
 	./../cornerstitching/Tile.h\
 	./../cornerstitching/TilePlane.h\
@@ -47,6 +57,7 @@ HEADERS_VERTICALTILEPLANE = \
 all:
 	make Corner.o
 	make CornerHorizontalTilePlane.o
+	make CornerVerticalTilePlane.o
 	make HorizontalTilePlane.o
 	make Tile.o
 	make TilePlane.o
@@ -57,6 +68,8 @@ Corner.o: Corner.cpp ${HEADERS_CORNER}
 	${CC} -c Corner.cpp ${INC}
 CornerHorizontalTilePlane.o: CornerHorizontalTilePlane.cpp ${HEADERS_CORNERHORIZONTALTILEPLANE}
 	${CC} -c CornerHorizontalTilePlane.cpp ${INC}
+CornerVerticalTilePlane.o: CornerVerticalTilePlane.cpp ${HEADERS_CORNERVERTICALTILEPLANE}
+	${CC} -c CornerVerticalTilePlane.cpp ${INC}
 HorizontalTilePlane.o: HorizontalTilePlane.cpp ${HEADERS_HORIZONTALTILEPLANE}
 	${CC} -c HorizontalTilePlane.cpp ${INC}
 Tile.o: Tile.cpp ${HEADERS_TILE}
