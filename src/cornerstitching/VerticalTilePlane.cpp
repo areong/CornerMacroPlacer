@@ -100,6 +100,7 @@ void VerticalTilePlane::placeSolidTile(Tile *tile, Tile *startTile) {
             // Check if it is the end Tile.
             bool atEndTile = false;
             bool checkMergingAtEndTile = true;
+            Tile *nextTile;
             int currentTileXEnd = currentTile->getXEnd();
             if (currentTileXEnd >= xEnd) {
                 atEndTile = true;
@@ -109,6 +110,11 @@ void VerticalTilePlane::placeSolidTile(Tile *tile, Tile *startTile) {
                     currentTile = splitEndTileHorizontally(currentTile, xEnd, lefterUpTile);
                     checkMergingAtEndTile = false;
                 }
+            } else {
+                // Save the next Tile before modifying currentTile,
+                // or it takes more effort to find the next Tile
+                // when currentTile shrinkToBottom for example.
+                nextTile = currentTile->getTr();
             }
             // Modify currentTile and update lefterUpTile.
             Tile *finalTopTile = 0;     // These two are used in merging.
@@ -212,8 +218,8 @@ void VerticalTilePlane::placeSolidTile(Tile *tile, Tile *startTile) {
                 // Terminate.
                 break;
             } else {
-                // Go to tr.
-                currentTile = currentTile->getTr();
+                // Go to nextTile, the original tr.
+                currentTile = nextTile;
             }
         } else {
             // It is a Tile outside the placedTile.

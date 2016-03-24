@@ -14,7 +14,9 @@ HEADERS_CORNERHORIZONTALTILEPLANE = \
 
 HEADERS_CORNERVERTICALTILEPLANE = \
 	./../cornerstitching/Corner.h\
+	./../cornerstitching/CornerHorizontalTilePlane.h\
 	./../cornerstitching/CornerVerticalTilePlane.h\
+	./../cornerstitching/HorizontalTilePlane.h\
 	./../cornerstitching/Tile.h\
 	./../cornerstitching/TilePlane.h\
 	./../cornerstitching/VerticalTilePlane.h
@@ -35,6 +37,7 @@ HEADERS_TILEPLANE = \
 	./../cornerstitching/TraversalTaskCollectAllTiles.h
 
 HEADERS_TILEPLANE_TEST = \
+	./../cornerstitching/Corner.h\
 	./../cornerstitching/CornerHorizontalTilePlane.h\
 	./../cornerstitching/CornerVerticalTilePlane.h\
 	./../cornerstitching/HorizontalTilePlane.h\

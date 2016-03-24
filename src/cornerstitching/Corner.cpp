@@ -1,5 +1,7 @@
 #include "cornerstitching/Corner.h"
 
+#include <iostream>
+
 Corner::Corner(int x, int y, int direction, bool isType1, bool isGapOnHorizontalSide) {
     this->x = x;
     this->y = y;
@@ -40,4 +42,16 @@ bool Corner::isType0() {
 
 bool Corner::isType1() {
     return type1;
+}
+
+int Corner::getX() {
+    return x;
+}
+
+int Corner::getY() {
+    return y;
+}
+
+void Corner::print() {
+    std::cout << "(" << x << ",\t" << y << ",\t" << direction << ",\t" << type1 << ",\t" << gapOnHorizontalSide << ")\n";
 }

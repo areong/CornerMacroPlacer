@@ -16,6 +16,12 @@ public:
     void setType(bool isType1);
     bool isType0();
     bool isType1();
+    int getX();
+    int getY();
+
+    // test
+
+    void print();
 
 private:
     int x;
