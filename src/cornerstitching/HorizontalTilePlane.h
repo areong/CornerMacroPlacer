@@ -1,9 +1,14 @@
 #ifndef CORNERSTITCHING_HORIZONTALTILEPLANE_H_
 #define CORNERSTITCHING_HORIZONTALTILEPLANE_H_
 
+//#include <set>
 #include "cornerstitching/TilePlane.h"
 
 class Tile;
+//class CompareTileWidth;
+
+// Temporary
+class SortedTiles;
 
 class HorizontalTilePlane : public TilePlane {
 public:
@@ -41,8 +46,18 @@ public:
     @param tile the inserted Tile
     */
     virtual void placeSolidTile(Tile *tile, Tile *startTile);
+    /*
+    Get the Tile with the smallest width.
+    This method does not modify the TilePlane.
+    */
+    Tile *getEmptyTileWithSmallestWidth();
 
 protected:
+    //// Empty Tiles sorted by width.
+    //std::set<Tile *, CompareTileWidth> *sortedEmptyTiles;
+    // Temporary
+    SortedTiles *sortedEmptyTiles;
+
     /*
     Split startTile into a bottom Tile and a top Tile at y.
     The input Tile becomes the top Tile,

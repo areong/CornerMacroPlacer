@@ -1,12 +1,23 @@
 #include "cornerstitching/HorizontalTilePlane.h"
 #include "cornerstitching/Tile.h"
 
-HorizontalTilePlane::HorizontalTilePlane(int xStart, int yStart, int xEnd, int yEnd) : TilePlane(xStart, yStart, xEnd, yEnd) {
+// Temporary
+#include "cornerstitching/SortedTiles.h"
 
+//struct CompareTileWidth {
+//    bool operator() (const Tile *tile1, const Tile *tile2) const {
+//        return tile1->getPreviousWidth() < tile2->getPreviousWidth();
+//    }
+//};
+
+HorizontalTilePlane::HorizontalTilePlane(int xStart, int yStart, int xEnd, int yEnd) : TilePlane(xStart, yStart, xEnd, yEnd) {
+    //sortedEmptyTiles = new std::set<Tile *, CompareTileWidth>();
+    sortedEmptyTiles = new SortedTiles(true);
+    sortedEmptyTiles->insert(getTopLeftMostTile());
 }
 
 HorizontalTilePlane::~HorizontalTilePlane() {
-
+    delete sortedEmptyTiles;
 }
 
 Tile *HorizontalTilePlane::findTile(int x, int y, Tile *startTile) {
@@ -229,11 +240,19 @@ void HorizontalTilePlane::placeSolidTile(Tile *tile, Tile *startTile) {
     }
 }
 
+Tile *HorizontalTilePlane::getEmptyTileWithSmallestWidth() {
+    //return *(sortedEmptyTiles->begin());
+    return sortedEmptyTiles->getSmallest();
+}
+
 Tile *HorizontalTilePlane::splitStartTileVertically(Tile *tile, int y) {
     int xEnd = tile->getXEnd();
     int yStart = tile->getYStart();
     Tile *bottomTile = new Tile(tile->getXStart(), yStart, xEnd, y, false);
     tile->setYStart(y);
+
+    // Sort.
+    sortedEmptyTiles->insert(bottomTile);
 
     // Update links of these two Tiles.
     bottomTile->setBl(tile->getBl());
@@ -280,6 +299,9 @@ Tile *HorizontalTilePlane::splitEndTileVertically(Tile *tile, int y, Tile *lower
     int yStart = tile->getYStart();
     Tile *bottomTile = new Tile(tile->getXStart(), yStart, xEnd, y, false);
     tile->setYStart(y);
+
+    // Sort.
+    sortedEmptyTiles->insert(bottomTile);
 
     // Update links of these two Tiles.
     bottomTile->setBl(tile->getBl());
@@ -337,6 +359,13 @@ Tile *HorizontalTilePlane::separateTileHorizontally(Tile *tile, Tile *insertedTi
     int x2 = insertedTile->getXEnd();
     Tile *leftTile = new Tile(xStart, yStart, x1, yEnd, false);
     tile->setXStart(x2);
+
+    // Sort.
+    //sortedEmptyTiles->erase(sortedEmptyTiles->find(tile));
+    sortedEmptyTiles->erase(tile);
+    tile->updateWidthAndHeightForSorting();
+    sortedEmptyTiles->insert(tile);
+    sortedEmptyTiles->insert(leftTile);
 
     // Update links of these two Tiles.
     leftTile->setBl(tile->getBl());
@@ -405,6 +434,12 @@ void HorizontalTilePlane::shrinkTileToRight(Tile *tile, Tile *insertedTile, Tile
     Tile *bl = tile->getBl();
     tile->setXStart(x);
 
+    // Sort.
+    //sortedEmptyTiles->erase(sortedEmptyTiles->find(tile));
+    sortedEmptyTiles->erase(tile);
+    tile->updateWidthAndHeightForSorting();
+    sortedEmptyTiles->insert(tile);
+
     // Top side
     Tile *currentTile = tile->getRt();
     while (currentTile->getXStart() >= x) {
@@ -452,6 +487,12 @@ void HorizontalTilePlane::shrinkTileToLeft(Tile *tile, Tile *insertedTile) {
     Tile *rt = tile->getRt();
     Tile *tr = tile->getTr();
     tile->setXEnd(x);
+
+    // Sort.
+    //sortedEmptyTiles->erase(sortedEmptyTiles->find(tile));
+    sortedEmptyTiles->erase(tile);
+    tile->updateWidthAndHeightForSorting();
+    sortedEmptyTiles->insert(tile);
 
     // Bottom side
     Tile *currentTile = tile->getLb();
@@ -539,6 +580,10 @@ void HorizontalTilePlane::coverTileWithSameWidthTile(Tile *tile, Tile *insertedT
 }
 
 void HorizontalTilePlane::removeEmptyTile(Tile *tile) {
+    // Sort.
+    //sortedEmptyTiles->erase(sortedEmptyTiles->find(tile));
+    sortedEmptyTiles->erase(tile);
+
     delete tile;
 }
 

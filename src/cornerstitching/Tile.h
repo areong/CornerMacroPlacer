@@ -15,8 +15,21 @@ public:
     int getYStart();
     int getXEnd();
     int getYEnd();
-    int getWidth();
-    int getHeight();
+    int getWidth() const;
+    int getHeight() const;
+
+    // The two methods are used as sorting keys.
+    int getPreviousWidth() const;
+    int getPreviousHeight() const;
+    /*
+    Please call this method after width or height changed and
+    before the Tile is inserted to a sorted container.
+    It prevents the sorting keys, previousWidth and previousHeight, being changed
+    when the Tile is in the sorted container.
+    This method assigns width and height to previousWidth and previousHeight respectively.
+    */
+    void updateWidthAndHeightForSorting();
+
     void setTr(Tile *tile);
     void setRt(Tile *tile);
     void setBl(Tile *tile);
@@ -108,6 +121,8 @@ private:
     int yEnd;
     int width;
     int height;
+    int previousWidth;  // These two attributes are used for sorting
+    int previousHeight; // to avoid sorting keys being changed. See Trello card 21.
     Tile *tr;
     Tile *rt;
     Tile *bl;

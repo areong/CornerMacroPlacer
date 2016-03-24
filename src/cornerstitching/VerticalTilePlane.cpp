@@ -1,12 +1,23 @@
 #include "cornerstitching/VerticalTilePlane.h"
 #include "cornerstitching/Tile.h"
 
-VerticalTilePlane::VerticalTilePlane(int xStart, int yStart, int xEnd, int yEnd) : TilePlane(xStart, yStart, xEnd, yEnd) {
+// Temporary
+#include "cornerstitching/SortedTiles.h"
 
+//struct CompareTileHeight {
+//    bool operator() (const Tile *tile1, const Tile *tile2) const {
+//        return tile1->getPreviousHeight() < tile2->getPreviousHeight();
+//    }
+//};
+
+VerticalTilePlane::VerticalTilePlane(int xStart, int yStart, int xEnd, int yEnd) : TilePlane(xStart, yStart, xEnd, yEnd) {
+    //sortedEmptyTiles = new std::set<Tile *, CompareTileHeight>();
+    sortedEmptyTiles = new SortedTiles(false);
+    sortedEmptyTiles->insert(getTopLeftMostTile());
 }
 
 VerticalTilePlane::~VerticalTilePlane() {
-
+    delete sortedEmptyTiles;
 }
 
 Tile *VerticalTilePlane::findTile(int x, int y, Tile *startTile) {
@@ -190,9 +201,9 @@ void VerticalTilePlane::placeSolidTile(Tile *tile, Tile *startTile) {
                     }
                 }
             }
-            // Check merging Tiles at right to endTile.
-            // It is separated from the above checkings which check Tiles at left.
             if (atEndTile) {
+                // Check merging Tiles at right to endTile.
+                // It is separated from the above checkings which check Tiles at left.
                 if (checkMergingAtEndTile) {
                     if (finalTopTile != 0) {
                         Tile *tr = finalTopTile->getTr();
@@ -229,11 +240,19 @@ void VerticalTilePlane::placeSolidTile(Tile *tile, Tile *startTile) {
     }
 }
 
+Tile *VerticalTilePlane::getEmptyTileWithSmallestHeight() {
+    //return *(sortedEmptyTiles->begin());
+    return sortedEmptyTiles->getSmallest();
+}
+
 Tile *VerticalTilePlane::splitStartTileHorizontally(Tile *tile, int x) {
     int yEnd = tile->getYEnd();
     int xStart = tile->getXStart();
     Tile *leftTile = new Tile(xStart, tile->getYStart(), x, yEnd, false);
     tile->setXStart(x);
+
+    // Sort.
+    sortedEmptyTiles->insert(leftTile);
 
     // Update links of these two Tiles.
     leftTile->setLb(tile->getLb());
@@ -280,6 +299,9 @@ Tile *VerticalTilePlane::splitEndTileHorizontally(Tile *tile, int x, Tile *lefte
     int xStart = tile->getXStart();
     Tile *leftTile = new Tile(xStart, tile->getYStart(), x, yEnd, false);
     tile->setXStart(x);
+
+    // Sort.
+    sortedEmptyTiles->insert(leftTile);
 
     // Update links of these two Tiles.
     leftTile->setLb(tile->getLb());
@@ -337,6 +359,13 @@ Tile *VerticalTilePlane::separateTileVertically(Tile *tile, Tile *insertedTile, 
     int y2 = insertedTile->getYEnd();
     Tile *bottomTile = new Tile(xStart, yStart, xEnd, y1, false);
     tile->setYStart(y2);
+
+    // Sort.
+    //sortedEmptyTiles->erase(sortedEmptyTiles->find(tile));
+    sortedEmptyTiles->erase(tile);
+    tile->updateWidthAndHeightForSorting();
+    sortedEmptyTiles->insert(tile);
+    sortedEmptyTiles->insert(bottomTile);
 
     // Update links of these two Tiles.
     bottomTile->setLb(tile->getLb());
@@ -405,6 +434,12 @@ void VerticalTilePlane::shrinkTileToTop(Tile *tile, Tile *insertedTile, Tile *le
     Tile *lb = tile->getLb();
     tile->setYStart(y);
 
+    // Sort.
+    //sortedEmptyTiles->erase(sortedEmptyTiles->find(tile));
+    sortedEmptyTiles->erase(tile);
+    tile->updateWidthAndHeightForSorting();
+    sortedEmptyTiles->insert(tile);
+
     // Right side
     Tile *currentTile = tile->getTr();
     while (currentTile->getYStart() >= y) {
@@ -452,6 +487,12 @@ void VerticalTilePlane::shrinkTileToBottom(Tile *tile, Tile *insertedTile) {
     Tile *tr = tile->getTr();
     Tile *rt = tile->getRt();
     tile->setYEnd(y);
+
+    // Sort.
+    //sortedEmptyTiles->erase(sortedEmptyTiles->find(tile));
+    sortedEmptyTiles->erase(tile);
+    tile->updateWidthAndHeightForSorting();
+    sortedEmptyTiles->insert(tile);
 
     // Left side
     Tile *currentTile = tile->getBl();
@@ -539,6 +580,10 @@ void VerticalTilePlane::coverTileWithSameHeightTile(Tile *tile, Tile *insertedTi
 }
 
 void VerticalTilePlane::removeEmptyTile(Tile *tile) {
+    // Sort.
+    //sortedEmptyTiles->erase(sortedEmptyTiles->find(tile));
+    sortedEmptyTiles->erase(tile);
+
     delete tile;
 }
 

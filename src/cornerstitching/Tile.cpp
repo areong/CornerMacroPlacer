@@ -10,6 +10,8 @@ Tile::Tile(int xStart, int yStart, int xEnd, int yEnd, bool isSolid) {
     this->yEnd = yEnd;
     width = xEnd - xStart;
     height = yEnd - yStart;
+    previousWidth = width;
+    previousHeight = height;
     solid = isSolid;
     tr = 0;
     rt = 0;
@@ -77,12 +79,25 @@ int Tile::getYEnd() {
     return yEnd;
 }
 
-int Tile::getWidth() {
+int Tile::getWidth() const {
     return width;
 }
 
-int Tile::getHeight() {
+int Tile::getHeight() const {
     return height;
+}
+
+int Tile::getPreviousWidth() const {
+    return previousWidth;
+}
+
+int Tile::getPreviousHeight() const {
+    return previousHeight;
+}
+
+void Tile::updateWidthAndHeightForSorting() {
+    previousWidth = width;
+    previousHeight = height;
 }
 
 void Tile::setTr(Tile *tile) {

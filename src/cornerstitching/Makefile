@@ -23,8 +23,13 @@ HEADERS_CORNERVERTICALTILEPLANE = \
 
 HEADERS_HORIZONTALTILEPLANE = \
 	./../cornerstitching/HorizontalTilePlane.h\
+	./../cornerstitching/SortedTiles.h\
 	./../cornerstitching/Tile.h\
 	./../cornerstitching/TilePlane.h
+
+HEADERS_SORTEDTILES = \
+	./../cornerstitching/SortedTiles.h\
+	./../cornerstitching/Tile.h
 
 HEADERS_TILE = \
 	./../cornerstitching/Corner.h\
@@ -53,6 +58,7 @@ HEADERS_TRAVERSALTASKCOLLECTALLTILES = \
 	./../cornerstitching/TraversalTaskCollectAllTiles.h
 
 HEADERS_VERTICALTILEPLANE = \
+	./../cornerstitching/SortedTiles.h\
 	./../cornerstitching/Tile.h\
 	./../cornerstitching/TilePlane.h\
 	./../cornerstitching/VerticalTilePlane.h
@@ -62,6 +68,7 @@ all:
 	make CornerHorizontalTilePlane.o
 	make CornerVerticalTilePlane.o
 	make HorizontalTilePlane.o
+	make SortedTiles.o
 	make Tile.o
 	make TilePlane.o
 	make TilePlane_test.o
@@ -75,6 +82,8 @@ CornerVerticalTilePlane.o: CornerVerticalTilePlane.cpp ${HEADERS_CORNERVERTICALT
 	${CC} -c CornerVerticalTilePlane.cpp ${INC}
 HorizontalTilePlane.o: HorizontalTilePlane.cpp ${HEADERS_HORIZONTALTILEPLANE}
 	${CC} -c HorizontalTilePlane.cpp ${INC}
+SortedTiles.o: SortedTiles.cpp ${HEADERS_SORTEDTILES}
+	${CC} -c SortedTiles.cpp ${INC}
 Tile.o: Tile.cpp ${HEADERS_TILE}
 	${CC} -c Tile.cpp ${INC}
 TilePlane.o: TilePlane.cpp ${HEADERS_TILEPLANE}
