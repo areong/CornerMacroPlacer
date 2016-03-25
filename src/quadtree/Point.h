@@ -5,12 +5,12 @@ class Point {
 public:
     Point();
     virtual ~Point();
-    virtual int getX() = 0;
-    virtual int getY() = 0;
+    virtual int getXForQuadtree() = 0;
+    virtual int getYForQuadtree() = 0;
     bool doesOverlapPoint(Point *point);
 
     // test
-    void print();
+    virtual void print();
 };
 
 #endif

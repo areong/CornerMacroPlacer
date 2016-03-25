@@ -9,10 +9,10 @@ Position::~Position() {
 
 }
 
-int Position::getX() {
+int Position::getXForQuadtree() {
     return x;
 }
 
-int Position::getY() {
+int Position::getYForQuadtree() {
     return y;
 }

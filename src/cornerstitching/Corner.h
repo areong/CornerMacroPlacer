@@ -1,9 +1,14 @@
 #ifndef CORNERSTITCHING_CORNER_H_
 #define CORNERSTITCHING_CORNER_H_
 
+#include "quadtree/Point.h"
+
 class Tile;
 
-class Corner {
+/*
+Implement an interface, Point, for being able to be sorted by a Quadtree.
+*/
+class Corner : public Point {
 public:
     // @param   isGapOnHorizontalSide
     //          For a type 0 Corner, this attribute is not used.
@@ -18,10 +23,44 @@ public:
     bool isType1();
     int getX();
     int getY();
+    /*
+    Please call this method after calling setHorizontalTile() and setVerticalTile()
+    to calculate the Corner's width, height and gapSize.
+    */
+    void calculateWidthAndHeight();
+    int getWidth();
+    int getHeight();
+    /*
+    For type 1 Corners, gapSize is the empty length on the horizontal side or
+    the vertical side, for horizontal Corner or vertical Corner respectively.
+    */
+    int getGapSize();
+    int getPreviousWidth();
+    int getPreviousHeight();
+    /*
+    Please call this method after width or height changed and
+    before the Corner is inserted to a sorted container.
+    It prevents the sorting keys, previousWidth and previousHeight, being changed
+    when the Corner is in the sorted container.
+    This method assigns width and height to previousWidth and previousHeight respectively.
+    */
+    void updateWidthAndHeightForSorting();
+
+    // Used by Quadtree
+
+    int getXForQuadtree() override;
+    int getYForQuadtree() override;
 
     // test
 
-    void print();
+    /*
+    Print (x, y, direction, type1, gapOnHorizontalSide).
+    */
+    void print() override;
+    /*
+    Print (width, height, gapSize).
+    */
+    void printWidthAndHeight();
 
 private:
     int x;
@@ -32,6 +71,12 @@ private:
     bool gapOnHorizontalSide;
     Tile *horizontalTile;
     Tile *verticalTile;
+
+    int width;
+    int height;
+    int gapSize;
+    int previousWidth;
+    int previousHeight;
 };
 
 #endif

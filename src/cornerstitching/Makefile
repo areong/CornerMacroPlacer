@@ -1,7 +1,9 @@
 CC = g++ -std=c++11
 INC = -I ./../
 HEADERS_CORNER = \
-	./../cornerstitching/Corner.h
+	./../cornerstitching/Corner.h\
+	./../cornerstitching/Tile.h\
+	./../quadtree/Point.h
 
 HEADERS_CORNERHORIZONTALTILEPLANE = \
 	./../cornerstitching/Corner.h\
@@ -10,7 +12,8 @@ HEADERS_CORNERHORIZONTALTILEPLANE = \
 	./../cornerstitching/HorizontalTilePlane.h\
 	./../cornerstitching/Tile.h\
 	./../cornerstitching/TilePlane.h\
-	./../cornerstitching/VerticalTilePlane.h
+	./../cornerstitching/VerticalTilePlane.h\
+	./../quadtree/Point.h
 
 HEADERS_CORNERVERTICALTILEPLANE = \
 	./../cornerstitching/Corner.h\
@@ -19,7 +22,8 @@ HEADERS_CORNERVERTICALTILEPLANE = \
 	./../cornerstitching/HorizontalTilePlane.h\
 	./../cornerstitching/Tile.h\
 	./../cornerstitching/TilePlane.h\
-	./../cornerstitching/VerticalTilePlane.h
+	./../cornerstitching/VerticalTilePlane.h\
+	./../quadtree/Point.h
 
 HEADERS_HORIZONTALTILEPLANE = \
 	./../cornerstitching/HorizontalTilePlane.h\
@@ -33,7 +37,8 @@ HEADERS_SORTEDTILES = \
 
 HEADERS_TILE = \
 	./../cornerstitching/Corner.h\
-	./../cornerstitching/Tile.h
+	./../cornerstitching/Tile.h\
+	./../quadtree/Point.h
 
 HEADERS_TILEPLANE = \
 	./../cornerstitching/Tile.h\
@@ -50,6 +55,7 @@ HEADERS_TILEPLANE_TEST = \
 	./../cornerstitching/TilePlane.h\
 	./../cornerstitching/TilePlane_test.h\
 	./../cornerstitching/VerticalTilePlane.h\
+	./../quadtree/Point.h\
 	./../view/FloorplanWindow.h\
 	./../view/Window.h
 

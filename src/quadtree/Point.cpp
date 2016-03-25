@@ -10,9 +10,9 @@ Point::~Point() {
 }
 
 bool Point::doesOverlapPoint(Point *point) {
-    return (getX() == point->getX()) && (getY() == point->getY());
+    return (getXForQuadtree() == point->getXForQuadtree()) && (getYForQuadtree() == point->getYForQuadtree());
 }
 
 void Point::print() {
-    std::cout << "(" << getX() << ",\t" << getY() << ")\n";
+    std::cout << "(" << getXForQuadtree() << ",\t" << getYForQuadtree() << ")\n";
 }

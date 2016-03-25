@@ -1,4 +1,5 @@
 #include "cornerstitching/Corner.h"
+#include "cornerstitching/Tile.h"
 
 #include <iostream>
 
@@ -10,6 +11,12 @@ Corner::Corner(int x, int y, int direction, bool isType1, bool isGapOnHorizontal
     this->gapOnHorizontalSide = isGapOnHorizontalSide;
     horizontalTile = 0;
     verticalTile = 0;
+
+    width = 0;
+    height = 0;
+    gapSize = 0;
+    previousWidth = 0;
+    previousHeight = 0;
 }
 
 Corner::~Corner() {
@@ -52,6 +59,98 @@ int Corner::getY() {
     return y;
 }
 
+void Corner::calculateWidthAndHeight() {
+    if (!type1) {
+        // The Corner is type 0.
+        // The calculation is the same whether the Corner
+        // is from a CornerHorizontalTilePlane or a CornerVerticalTilePlane.
+        width = horizontalTile->getWidth();
+        height = verticalTile->getHeight();
+    } else {
+        // The Corner is type 1.
+        if (gapOnHorizontalSide) {
+            // The Corner is from a CornerHorizontalTilePlane.
+            width = horizontalTile->getWidth();
+            switch (direction) {
+            case 0:
+                height = verticalTile->getYEnd() - y;
+                gapSize = horizontalTile->getBlOpenWidth();
+                break;
+            case 1:
+                height = y - verticalTile->getYStart();
+                gapSize = horizontalTile->getBrOpenWidth();
+                break;
+            case 2:
+                height = verticalTile->getYEnd() - y;
+                gapSize = horizontalTile->getTlOpenWidth();
+                break;
+            case 3:
+                height = y - verticalTile->getYStart();
+                gapSize = horizontalTile->getTrOpenWidth();
+                break;
+            }
+        } else {
+            // The Corner is from a CornerVerticalTilePlane.
+            height = verticalTile->getHeight();
+            switch (direction) {
+            case 0:
+                width = horizontalTile->getXEnd() - x;
+                gapSize = verticalTile->getLbOpenHeight();
+                break;
+            case 1:
+                width = x - horizontalTile->getXStart();
+                gapSize = verticalTile->getRbOpenHeight();
+                break;
+            case 2:
+                width = horizontalTile->getXEnd() - x;
+                gapSize = verticalTile->getLtOpenHeight();
+                break;
+            case 3:
+                width = x - horizontalTile->getXStart();
+                gapSize = verticalTile->getRtOpenHeight();
+                break;
+            }
+        }
+    }
+}
+
+int Corner::getWidth() {
+    return width;
+}
+
+int Corner::getHeight() {
+    return height;
+}
+
+int Corner::getGapSize() {
+    return gapSize;
+}
+
+int Corner::getPreviousWidth() {
+    return previousWidth;
+}
+
+int Corner::getPreviousHeight() {
+    return previousHeight;
+}
+
+void Corner::updateWidthAndHeightForSorting() {
+    previousWidth = width;
+    previousHeight = height;
+}
+
+int Corner::getXForQuadtree() {
+    return previousWidth;
+}
+
+int Corner::getYForQuadtree() {
+    return previousHeight;
+}
+
 void Corner::print() {
     std::cout << "(" << x << ",\t" << y << ",\t" << direction << ",\t" << type1 << ",\t" << gapOnHorizontalSide << ")\n";
+}
+
+void Corner::printWidthAndHeight() {
+    std::cout << "(" << width << ",\t" << height << ",\t" << gapSize << ")\n";
 }

@@ -16,6 +16,7 @@ HEADERS_TILEPLANEVIEW = \
 	./../cornerstitching/Corner.h\
 	./../cornerstitching/Tile.h\
 	./../cornerstitching/TilePlane.h\
+	./../quadtree/Point.h\
 	./../view/TilePlaneView.h\
 	./../view/View.h\
 	./../view/Window.h
