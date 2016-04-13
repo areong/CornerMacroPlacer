@@ -38,6 +38,12 @@ public:
     to delete the Corners removed during placing the Tile.
     */
     void placeSolidTile(Tile *tile, Tile *startTile) override;
+    /*
+    Please call this method after placing solid Tile to both
+    CornerHorizontalTilePlane and CornerVerticalTilePlane.
+    Calculate the width and height of currently created or modified Corners.
+    */
+    void calculateCurrentCornersWidthAndHeight();
     std::vector<Corner *> *getCurrentlyCreatedCorners();
     std::vector<Corner *> *getCurrentlyModifiedHorizontalCorners();
     std::vector<Corner *> *getCurrentlyModifiedVerticalCorners();

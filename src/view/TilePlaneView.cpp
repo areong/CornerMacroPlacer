@@ -36,37 +36,37 @@ void TilePlaneView::display() {
             Corner *trCorner = tile->getTrCorner();
             if (blCorner != 0) {
                 if (blCorner->isType0()) {
-                    window->drawRectangle(tileXStart + 1, tileYStart + 1, tileXStart + 3, tileYStart + 3,
+                    window->drawRectangle(tileXStart + 1, tileYStart + 1, tileXStart + 2, tileYStart + 2,
                         0.2, 0.2, 0.2, 0.5, 0.5, 0.5, true);
                 } else {
-                    window->drawRectangle(tileXStart + 1, tileYStart + 1, tileXStart + 3, tileYStart + 3,
+                    window->drawRectangle(tileXStart + 1, tileYStart + 1, tileXStart + 2, tileYStart + 2,
                         0.5, 0.5, 0.5, 0.5, 0.5, 0.5);
                 }
             }
             if (brCorner != 0) {
                 if (brCorner->isType0()) {
-                    window->drawRectangle(tileXEnd - 3, tileYStart + 1, tileXEnd - 1, tileYStart + 3,
+                    window->drawRectangle(tileXEnd - 2, tileYStart + 1, tileXEnd - 1, tileYStart + 2,
                         0.2, 0.2, 0.2, 0.5, 0.5, 0.5, true);
                 } else {
-                    window->drawRectangle(tileXEnd - 3, tileYStart + 1, tileXEnd - 1, tileYStart + 3,
+                    window->drawRectangle(tileXEnd - 2, tileYStart + 1, tileXEnd - 1, tileYStart + 2,
                         0.5, 0.5, 0.5, 0.5, 0.5, 0.5);
                 }
             }
             if (tlCorner != 0) {
                 if (tlCorner->isType0()) {
-                    window->drawRectangle(tileXStart + 1, tileYEnd - 3, tileXStart + 3, tileYEnd - 1,
+                    window->drawRectangle(tileXStart + 1, tileYEnd - 2, tileXStart + 2, tileYEnd - 1,
                         0.2, 0.2, 0.2, 0.5, 0.5, 0.5, true);
                 } else {
-                    window->drawRectangle(tileXStart + 1, tileYEnd - 3, tileXStart + 3, tileYEnd - 1,
+                    window->drawRectangle(tileXStart + 1, tileYEnd - 2, tileXStart + 2, tileYEnd - 1,
                         0.5, 0.5, 0.5, 0.5, 0.5, 0.5);
                 }
             }
             if (trCorner != 0) {
                 if (trCorner->isType0()) {
-                    window->drawRectangle(tileXEnd - 3, tileYEnd - 3, tileXEnd - 1, tileYEnd - 1,
+                    window->drawRectangle(tileXEnd - 2, tileYEnd - 2, tileXEnd - 1, tileYEnd - 1,
                         0.2, 0.2, 0.2, 0.5, 0.5, 0.5, true);
                 } else {
-                    window->drawRectangle(tileXEnd - 3, tileYEnd - 3, tileXEnd - 1, tileYEnd - 1,
+                    window->drawRectangle(tileXEnd - 2, tileYEnd - 2, tileXEnd - 1, tileYEnd - 1,
                         0.5, 0.5, 0.5, 0.5, 0.5, 0.5);
                 }
             }

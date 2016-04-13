@@ -818,11 +818,11 @@ Quadtree *Quadtree::getSubQuadtreePointIsIn(Point *point) {
         if (point->getYForQuadtree() < yCenter) {
             return bl;
         } else {
-            return br;
+            return tl;
         }
     } else {
         if (point->getYForQuadtree() < yCenter) {
-            return tl;
+            return br;
         } else {
             return tr;
         }

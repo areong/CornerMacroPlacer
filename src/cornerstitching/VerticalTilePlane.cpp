@@ -4,6 +4,8 @@
 // Temporary
 #include "cornerstitching/SortedTiles.h"
 
+#include <iostream>
+
 //struct CompareTileHeight {
 //    bool operator() (const Tile *tile1, const Tile *tile2) const {
 //        return tile1->getPreviousHeight() < tile2->getPreviousHeight();
@@ -11,12 +13,14 @@
 //};
 
 VerticalTilePlane::VerticalTilePlane(int xStart, int yStart, int xEnd, int yEnd) : TilePlane(xStart, yStart, xEnd, yEnd) {
+    currentlyRemovedTiles = new std::vector<Tile *>();
     //sortedEmptyTiles = new std::set<Tile *, CompareTileHeight>();
     sortedEmptyTiles = new SortedTiles(false);
     sortedEmptyTiles->insert(getTopLeftMostTile());
 }
 
 VerticalTilePlane::~VerticalTilePlane() {
+    delete currentlyRemovedTiles;
     delete sortedEmptyTiles;
 }
 
@@ -106,6 +110,8 @@ void VerticalTilePlane::placeSolidTile(Tile *tile, Tile *startTile) {
     // Update overlapping Tiles.
     bool atStartTile = true;
     while (true) {
+        ////currentTile->print();
+        //////currentTile->printFourNeighbors();
         if (currentTile->getYStart() <= yStart) {
             // It is an empty Tile under the placed Tile.
             // Check if it is the end Tile.
@@ -118,7 +124,14 @@ void VerticalTilePlane::placeSolidTile(Tile *tile, Tile *startTile) {
                 if (currentTileXEnd > xEnd) {
                     // Split the end Tile.
                     // currentTile becomes the leftTile after splitting.
+                    Tile *rightTile = currentTile;
+                    ////currentTile->print();
+                    //////currentTile->printFourNeighbors();
                     currentTile = splitEndTileHorizontally(currentTile, xEnd, lefterUpTile);
+                    ////currentTile->print();
+                    //////currentTile->printFourNeighbors();
+                    ////rightTile->print();
+                    //////rightTile->printFourNeighbors();
                     checkMergingAtEndTile = false;
                 }
             } else {
@@ -238,6 +251,11 @@ void VerticalTilePlane::placeSolidTile(Tile *tile, Tile *startTile) {
             currentTile = currentTile->getLb();   
         }
     }
+    // Delete removed Tiles.
+    for (int i = 0; i < currentlyRemovedTiles->size(); ++i) {
+        delete currentlyRemovedTiles->at(i);
+    }
+    currentlyRemovedTiles->clear();
 }
 
 Tile *VerticalTilePlane::getEmptyTileWithSmallestHeight() {
@@ -283,31 +301,34 @@ Tile *VerticalTilePlane::splitStartTileHorizontally(Tile *tile, int x) {
     while (currentTile->getYEnd() <= yEnd) {
         currentTile->setTr(leftTile);
         currentTile = currentTile->getRt();
-        // Break if currentTile is the placed solid Tile.
-        if (currentTile->getXEnd() > xStart) {
-            break;
-        }
     }
 
     return leftTile;
 }
 
 Tile *VerticalTilePlane::splitEndTileHorizontally(Tile *tile, int x, Tile *lefterUpTile) {
-    // < Start of copied code from splitStartTileHorizontally() >
-
+    //std::cout << "splitEndTileHorizontally()\n";
+    //tile->print();
+    //tile->printFourNeighbors();
+    ////lefterUpTile->print();
+    int yStart = tile->getYStart();
     int yEnd = tile->getYEnd();
     int xStart = tile->getXStart();
-    Tile *leftTile = new Tile(xStart, tile->getYStart(), x, yEnd, false);
+    Tile *leftTile = new Tile(xStart, yStart, x, yEnd, false);
     tile->setXStart(x);
 
     // Sort.
     sortedEmptyTiles->insert(leftTile);
 
     // Update links of these two Tiles.
+    ////tile->getLb()->print();
+    //////tile->getBl()->print();
+    ////std::cout << (tile->getBl() == 0) << "\n";
     leftTile->setLb(tile->getLb());
     leftTile->setBl(tile->getBl());
     leftTile->setTr(tile);
     tile->setBl(leftTile);
+    ////leftTile->getTr()->print();
 
     // Update tile->lb, leftTile->rt and links of neighbors.
     // Top side
@@ -329,16 +350,18 @@ Tile *VerticalTilePlane::splitEndTileHorizontally(Tile *tile, int x, Tile *lefte
     tile->setLb(currentTile);
     // Left side
     currentTile = leftTile->getBl();
-    while (currentTile->getYEnd() <= yEnd) {
-        currentTile->setTr(leftTile);
-        currentTile = currentTile->getRt();
-        // Break if currentTile is the placed solid Tile.
-        if (currentTile->getXEnd() > xStart) {
-            break;
+    if (currentTile->getYEnd() > yStart) {
+        // Check this condition because shrinkTileToBottom() may have changed
+        // bl->yStart to tile->yStart.
+        while (currentTile->getYEnd() <= yEnd) {
+            currentTile->setTr(leftTile);
+            currentTile = currentTile->getRt();
+            // Break if currentTile is the placed solid Tile.
+            if (currentTile->getXEnd() > xStart) {
+                break;
+            }
         }
     }
-
-    // < End of copied code >
 
     // Tiles on the left side is separated by the solid Tile.
     // Update the Tiles top of the solid Tile.
@@ -425,6 +448,7 @@ Tile *VerticalTilePlane::separateTileVertically(Tile *tile, Tile *insertedTile, 
 }
 
 void VerticalTilePlane::shrinkTileToTop(Tile *tile, Tile *insertedTile, Tile *lefterUpTile) {
+    ////std::cout << "shrinkTileToTop()\n";
     int yStart = tile->getYStart();
     int yEnd = tile->getYEnd();
     int xStart = tile->getXStart();
@@ -441,12 +465,13 @@ void VerticalTilePlane::shrinkTileToTop(Tile *tile, Tile *insertedTile, Tile *le
     sortedEmptyTiles->insert(tile);
 
     // Right side
-    Tile *currentTile = tile->getTr();
-    while (currentTile->getYStart() >= y) {
-        currentTile = currentTile->getLb();
-    }
+    Tile *currentTile;
     // Update insertedTile if insertedTile->xEnd == xEnd.
     if (insertedTile->getXEnd() == xEnd) {
+        currentTile = tile->getTr();
+        while (currentTile->getYStart() >= y) {
+            currentTile = currentTile->getLb();
+        }
         insertedTile->setTr(currentTile);
         insertedTile->setRt(tile);
         while (currentTile->getYStart() >= yStart) {
@@ -455,11 +480,11 @@ void VerticalTilePlane::shrinkTileToTop(Tile *tile, Tile *insertedTile, Tile *le
         }
     }
     // Left side
-    currentTile = bl;
     // Update insertedTile if insertedTile->xStart == xStart.
     if (insertedTile->getXStart() == xStart) {
         insertedTile->setBl(bl);
         insertedTile->setLb(lb);
+        currentTile = bl;
         while (currentTile->getYEnd() <= y) {
             currentTile->setTr(insertedTile);
             currentTile = currentTile->getRt();
@@ -479,6 +504,7 @@ void VerticalTilePlane::shrinkTileToTop(Tile *tile, Tile *insertedTile, Tile *le
 }
 
 void VerticalTilePlane::shrinkTileToBottom(Tile *tile, Tile *insertedTile) {
+    //std::cout << "shrinkTileToBottom()\n";
     int yStart = tile->getYStart();
     int yEnd = tile->getYEnd();
     int xStart = tile->getXStart();
@@ -495,12 +521,13 @@ void VerticalTilePlane::shrinkTileToBottom(Tile *tile, Tile *insertedTile) {
     sortedEmptyTiles->insert(tile);
 
     // Left side
-    Tile *currentTile = tile->getBl();
-    while (currentTile->getYEnd() <= y) {
-        currentTile = currentTile->getRt();
-    }
+    Tile *currentTile;
     // Update insertedTile if insertedTile->xStart == xStart.
     if (insertedTile->getXStart() == xStart) {
+        currentTile = tile->getBl();
+        while (currentTile->getYEnd() <= y) {
+            currentTile = currentTile->getRt();
+        }
         insertedTile->setBl(currentTile);
         insertedTile->setLb(tile);
         while (currentTile->getYEnd() <= yEnd) {
@@ -522,8 +549,10 @@ void VerticalTilePlane::shrinkTileToBottom(Tile *tile, Tile *insertedTile) {
         tile->setRt(insertedTile);
     } else {
         while (currentTile->getYStart() >= y) {
+            //currentTile->print();
             currentTile = currentTile->getLb();
         }
+        //currentTile->print();
         tile->setTr(currentTile);
         tile->setRt(insertedTile);
     }
@@ -553,7 +582,7 @@ void VerticalTilePlane::coverTileWithSameHeightTile(Tile *tile, Tile *insertedTi
     }
     if (insertedTile->getXEnd() == xEnd) {
         insertedTile->setRt(rt);
-        // Top side
+        // Right side
         insertedTile->setTr(tr);
         currentTile = tr;
         while (currentTile->getYStart() >= yStart) {
@@ -580,11 +609,10 @@ void VerticalTilePlane::coverTileWithSameHeightTile(Tile *tile, Tile *insertedTi
 }
 
 void VerticalTilePlane::removeEmptyTile(Tile *tile) {
+    currentlyRemovedTiles->push_back(tile);
     // Sort.
     //sortedEmptyTiles->erase(sortedEmptyTiles->find(tile));
     sortedEmptyTiles->erase(tile);
-
-    delete tile;
 }
 
 void VerticalTilePlane::mergeTileWithLeftTile(Tile *tile, Tile *leftTile) {

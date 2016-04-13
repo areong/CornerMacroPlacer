@@ -53,6 +53,11 @@ public:
     Tile *getEmptyTileWithSmallestHeight();
 
 protected:
+    /*
+    Store Tiles removed by removeEmptyTile().
+    They are deleted at the end of placeSolidTile().
+    */
+    std::vector<Tile *> *currentlyRemovedTiles;
     //// Empty Tiles sorted by height.
     //std::set<Tile *, CompareTileHeight> *sortedEmptyTiles;
     // Temporary
@@ -128,7 +133,7 @@ protected:
     */
     virtual void coverTileWithSameHeightTile(Tile *tile, Tile *insertedTile);
     /*
-    Delete tile.
+    Collect to be deleted Tiles.
     The method can be overriden.
         Update tiles sorted list in CornerVerticalTilePlane.
     Used in placeSolidTile() after coverTileWithSameHeightTile().

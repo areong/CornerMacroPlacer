@@ -17,6 +17,8 @@ Corner::Corner(int x, int y, int direction, bool isType1, bool isGapOnHorizontal
     gapSize = 0;
     previousWidth = 0;
     previousHeight = 0;
+
+    removedFromQuadtree = false;
 }
 
 Corner::~Corner() {
@@ -39,6 +41,10 @@ Tile *Corner::getVerticalTile() {
     return verticalTile;
 }
 
+int Corner::getDirection() {
+    return direction;
+}
+
 void Corner::setType(bool isType1) {
     type1 = isType1;
 }
@@ -49,6 +55,10 @@ bool Corner::isType0() {
 
 bool Corner::isType1() {
     return type1;
+}
+
+bool Corner::isGapOnHorizontalSide() {
+    return gapOnHorizontalSide;
 }
 
 int Corner::getX() {
@@ -77,11 +87,11 @@ void Corner::calculateWidthAndHeight() {
                 gapSize = horizontalTile->getBlOpenWidth();
                 break;
             case 1:
-                height = y - verticalTile->getYStart();
+                height = verticalTile->getYEnd() - y;
                 gapSize = horizontalTile->getBrOpenWidth();
                 break;
             case 2:
-                height = verticalTile->getYEnd() - y;
+                height = y - verticalTile->getYStart();
                 gapSize = horizontalTile->getTlOpenWidth();
                 break;
             case 3:
@@ -147,8 +157,16 @@ int Corner::getYForQuadtree() {
     return previousHeight;
 }
 
+void Corner::setRemovedFromQuadtree() {
+    removedFromQuadtree = true;
+}
+
+bool Corner::isRemovedFromQuadtree() {
+    return removedFromQuadtree;
+}
+
 void Corner::print() {
-    std::cout << "(" << x << ",\t" << y << ",\t" << direction << ",\t" << type1 << ",\t" << gapOnHorizontalSide << ")\n";
+    std::cout << "(" << x << ",\t" << y << ",\t" << width << ",\t" << height << ",\t" << direction << ",\t" << type1 << ",\t" << gapOnHorizontalSide << ")\n";
 }
 
 void Corner::printWidthAndHeight() {

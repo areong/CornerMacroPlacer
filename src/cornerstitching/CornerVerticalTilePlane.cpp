@@ -3,6 +3,8 @@
 #include "cornerstitching/Corner.h"
 #include "cornerstitching/Tile.h"
 
+#include <iostream>
+
 CornerVerticalTilePlane::CornerVerticalTilePlane(int xStart, int yStart, int xEnd, int yEnd) : VerticalTilePlane(xStart, yStart, xEnd, yEnd) {
     cornerHorizontalTilePlane = 0;
     currentStartHorizontalTile = 0;
@@ -24,6 +26,10 @@ CornerVerticalTilePlane::CornerVerticalTilePlane(int xStart, int yStart, int xEn
     currentlyCreatedCorners->push_back(centerTile->createTlCorner());
     currentlyCreatedCorners->push_back(centerTile->createBrCorner());
     currentlyCreatedCorners->push_back(centerTile->createTrCorner());
+    centerTile->getBlCorner()->setVerticalTile(centerTile);
+    centerTile->getTlCorner()->setVerticalTile(centerTile);
+    centerTile->getBrCorner()->setVerticalTile(centerTile);
+    centerTile->getTrCorner()->setVerticalTile(centerTile);
 }
 
 CornerVerticalTilePlane::~CornerVerticalTilePlane() {
@@ -51,7 +57,9 @@ void CornerVerticalTilePlane::placeSolidTile(Tile *tile, Tile *startTile) {
     currentlyDidSplitStartTile = false;
     currentlyDidSplitEndTile = false;
 
+    std::cout << "VerticalTilePlane::placeSolidTile()\n";
     VerticalTilePlane::placeSolidTile(tile, startTile);
+    std::cout << "VerticalTilePlane::placeSolidTile() end\n";
 
     // Modify tile->bl and tile->tr.
     Tile *bl = tile->getBl();
@@ -68,12 +76,15 @@ void CornerVerticalTilePlane::placeSolidTile(Tile *tile, Tile *startTile) {
     }
 
     // bl
+    std::cout << "bl\n";
     if (currentlyDidSplitStartTile) {
         // Create right Corners for bl.
         bl->checkRightBlocked();
         Corner *brCorner = bl->createBrCorner();
         Corner *trCorner = bl->createTrCorner();
-        horizontalTile = cornerHorizontalTilePlane->findTile(brCorner->getX() - 1, trCorner->getY(), horizontalTile);
+        brCorner->setVerticalTile(bl);
+        trCorner->setVerticalTile(bl);
+        horizontalTile = cornerHorizontalTilePlane->findTile(brCorner->getX() - 1, brCorner->getY(), horizontalTile);
         brCorner->setHorizontalTile(horizontalTile);
         horizontalTile = cornerHorizontalTilePlane->findTile(trCorner->getX() - 1, trCorner->getY() - 1, horizontalTile);
         trCorner->setHorizontalTile(horizontalTile);
@@ -86,7 +97,9 @@ void CornerVerticalTilePlane::placeSolidTile(Tile *tile, Tile *startTile) {
             Corner *brCorner = bl->createBrCorner();
             Corner *trCorner = bl->createTrCorner();
             if (brCorner != 0) {
-                horizontalTile = cornerHorizontalTilePlane->findTile(brCorner->getX() - 1, trCorner->getY(), horizontalTile);
+                brCorner->setVerticalTile(bl);
+                trCorner->setVerticalTile(bl);
+                horizontalTile = cornerHorizontalTilePlane->findTile(brCorner->getX() - 1, brCorner->getY(), horizontalTile);
                 brCorner->setHorizontalTile(horizontalTile);
                 horizontalTile = cornerHorizontalTilePlane->findTile(trCorner->getX() - 1, trCorner->getY() - 1, horizontalTile);
                 trCorner->setHorizontalTile(horizontalTile);
@@ -108,6 +121,8 @@ void CornerVerticalTilePlane::placeSolidTile(Tile *tile, Tile *startTile) {
                     currentTile->checkRightBlocked();
                     Corner *brCorner = currentTile->createBrCorner();
                     Corner *trCorner = currentTile->createTrCorner();
+                    brCorner->setVerticalTile(currentTile);
+                    trCorner->setVerticalTile(currentTile);
                     horizontalTile = cornerHorizontalTilePlane->findTile(brCorner->getX() - 1, brCorner->getY(), horizontalTile);
                     brCorner->setHorizontalTile(horizontalTile);
                     horizontalTile = cornerHorizontalTilePlane->findTile(trCorner->getX() - 1, trCorner->getY() - 1, horizontalTile);
@@ -123,6 +138,8 @@ void CornerVerticalTilePlane::placeSolidTile(Tile *tile, Tile *startTile) {
                 Corner *brCorner = currentTile->createBrCorner();
                 Corner *trCorner = currentTile->createTrCorner();
                 if (brCorner != 0) {
+                    brCorner->setVerticalTile(currentTile);
+                    trCorner->setVerticalTile(currentTile);
                     horizontalTile = cornerHorizontalTilePlane->findTile(brCorner->getX() - 1, brCorner->getY(), horizontalTile);
                     brCorner->setHorizontalTile(horizontalTile);
                     horizontalTile = cornerHorizontalTilePlane->findTile(trCorner->getX() - 1, trCorner->getY() - 1, horizontalTile);
@@ -138,24 +155,37 @@ void CornerVerticalTilePlane::placeSolidTile(Tile *tile, Tile *startTile) {
         }
     }
     // tr
+    std::cout << "tr\n";
     if (currentlyDidSplitEndTile) {
+        std::cout << "part 1\n";
         // Create left Corners for tr.
+        tr->print();
         tr->checkLeftBlocked();
+        std::cout << "createTlCorner()\n";
         Corner *tlCorner = tr->createTlCorner();
+        std::cout << "createBlCorner()\n";
         Corner *blCorner = tr->createBlCorner();
+        std::cout << (tlCorner != 0) << " " << (blCorner != 0) << "\n";
+        tlCorner->setVerticalTile(tr);
+        blCorner->setVerticalTile(tr);
+        std::cout << "tlCorner horizontalTile\n";
         horizontalTile = cornerHorizontalTilePlane->findTile(tlCorner->getX(), tlCorner->getY() - 1, horizontalTile);
         tlCorner->setHorizontalTile(horizontalTile);
+        std::cout << "blCorner horizontalTile\n";
         horizontalTile = cornerHorizontalTilePlane->findTile(blCorner->getX(), blCorner->getY(), horizontalTile);
         blCorner->setHorizontalTile(horizontalTile);
         currentlyCreatedCorners->push_back(tlCorner);
         currentlyCreatedCorners->push_back(blCorner);
     } else {
         if (tr->isEmpty()) {
+            std::cout << "part 2\n";
             // Create Corners for tr.
             tr->checkLeftBlocked();
             Corner *tlCorner = tr->createTlCorner();
             Corner *blCorner = tr->createBlCorner();
             if (blCorner != 0) {
+                tlCorner->setVerticalTile(tr);
+                blCorner->setVerticalTile(tr);
                 horizontalTile = cornerHorizontalTilePlane->findTile(tlCorner->getX(), tlCorner->getY() - 1, horizontalTile);
                 tlCorner->setHorizontalTile(horizontalTile);
                 horizontalTile = cornerHorizontalTilePlane->findTile(blCorner->getX(), blCorner->getY(), horizontalTile);
@@ -173,11 +203,14 @@ void CornerVerticalTilePlane::placeSolidTile(Tile *tile, Tile *startTile) {
             // For tile's other adjacent right Tiles, create left Corners.
             Tile *currentTile = tr->getLb();
             while (currentTile->getYStart() >= tileYStart) {
+                std::cout << "part 3\n";
                 if (currentTile->isEmpty()) {
                     // Create left Corners.
                     currentTile->checkLeftBlocked();
                     Corner *tlCorner = currentTile->createTlCorner();
                     Corner *blCorner = currentTile->createBlCorner();
+                    tlCorner->setVerticalTile(currentTile);
+                    blCorner->setVerticalTile(currentTile);
                     horizontalTile = cornerHorizontalTilePlane->findTile(tlCorner->getX(), tlCorner->getY() - 1, horizontalTile);
                     tlCorner->setHorizontalTile(horizontalTile);
                     horizontalTile = cornerHorizontalTilePlane->findTile(blCorner->getX(), blCorner->getY(), horizontalTile);
@@ -188,11 +221,14 @@ void CornerVerticalTilePlane::placeSolidTile(Tile *tile, Tile *startTile) {
                 currentTile = currentTile->getLb();
             }
             if (currentTile->isEmpty() && currentTile->getYEnd() > tileYStart) {
+                std::cout << "part 4\n";
                 // Create Corners for currentTile.
                 currentTile->checkLeftBlocked();
                 Corner *tlCorner = currentTile->createTlCorner();
                 Corner *blCorner = currentTile->createBlCorner();
                 if (blCorner != 0) {
+                    tlCorner->setVerticalTile(currentTile);
+                    blCorner->setVerticalTile(currentTile);
                     horizontalTile = cornerHorizontalTilePlane->findTile(tlCorner->getX(), tlCorner->getY() - 1, horizontalTile);
                     tlCorner->setHorizontalTile(horizontalTile);
                     horizontalTile = cornerHorizontalTilePlane->findTile(blCorner->getX(), blCorner->getY(), horizontalTile);
@@ -206,6 +242,19 @@ void CornerVerticalTilePlane::placeSolidTile(Tile *tile, Tile *startTile) {
                 }
             }
         }
+    }
+    std::cout << "end\n";
+}
+
+void CornerVerticalTilePlane::calculateCurrentCornersWidthAndHeight() {
+    for (int i = 0; i < currentlyCreatedCorners->size(); ++i) {
+        currentlyCreatedCorners->at(i)->calculateWidthAndHeight();
+    }
+    for (int i = 0; i < currentlyModifiedVerticalCorners->size(); ++i) {
+        currentlyModifiedVerticalCorners->at(i)->calculateWidthAndHeight();
+    }
+    for (int i = 0; i < currentlyModifiedHorizontalCorners->size(); ++i) {
+        currentlyModifiedHorizontalCorners->at(i)->calculateWidthAndHeight();
     }
 }
 
@@ -234,6 +283,7 @@ void CornerVerticalTilePlane::deleteCurrentlyRemovedCorners() {
 // private
 
 Tile *CornerVerticalTilePlane::splitStartTileHorizontally(Tile *tile, int x) {
+    std::cout << "splitStartTileHorizontally()\n";
     Tile *leftTile = VerticalTilePlane::splitStartTileHorizontally(tile, x);
 
     // Copy blockage attributes and move Corners to the new Tile.
@@ -241,8 +291,16 @@ Tile *CornerVerticalTilePlane::splitStartTileHorizontally(Tile *tile, int x) {
     leftTile->setLeftBlocked(tile);
     leftTile->setBottomBlocked(true, true);
     leftTile->setTopBlocked(true, true);
-    leftTile->setBlCorner(tile->removeBlCorner());
-    leftTile->setTlCorner(tile->removeTlCorner());
+    Corner *blCorner = tile->removeBlCorner();
+    Corner *tlCorner = tile->removeTlCorner();
+    if (blCorner != 0) {
+        blCorner->setVerticalTile(leftTile);
+        leftTile->setBlCorner(blCorner);
+    }
+    if (tlCorner != 0) {
+        tlCorner->setVerticalTile(leftTile);
+        leftTile->setTlCorner(tlCorner);
+    }
 
     // Link Corners from horizontalTilePlane to leftTile.
     linkCornersFromHorizontalTilePlaneToTile(leftTile);
@@ -261,8 +319,16 @@ Tile *CornerVerticalTilePlane::splitEndTileHorizontally(Tile *tile, int x, Tile 
     // because they will be updated later in split*(), separate*() or shrink*() if necessary.
     leftTile->setBottomBlocked(true, true);
     leftTile->setTopBlocked(true, true);
-    leftTile->setBlCorner(tile->removeBlCorner());
-    leftTile->setTlCorner(tile->removeTlCorner());
+    Corner *blCorner = tile->removeBlCorner();
+    Corner *tlCorner = tile->removeTlCorner();
+    if (blCorner != 0) {
+        blCorner->setVerticalTile(leftTile);
+        leftTile->setBlCorner(blCorner);
+    }
+    if (tlCorner != 0) {
+        tlCorner->setVerticalTile(leftTile);
+        leftTile->setTlCorner(tlCorner);
+    }
 
     // Link Corners from horizontalTilePlane to leftTile.
     linkCornersFromHorizontalTilePlaneToTile(leftTile);
@@ -279,8 +345,16 @@ Tile *CornerVerticalTilePlane::separateTileVertically(Tile *tile, Tile *inserted
     // Split Corners.
     bottomTile->setBottomBlocked(true, true);
     bottomTile->setTopBlocked(true, true);
-    bottomTile->setBlCorner(tile->removeBlCorner());
-    bottomTile->setBrCorner(tile->removeBrCorner());
+    Corner *blCorner = tile->removeBlCorner();
+    Corner *brCorner = tile->removeBrCorner();
+    if (blCorner != 0) {
+        blCorner->setVerticalTile(bottomTile);
+        bottomTile->setBlCorner(blCorner);
+    }
+    if (brCorner != 0) {
+        brCorner->setVerticalTile(bottomTile);
+        bottomTile->setBrCorner(brCorner);
+    }
 
     // Update blockage and create/remove Corners.
     createOrRemoveCornersForTile(bottomTile);
@@ -313,9 +387,11 @@ void CornerVerticalTilePlane::shrinkTileToTop(Tile *tile, Tile *insertedTile, Ti
 }
 
 void CornerVerticalTilePlane::shrinkTileToBottom(Tile *tile, Tile *insertedTile) {
+    std::cout << "shrinkTileToBottom()\n";
     VerticalTilePlane::shrinkTileToBottom(tile, insertedTile);
 
     // Remove top Corners.
+    std::cout << "remove top Corners\n";
     Corner *tlCorner = tile->removeTlCorner();
     Corner *trCorner = tile->removeTrCorner();
     if (tlCorner != 0) currentlyRemovedCorners->push_back(tlCorner);
@@ -329,6 +405,7 @@ void CornerVerticalTilePlane::shrinkTileToBottom(Tile *tile, Tile *insertedTile)
 }
 
 void CornerVerticalTilePlane::coverTileWithSameHeightTile(Tile *tile, Tile *insertedTile) {
+    std::cout << "coverTileWithSameHeightTile()\n";
     VerticalTilePlane::coverTileWithSameHeightTile(tile, insertedTile);
 
     // Remove Corners.
@@ -353,11 +430,22 @@ void CornerVerticalTilePlane::mergeTileWithLeftTile(Tile *tile, Tile *leftTile) 
     // The two Tiles has updated their Corners.
     // tile has no left Corner and leftTile has no right Corner.
     // Move Corners from leftTile to tile.
-    tile->setBlCorner(leftTile->removeBlCorner());
-    tile->setTlCorner(leftTile->removeTlCorner());
+    Corner *blCorner = leftTile->removeBlCorner();
+    Corner *tlCorner = leftTile->removeTlCorner();
+    if (blCorner != 0) {
+        blCorner->setVerticalTile(tile);
+        tile->setBlCorner(blCorner);
+    }
+    if (tlCorner != 0) {
+        tlCorner->setVerticalTile(tile);
+        tile->setTlCorner(tlCorner);
+    }
 
     // Copy blockage attributes.
     tile->setLeftBlocked(leftTile);
+
+    // Link Corners from horizontalTilePlane to tile.
+    linkCornersFromHorizontalTilePlaneToTile(tile);
 }
 
 void CornerVerticalTilePlane::linkCornersFromHorizontalTilePlaneToTile(Tile *tile) {
@@ -405,6 +493,7 @@ void CornerVerticalTilePlane::linkCornersFromHorizontalTilePlaneToTile(Tile *til
 }
 
 void CornerVerticalTilePlane::collectModifiedHorizontalCornersByBottomTile(Tile *tile) {
+    std::cout << "collectModifiedHorizontalCornersByBottomTile()\n";
     Corner *corner = tile->getTlCorner();   // Choose top Corner because traversal starts from top left.
     if (corner == 0) {
         corner = tile->getTrCorner();
@@ -479,9 +568,10 @@ void CornerVerticalTilePlane::collectModifiedHorizontalCornersByTopTile(Tile *ti
 }
 
 void CornerVerticalTilePlane::createOrRemoveCornersForTile(Tile *tile) {
+    std::cout << "createOrRemoveCornersForTile()\n";
     // Assume this method is only called by separateTileHorizontally(),
     // shrinkTileToRight() or shrinkTileToLeft().
-    // Thus tile's width has changed and its Corners are modified
+    // Thus tile's height has changed and its Corners are modified
     // if the Corners already exist.
     // When creating a new Corner, find the horizontalTile and set it to the Corner.
     // Before creating a new Corner, either bottom Corner or top Corner exists.
@@ -489,14 +579,17 @@ void CornerVerticalTilePlane::createOrRemoveCornersForTile(Tile *tile) {
         Corner *blCorner = tile->getBlCorner();
         Corner *tlCorner = tile->getTlCorner();
         if (blCorner != 0) {
+            std::cout << "blCorner != 0\n";
             Tile *horizontalTile = cornerHorizontalTilePlane->findTile(tile->getXEnd() - 1, tile->getYStart(), blCorner->getHorizontalTile());
             tlCorner = tile->createTlCorner();
+            tlCorner->setVerticalTile(tile);
             tlCorner->setHorizontalTile(horizontalTile);
             currentlyCreatedCorners->push_back(tlCorner);
             currentlyModifiedVerticalCorners->push_back(blCorner);
         } else {
             Tile *horizontalTile = cornerHorizontalTilePlane->findTile(tile->getXStart(), tile->getYStart(), tlCorner->getHorizontalTile());
             blCorner = tile->createBlCorner();
+            blCorner->setVerticalTile(tile);
             blCorner->setHorizontalTile(horizontalTile);
             currentlyCreatedCorners->push_back(blCorner);
             currentlyModifiedVerticalCorners->push_back(tlCorner);
@@ -511,14 +604,25 @@ void CornerVerticalTilePlane::createOrRemoveCornersForTile(Tile *tile) {
         Corner *brCorner = tile->getBrCorner();
         Corner *trCorner = tile->getTrCorner();
         if (brCorner != 0) {
+            std::cout << "brCorner != 0\n";
+            tile->print();
+            brCorner->print();
+            brCorner->getVerticalTile()->print();
+            brCorner->getHorizontalTile()->print();
             Tile *horizontalTile = cornerHorizontalTilePlane->findTile(tile->getXEnd() - 1, tile->getYEnd() - 1, brCorner->getHorizontalTile());
+            std::cout << "createTrCorner()\n";
             trCorner = tile->createTrCorner();
+            std::cout << "setVerticalTile()\n";
+            trCorner->setVerticalTile(tile);
+            std::cout << "setHorizontalTile()\n";
             trCorner->setHorizontalTile(horizontalTile);
             currentlyCreatedCorners->push_back(trCorner);
             currentlyModifiedVerticalCorners->push_back(brCorner);
+            std::cout << "brCorner != 0 end\n";
         } else {
             Tile *horizontalTile = cornerHorizontalTilePlane->findTile(tile->getXEnd() - 1, tile->getYStart(), trCorner->getHorizontalTile());
             brCorner = tile->createBrCorner();
+            brCorner->setVerticalTile(tile);
             brCorner->setHorizontalTile(horizontalTile);
             currentlyCreatedCorners->push_back(brCorner);
             currentlyModifiedVerticalCorners->push_back(trCorner);

@@ -11,8 +11,6 @@
 
 #include <iostream>
 
-void displayTilePlane(TilePlane *tilePlane);
-
 void testTilePlane_memoryLeak() {
     for (int iLoop = 0; iLoop < 100000; ++iLoop) {
         CornerHorizontalTilePlane *cornerHorizontalTilePlane = new CornerHorizontalTilePlane(0, 0, 100, 100);
@@ -63,23 +61,76 @@ void testTilePlane_CornerHorizontalTilePlane() {
     std::vector<Tile *> *horizontalTiles = new std::vector<Tile *>();
     std::vector<Tile *> *verticalTiles = new std::vector<Tile *>();
 
-    horizontalTiles->push_back(new Tile(0, 40, 50, 90, true));
-    horizontalTiles->push_back(new Tile(80, 50, 90, 100, true));
-    horizontalTiles->push_back(new Tile(60, 40, 70, 60, true));
-    horizontalTiles->push_back(new Tile(50, 10, 100, 30, true));
+    //horizontalTiles->push_back(new Tile(0, 40, 50, 90, true));
+    //horizontalTiles->push_back(new Tile(80, 50, 90, 100, true));
+    //horizontalTiles->push_back(new Tile(60, 40, 70, 60, true));
+    //horizontalTiles->push_back(new Tile(50, 10, 100, 30, true));
     //horizontalTiles->push_back(new Tile(80, 20, 100, 90, true));
     //horizontalTiles->push_back(new Tile(40, 0, 60, 20, true));
     //horizontalTiles->push_back(new Tile(40, 20, 80, 60, true));
-    verticalTiles->push_back(new Tile(0, 40, 50, 90, true));
-    verticalTiles->push_back(new Tile(80, 50, 90, 100, true));
-    verticalTiles->push_back(new Tile(60, 40, 70, 60, true));
-    verticalTiles->push_back(new Tile(50, 10, 100, 30, true));
+    
+    //horizontalTiles->push_back(new Tile(60, 90, 100, 100, true));
+    //horizontalTiles->push_back(new Tile(0, 0, 60, 20, true));
+    //horizontalTiles->push_back(new Tile(30, 70, 60, 100, true));
+
+    //horizontalTiles->push_back(new Tile(0, 0, 60, 10, true));
+    //horizontalTiles->push_back(new Tile(60, 0, 80, 70, true));
+    //horizontalTiles->push_back(new Tile(70, 70, 100, 100, true));
+
+    //horizontalTiles->push_back(new Tile(40, 0, 100, 10, true));
+    //horizontalTiles->push_back(new Tile(0, 30, 20, 100, true));
+    //horizontalTiles->push_back(new Tile(0, 0, 30, 30, true));
+
+    //horizontalTiles->push_back(new Tile(0, 0, 30, 15, true));
+    //horizontalTiles->push_back(new Tile(0, 70, 45, 100, true));
+    //horizontalTiles->push_back(new Tile(80, 0, 100, 45, true));
+    //horizontalTiles->push_back(new Tile(95, 55, 100, 100, true));
+    //horizontalTiles->push_back(new Tile(0, 40, 40, 70, true));
+    //horizontalTiles->push_back(new Tile(45, 50, 95, 100, true));
+    //horizontalTiles->push_back(new Tile(45, 0, 80, 35, true));
+
+    horizontalTiles->push_back(new Tile(85, 0, 100, 25, true));
+    horizontalTiles->push_back(new Tile(0, 70, 50, 100, true));
+    horizontalTiles->push_back(new Tile(0, 0, 45, 25, true));
+    horizontalTiles->push_back(new Tile(0, 65, 50, 70, true));
+
+    
+    //verticalTiles->push_back(new Tile(0, 40, 50, 90, true));
+    //verticalTiles->push_back(new Tile(80, 50, 90, 100, true));
+    //verticalTiles->push_back(new Tile(60, 40, 70, 60, true));
+    //verticalTiles->push_back(new Tile(50, 10, 100, 30, true));
     //verticalTiles->push_back(new Tile(80, 20, 100, 90, true));
     //verticalTiles->push_back(new Tile(40, 0, 60, 20, true));
     //verticalTiles->push_back(new Tile(40, 20, 80, 60, true));
+    
+    //verticalTiles->push_back(new Tile(60, 90, 100, 100, true));
+    //verticalTiles->push_back(new Tile(0, 0, 60, 20, true));
+    //verticalTiles->push_back(new Tile(30, 70, 60, 100, true));
+
+    //verticalTiles->push_back(new Tile(0, 0, 60, 10, true));
+    //verticalTiles->push_back(new Tile(60, 0, 80, 70, true));
+    //verticalTiles->push_back(new Tile(70, 70, 100, 100, true));
+
+    //verticalTiles->push_back(new Tile(40, 0, 100, 10, true));
+    //verticalTiles->push_back(new Tile(0, 30, 20, 100, true));
+    //verticalTiles->push_back(new Tile(0, 0, 30, 30, true));
+
+    //verticalTiles->push_back(new Tile(0, 0, 30, 15, true));
+    //verticalTiles->push_back(new Tile(0, 70, 45, 100, true));
+    //verticalTiles->push_back(new Tile(80, 0, 100, 45, true));
+    //verticalTiles->push_back(new Tile(95, 55, 100, 100, true));
+    //verticalTiles->push_back(new Tile(0, 40, 40, 70, true));
+    //verticalTiles->push_back(new Tile(45, 50, 95, 100, true));
+    //verticalTiles->push_back(new Tile(45, 0, 80, 35, true));
+
+    verticalTiles->push_back(new Tile(85, 0, 100, 25, true));
+    verticalTiles->push_back(new Tile(0, 70, 50, 100, true));
+    verticalTiles->push_back(new Tile(0, 0, 45, 25, true));
+    verticalTiles->push_back(new Tile(0, 65, 50, 70, true));
     for (int i = 0; i < horizontalTiles->size(); ++i) {
         std::cout << "tile " << i << "\n";
 
+        std::cout << "place horizontal\n";
         Tile *startHorizontalTile = cornerHorizontalTilePlane->findTile(horizontalTiles->at(i)->getXStart(),
             horizontalTiles->at(i)->getYStart(), cornerHorizontalTilePlane->getTopLeftMostTile());
         Tile *startVerticalTile = cornerVerticalTilePlane->findTile(verticalTiles->at(i)->getXStart(),
@@ -88,48 +139,101 @@ void testTilePlane_CornerHorizontalTilePlane() {
         //cornerHorizontalTilePlane->placeSolidTile(horizontalTiles->at(i),startHorizontalTile);
         cornerHorizontalTilePlane->placeSolidTileGivenBothStartTiles(horizontalTiles->at(i),startHorizontalTile, startVerticalTile);
         
+        std::cout << "place vertical\n";
         startHorizontalTile = horizontalTiles->at(i);   // The horizontalTile is already placed.
         startVerticalTile = cornerVerticalTilePlane->findTile(verticalTiles->at(i)->getXStart(),
             verticalTiles->at(i)->getYStart(), cornerVerticalTilePlane->getTopLeftMostTile());
+        startVerticalTile->print();
 
         //cornerVerticalTilePlane->placeSolidTile(verticalTiles->at(i), startVerticalTile);
         cornerVerticalTilePlane->placeSolidTileGivenBothStartTiles(verticalTiles->at(i), startVerticalTile, startHorizontalTile);
+        std::cout << "placed\n";
 
-        //std::cout << "modified horizontal Corners:\n";
-        //for (int j = 0; j < cornerHorizontalTilePlane->getCurrentlyModifiedHorizontalCorners()->size(); ++j) {
-        //    cornerHorizontalTilePlane->getCurrentlyModifiedHorizontalCorners()->at(j)->print();
-        //}
-        //std::cout << "modified vertical Corners:\n";
-        //for (int j = 0; j < cornerHorizontalTilePlane->getCurrentlyModifiedVerticalCorners()->size(); ++j) {
-        //    cornerHorizontalTilePlane->getCurrentlyModifiedVerticalCorners()->at(j)->print();   
-        //}
-        //std::cout << "modified vertical Corners:\n";
-        //for (int j = 0; j < cornerVerticalTilePlane->getCurrentlyModifiedVerticalCorners()->size(); ++j) {
-        //    cornerVerticalTilePlane->getCurrentlyModifiedVerticalCorners()->at(j)->print();
-        //}
-        //std::cout << "modified horizontal Corners:\n";
-        //for (int j = 0; j < cornerVerticalTilePlane->getCurrentlyModifiedHorizontalCorners()->size(); ++j) {
-        //    cornerVerticalTilePlane->getCurrentlyModifiedHorizontalCorners()->at(j)->print();
-        //}
-        //std::cout << "created Corners:\n";
-        //for (int j = 0; j < cornerHorizontalTilePlane->getCurrentlyCreatedCorners()->size(); ++j) {
-        //    cornerHorizontalTilePlane->getCurrentlyCreatedCorners()->at(j)->print();
-        //}
-        //std::cout << "removed Corners:\n";
-        //for (int j = 0; j < cornerHorizontalTilePlane->getCurrentlyRemovedCorners()->size(); ++j) {
-        //    cornerHorizontalTilePlane->getCurrentlyRemovedCorners()->at(j)->print();
-        //}
-        //std::cout << "created Corners:\n";
-        //for (int j = 0; j < cornerVerticalTilePlane->getCurrentlyCreatedCorners()->size(); ++j) {
-        //    cornerVerticalTilePlane->getCurrentlyCreatedCorners()->at(j)->print();
-        //}
-        //std::cout << "removed Corners:\n";
-        //for (int j = 0; j < cornerVerticalTilePlane->getCurrentlyRemovedCorners()->size(); ++j) {
-        //    cornerVerticalTilePlane->getCurrentlyRemovedCorners()->at(j)->print();
-        //}
+        std::vector<Tile *> *allHorizontalTiles = cornerHorizontalTilePlane->collectAllTiles();
+        std::vector<Tile *> *allVerticalTiles = cornerVerticalTilePlane->collectAllTiles();
+        std::cout << "horizontal Corners:\n";
+        for (int i = 0; i < allHorizontalTiles->size(); ++i) {
+            Tile *tile = allHorizontalTiles->at(i);
+            if (tile->getBlCorner() != 0) tile->getBlCorner()->print();
+            if (tile->getBrCorner() != 0) tile->getBrCorner()->print();
+            if (tile->getTlCorner() != 0) tile->getTlCorner()->print();
+            if (tile->getTrCorner() != 0) tile->getTrCorner()->print();
+            Corner *brCorner = tile->getBrCorner();
+            if (brCorner != 0 && brCorner->getX() == 45 && brCorner->getY() == 0) {
+                if (brCorner->getHorizontalTile() != 0) {
+                    brCorner->getHorizontalTile()->print();
+                } else {
+                    std::cout << "no horizontalTile\n";
+                }
+                if (brCorner->getVerticalTile() != 0) {
+                    brCorner->getVerticalTile()->print();
+                } else {
+                    std::cout << "no verticalTile\n";
+                }
+                std::cout << cornerHorizontalTilePlane->checkAreaEmptyCheckFromBottom(30, 0, 45, 50, brCorner->getHorizontalTile()) << "\n";
+            }
+        }
+        std::cout << "vertical Corners:\n";
+        for (int i = 0; i < allVerticalTiles->size(); ++i) {
+            Tile *tile = allVerticalTiles->at(i);
+            if (tile->getBlCorner() != 0) tile->getBlCorner()->print();
+            if (tile->getBrCorner() != 0) tile->getBrCorner()->print();
+            if (tile->getTlCorner() != 0) tile->getTlCorner()->print();
+            if (tile->getTrCorner() != 0) tile->getTrCorner()->print();
+            Corner *brCorner = tile->getBrCorner();
+            if (brCorner != 0 && brCorner->getX() == 45 && brCorner->getY() == 0) {
+                if (brCorner->getHorizontalTile() != 0) {
+                    brCorner->getHorizontalTile()->print();
+                } else {
+                    std::cout << "no horizontalTile\n";
+                }
+                if (brCorner->getVerticalTile() != 0) {
+                    brCorner->getVerticalTile()->print();
+                } else {
+                    std::cout << "no verticalTile\n";
+                }
+                std::cout << cornerVerticalTilePlane->checkAreaEmptyCheckFromRight(30, 0, 45, 50, brCorner->getVerticalTile()) << "\n";
+            }
+        }
+        delete allHorizontalTiles;
+        delete allVerticalTiles;
+
+        std::cout << "modified horizontal Corners:\n";
+        for (int j = 0; j < cornerHorizontalTilePlane->getCurrentlyModifiedHorizontalCorners()->size(); ++j) {
+            cornerHorizontalTilePlane->getCurrentlyModifiedHorizontalCorners()->at(j)->print();
+        }
+        std::cout << "modified vertical Corners:\n";
+        for (int j = 0; j < cornerHorizontalTilePlane->getCurrentlyModifiedVerticalCorners()->size(); ++j) {
+            cornerHorizontalTilePlane->getCurrentlyModifiedVerticalCorners()->at(j)->print();   
+        }
+        std::cout << "modified vertical Corners:\n";
+        for (int j = 0; j < cornerVerticalTilePlane->getCurrentlyModifiedVerticalCorners()->size(); ++j) {
+            cornerVerticalTilePlane->getCurrentlyModifiedVerticalCorners()->at(j)->print();
+        }
+        std::cout << "modified horizontal Corners:\n";
+        for (int j = 0; j < cornerVerticalTilePlane->getCurrentlyModifiedHorizontalCorners()->size(); ++j) {
+            cornerVerticalTilePlane->getCurrentlyModifiedHorizontalCorners()->at(j)->print();
+        }
+        std::cout << "created Corners:\n";
+        for (int j = 0; j < cornerHorizontalTilePlane->getCurrentlyCreatedCorners()->size(); ++j) {
+            cornerHorizontalTilePlane->getCurrentlyCreatedCorners()->at(j)->print();
+        }
+        std::cout << "removed Corners:\n";
+        for (int j = 0; j < cornerHorizontalTilePlane->getCurrentlyRemovedCorners()->size(); ++j) {
+            cornerHorizontalTilePlane->getCurrentlyRemovedCorners()->at(j)->print();
+        }
+        std::cout << "created Corners:\n";
+        for (int j = 0; j < cornerVerticalTilePlane->getCurrentlyCreatedCorners()->size(); ++j) {
+            cornerVerticalTilePlane->getCurrentlyCreatedCorners()->at(j)->print();
+        }
+        std::cout << "removed Corners:\n";
+        for (int j = 0; j < cornerVerticalTilePlane->getCurrentlyRemovedCorners()->size(); ++j) {
+            cornerVerticalTilePlane->getCurrentlyRemovedCorners()->at(j)->print();
+        }
 
         cornerHorizontalTilePlane->deleteCurrentlyRemovedCorners();
         cornerVerticalTilePlane->deleteCurrentlyRemovedCorners();
+
     }
 
     displayTilePlane(cornerHorizontalTilePlane);
@@ -137,19 +241,39 @@ void testTilePlane_CornerHorizontalTilePlane() {
 }
 
 void testTilePlane_HorizontalTilePlane() {
-    //HorizontalTilePlane *tilePlane = new HorizontalTilePlane(0, 0, 100, 100);
-    VerticalTilePlane *tilePlane = new VerticalTilePlane(0, 0, 100, 100);
+    HorizontalTilePlane *tilePlane = new HorizontalTilePlane(0, 0, 100, 100);
+    //VerticalTilePlane *tilePlane = new VerticalTilePlane(0, 0, 100, 100);
     std::vector<Tile *> *tiles = new std::vector<Tile *>();
-    tiles->push_back(new Tile(0, 40, 50, 90, true));
-    tiles->push_back(new Tile(70, 50, 90, 100, true));
-    tiles->push_back(new Tile(60, 40, 70, 60, true));
-    tiles->push_back(new Tile(90, 40, 100, 100, true));
+    //tiles->push_back(new Tile(0, 40, 50, 90, true));
+    //tiles->push_back(new Tile(70, 50, 90, 100, true));
+    //tiles->push_back(new Tile(60, 40, 70, 60, true));
+    //tiles->push_back(new Tile(90, 40, 100, 100, true));
     //tiles->push_back(new Tile(20, 0, 60, 30, true));
+
+    //tiles->push_back(new Tile(60, 90, 100, 100, true));
+    //tiles->push_back(new Tile(0, 0, 60, 20, true));
+    //tiles->push_back(new Tile(30, 70, 60, 100, true));
+
+    //tiles->push_back(new Tile(0, 0, 60, 10, true));
+    //tiles->push_back(new Tile(60, 0, 80, 70, true));
+    //tiles->push_back(new Tile(70, 70, 100, 100, true));
+
+    //tiles->push_back(new Tile(40, 0, 100, 10, true));
+    //tiles->push_back(new Tile(0, 30, 20, 100, true));
+    //tiles->push_back(new Tile(0, 0, 30, 30, true));
+
+    //tiles->push_back(new Tile(0, 90, 60, 100, true));
+    //tiles->push_back(new Tile(80, 0, 100, 70, true));
+    //tiles->push_back(new Tile(60, 70, 90, 100, true));
+
+    tiles->push_back(new Tile(20, 0, 100, 90, true));
+    tiles->push_back(new Tile(0, 0, 10, 70, true));
+    //tiles->push_back(new Tile(90, 0, 100, 70, true));
     
     //std::cout << "initial smallest-width Tile: ";
     //tilePlane->getEmptyTileWithSmallestWidth()->print();
-    std::cout << "initial smallest-height Tile: ";
-    tilePlane->getEmptyTileWithSmallestHeight()->print();
+    //std::cout << "initial smallest-height Tile: ";
+    //tilePlane->getEmptyTileWithSmallestHeight()->print();
 
     for (int i = 0; i < tiles->size(); ++i) {
         std::cout << "tile " << i << "\n";
@@ -160,22 +284,29 @@ void testTilePlane_HorizontalTilePlane() {
 
         //std::cout << "\tsmallest-width Tile: ";
         //tilePlane->getEmptyTileWithSmallestWidth()->print();
-        std::cout << "\tsmallest-height Tile: ";
-        tilePlane->getEmptyTileWithSmallestHeight()->print();
+        //std::cout << "\tsmallest-height Tile: ";
+        //tilePlane->getEmptyTileWithSmallestHeight()->print();
     }
 
-    //bool isAreaEmpty = tilePlane->checkAreaEmptyCheckFromBottom(50, 30, 65, 100,
-    //    tilePlane->findTile(51, 31, tilePlane->getTopLeftMostTile()));
+    bool isAreaEmpty = tilePlane->checkAreaEmptyCheckFromTop(0, 60, 20, 100,
+        tilePlane->findTile(0, 100 - 1, tilePlane->getTopLeftMostTile()));
     //bool isAreaEmpty = tilePlane->checkAreaEmptyCheckFromLeft(0, 0, 65, 10,
     //    tilePlane->findTile(51, 31, tilePlane->getTopLeftMostTile()));
-    //std::cout << "isAreaEmpty: " << isAreaEmpty << "\n";
+    std::cout << "isAreaEmpty: " << isAreaEmpty << "\n";
+
+    std::vector<Tile *> *allTiles = tilePlane->collectAllTiles();
+
+    for (int i = 0; i < allTiles->size(); ++i) {
+        allTiles->at(i)->print();
+        allTiles->at(i)->printFourNeighbors();
+    }
 
     displayTilePlane(tilePlane);
 }
 
 struct CompareTileWidth {
     bool operator() (const Tile *tile1, const Tile *tile2) const {
-        return (tile1->getWidth() < tile2->getWidth());
+        return (tile1->getPreviousWidth() < tile2->getPreviousWidth());
     }
 };
 
@@ -210,7 +341,7 @@ void testTilePlane_sortTiles() {
     //}
     sortedEmptyTiles->insert(tiles->at(0));
     sortedEmptyTiles->insert(tiles->at(1));
-    //sortedEmptyTiles->insert(tiles->at(2));
+    sortedEmptyTiles->insert(tiles->at(2));
     std::cout << (sortedEmptyTiles->find(tiles->at(2)) == sortedEmptyTiles->end()) << "\n";
     std::cout << (tiles->at(0) == tiles->at(2)) << "\n";
     std::cout << sortedEmptyTiles->size() << "\n";
@@ -234,9 +365,9 @@ void testTilePlane_sortTiles() {
     std::set<Box *, CompareBoxWidth> *sortedBoxes = new std::set<Box *, CompareBoxWidth>();
     sortedBoxes->insert(boxes->at(0));
     sortedBoxes->insert(boxes->at(1));
-    sortedBoxes->insert(boxes->at(1));
+    sortedBoxes->insert(boxes->at(2));
     std::cout << (sortedBoxes->find(boxes->at(2)) == sortedBoxes->end()) << "\n";
-    for (std::set<Box *, CompareTileWidth>::iterator it = sortedBoxes->begin(); it != sortedBoxes->end(); ++it) {
+    for (std::set<Box *, CompareBoxWidth>::iterator it = sortedBoxes->begin(); it != sortedBoxes->end(); ++it) {
         std::cout << (*it)->getWidth() << " ";
     }
     std::cout << "\n";

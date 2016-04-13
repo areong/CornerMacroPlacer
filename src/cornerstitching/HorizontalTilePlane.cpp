@@ -11,12 +11,14 @@
 //};
 
 HorizontalTilePlane::HorizontalTilePlane(int xStart, int yStart, int xEnd, int yEnd) : TilePlane(xStart, yStart, xEnd, yEnd) {
+    currentlyRemovedTiles = new std::vector<Tile *>();
     //sortedEmptyTiles = new std::set<Tile *, CompareTileWidth>();
     sortedEmptyTiles = new SortedTiles(true);
     sortedEmptyTiles->insert(getTopLeftMostTile());
 }
 
 HorizontalTilePlane::~HorizontalTilePlane() {
+    delete currentlyRemovedTiles;
     delete sortedEmptyTiles;
 }
 
@@ -62,7 +64,7 @@ bool HorizontalTilePlane::checkAreaEmptyCheckFromBottom(int xStart, int yStart, 
 }
 
 bool HorizontalTilePlane::checkAreaEmptyCheckFromTop(int xStart, int yStart, int xEnd, int yEnd, Tile *startTile) {
-    if (startTile->getXStart() < xStart) {
+    if (startTile->getXStart() > xStart) {
         return false;
     }
     Tile *currentTile = startTile;
@@ -238,6 +240,11 @@ void HorizontalTilePlane::placeSolidTile(Tile *tile, Tile *startTile) {
             currentTile = currentTile->getBl();   
         }
     }
+    // Delete removed Tiles.
+    for (int i = 0; i < currentlyRemovedTiles->size(); ++i) {
+        delete currentlyRemovedTiles->at(i);
+    }
+    currentlyRemovedTiles->clear();
 }
 
 Tile *HorizontalTilePlane::getEmptyTileWithSmallestWidth() {
@@ -283,21 +290,16 @@ Tile *HorizontalTilePlane::splitStartTileVertically(Tile *tile, int y) {
     while (currentTile->getXEnd() <= xEnd) {
         currentTile->setRt(bottomTile);
         currentTile = currentTile->getTr();
-        // Break if currentTile is the placed solid Tile.
-        if (currentTile->getYEnd() > yStart) {
-            break;
-        }
     }
 
     return bottomTile;
 }
 
 Tile *HorizontalTilePlane::splitEndTileVertically(Tile *tile, int y, Tile *lowerRightTile) {
-    // < Start of copied code from splitStartTileVertically() >
-
+    int xStart = tile->getXStart();
     int xEnd = tile->getXEnd();
     int yStart = tile->getYStart();
-    Tile *bottomTile = new Tile(tile->getXStart(), yStart, xEnd, y, false);
+    Tile *bottomTile = new Tile(xStart, yStart, xEnd, y, false);
     tile->setYStart(y);
 
     // Sort.
@@ -329,16 +331,18 @@ Tile *HorizontalTilePlane::splitEndTileVertically(Tile *tile, int y, Tile *lower
     tile->setBl(currentTile);
     // Bottom side
     currentTile = bottomTile->getLb();
-    while (currentTile->getXEnd() <= xEnd) {
-        currentTile->setRt(bottomTile);
-        currentTile = currentTile->getTr();
-        // Break if currentTile is the placed solid Tile.
-        if (currentTile->getYEnd() > yStart) {
-            break;
+    if (currentTile->getXEnd() > xStart) {
+        // Check this condition because shrinkTileToLeft() may have changed
+        // lb->xStart to tile->xStart.
+        while (currentTile->getXEnd() <= xEnd) {
+            currentTile->setRt(bottomTile);
+            currentTile = currentTile->getTr();
+            // Break if currentTile is the placed solid Tile.
+            if (currentTile->getYEnd() > yStart) {
+                break;
+            }
         }
     }
-
-    // < End of copied code >
 
     // Tiles on the bottom side is separated by the solid Tile.
     // Update the Tiles right of the solid Tile.
@@ -455,11 +459,11 @@ void HorizontalTilePlane::shrinkTileToRight(Tile *tile, Tile *insertedTile, Tile
         }
     }
     // Bottom side
-    currentTile = lb;
     // Update insertedTile if insertedTile->yStart == yStart.
     if (insertedTile->getYStart() == yStart) {
         insertedTile->setLb(lb);
         insertedTile->setBl(bl);
+        currentTile = lb;
         while (currentTile->getXEnd() <= x) {
             currentTile->setRt(insertedTile);
             currentTile = currentTile->getTr();
@@ -580,11 +584,10 @@ void HorizontalTilePlane::coverTileWithSameWidthTile(Tile *tile, Tile *insertedT
 }
 
 void HorizontalTilePlane::removeEmptyTile(Tile *tile) {
+    currentlyRemovedTiles->push_back(tile);
     // Sort.
     //sortedEmptyTiles->erase(sortedEmptyTiles->find(tile));
     sortedEmptyTiles->erase(tile);
-
-    delete tile;
 }
 
 void HorizontalTilePlane::mergeTileWithBottomTile(Tile *tile, Tile *bottomTile) {

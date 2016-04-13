@@ -18,9 +18,11 @@ public:
     void setVerticalTile(Tile *tile);
     Tile *getHorizontalTile();
     Tile *getVerticalTile();
+    int getDirection();
     void setType(bool isType1);
     bool isType0();
     bool isType1();
+    bool isGapOnHorizontalSide();
     int getX();
     int getY();
     /*
@@ -51,10 +53,18 @@ public:
     int getXForQuadtree() override;
     int getYForQuadtree() override;
 
+    /*
+    In CornerSequence, instead of deleting removed Corners immediately,
+    use this attribute to indicate whether a Corner on the sequence is already removed.
+    It prevents calling a deallocated pointer.
+    */
+    void setRemovedFromQuadtree();
+    bool isRemovedFromQuadtree();
+
     // test
 
     /*
-    Print (x, y, direction, type1, gapOnHorizontalSide).
+    Print (x, y, width, height, direction, type1, gapOnHorizontalSide).
     */
     void print() override;
     /*
@@ -77,6 +87,8 @@ private:
     int gapSize;
     int previousWidth;
     int previousHeight;
+
+    bool removedFromQuadtree;
 };
 
 #endif
