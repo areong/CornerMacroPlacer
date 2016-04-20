@@ -25,4 +25,16 @@ private:
     int yEnd;
 };
 
+struct CompareMacroWidth {
+    bool operator() (const Macro *macro1, const Macro *macro2) const {
+        return (macro1->getWidth() < macro2->getWidth());
+    }
+};
+
+struct CompareMacroHeight {
+    bool operator() (const Macro *macro1, const Macro *macro2) const {
+        return (macro1->getHeight() < macro2->getHeight());
+    }
+};
+
 #endif

@@ -10,9 +10,15 @@ Implement an interface, Point, for being able to be sorted by a Quadtree.
 */
 class Corner : public Point {
 public:
-    // @param   isGapOnHorizontalSide
-    //          For a type 0 Corner, this attribute is not used.
-    Corner(int x, int y, int direction, bool isType1, bool isGapOnHorizontalSide);
+    /*
+    @param  isGapOnHorizontalSide
+            For a type 0 Corner, this attribute is not used.
+    @param  notFromTilePlane, false by default
+            Let CornerSequence know whether the Corner is created from its TilePlanes.
+            If true, CornerSequence will find a Corner of its own with the same
+            x, y and direction and place Macro on it.
+    */
+    Corner(int x, int y, int direction, bool isType1, bool isGapOnHorizontalSide, bool notFromTilePlane=false);
     ~Corner();
     void setHorizontalTile(Tile *tile);
     void setVerticalTile(Tile *tile);
@@ -23,6 +29,7 @@ public:
     bool isType0();
     bool isType1();
     bool isGapOnHorizontalSide();
+    bool isNotFromTilePlane();
     int getX();
     int getY();
     /*
@@ -48,19 +55,6 @@ public:
     */
     void updateWidthAndHeightForSorting();
 
-    // Used by Quadtree
-
-    int getXForQuadtree() override;
-    int getYForQuadtree() override;
-
-    /*
-    In CornerSequence, instead of deleting removed Corners immediately,
-    use this attribute to indicate whether a Corner on the sequence is already removed.
-    It prevents calling a deallocated pointer.
-    */
-    void setRemovedFromQuadtree();
-    bool isRemovedFromQuadtree();
-
     // test
 
     /*
@@ -79,6 +73,7 @@ private:
     int direction;
     bool type1;
     bool gapOnHorizontalSide;
+    bool notFromTilePlane;
     Tile *horizontalTile;
     Tile *verticalTile;
 
@@ -87,8 +82,6 @@ private:
     int gapSize;
     int previousWidth;
     int previousHeight;
-
-    bool removedFromQuadtree;
 };
 
 #endif

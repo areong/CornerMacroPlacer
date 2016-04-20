@@ -11,18 +11,6 @@ class CornerVerticalTilePlane;
 class Macro;
 class Quadtree;
 
-struct CompareMacroWidth {
-    bool operator() (const Macro *macro1, const Macro *macro2) const {
-        return (macro1->getWidth() < macro2->getWidth());
-    }
-};
-
-struct CompareMacroHeight {
-    bool operator() (const Macro *macro1, const Macro *macro2) const {
-        return (macro1->getHeight() < macro2->getHeight());
-    }
-};
-
 /*
 A corner stitching defined corner sequence.
 Only four methods belong to general corner sequence's behavior,
@@ -87,24 +75,21 @@ private:
     std::vector<Corner *> *corners;
     CornerHorizontalTilePlane *cornerHorizontalTilePlane;
     CornerVerticalTilePlane* cornerVerticalTilePlane;
-    Quadtree *quadtree;
+    Quadtree *sizeQuadtree;
+    Quadtree *positionQuadtree;
 
     std::set<Macro *, CompareMacroWidth> *initialWidthSortedMacros;
     std::set<Macro *, CompareMacroHeight> *initialHeightSortedMacros;
     std::set<Macro *, CompareMacroWidth> *widthSortedMacros;
     std::set<Macro *, CompareMacroHeight> *heightSortedMacros;
 
-    /*
-    Store all removed Corners when placing Macros.
-    The removed Corners will be deleted at the end of placing.
-    */
-    std::vector<Corner *> *allRemovedCorners;
+    int indexPlacedUnsuccessfully;
 
     /*
-    Update quadtree with created, modified and removed Corners.
-    Removed Corners are pushed into allRemovedCorners.
+    Update sizeQuadtree with created, modified and removed Corners.
+    Delete removed Corners.
     */
-    void updateQuadtree();
+    void updateQuadtrees();
 };
 
 #endif

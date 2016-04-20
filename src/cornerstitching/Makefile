@@ -15,6 +15,18 @@ HEADERS_CORNERHORIZONTALTILEPLANE = \
 	./../cornerstitching/VerticalTilePlane.h\
 	./../quadtree/Point.h
 
+HEADERS_CORNERPOSITION = \
+	./../cornerstitching/Corner.h\
+	./../cornerstitching/CornerPosition.h\
+	./../quadtree/Point.h\
+	./../quadtree/PointValue.h
+
+HEADERS_CORNERSIZE = \
+	./../cornerstitching/Corner.h\
+	./../cornerstitching/CornerSize.h\
+	./../quadtree/Point.h\
+	./../quadtree/PointValue.h
+
 HEADERS_CORNERVERTICALTILEPLANE = \
 	./../cornerstitching/Corner.h\
 	./../cornerstitching/CornerHorizontalTilePlane.h\
@@ -72,6 +84,8 @@ HEADERS_VERTICALTILEPLANE = \
 all:
 	make Corner.o
 	make CornerHorizontalTilePlane.o
+	make CornerPosition.o
+	make CornerSize.o
 	make CornerVerticalTilePlane.o
 	make HorizontalTilePlane.o
 	make SortedTiles.o
@@ -84,6 +98,10 @@ Corner.o: Corner.cpp ${HEADERS_CORNER}
 	${CC} -c Corner.cpp ${INC}
 CornerHorizontalTilePlane.o: CornerHorizontalTilePlane.cpp ${HEADERS_CORNERHORIZONTALTILEPLANE}
 	${CC} -c CornerHorizontalTilePlane.cpp ${INC}
+CornerPosition.o: CornerPosition.cpp ${HEADERS_CORNERPOSITION}
+	${CC} -c CornerPosition.cpp ${INC}
+CornerSize.o: CornerSize.cpp ${HEADERS_CORNERSIZE}
+	${CC} -c CornerSize.cpp ${INC}
 CornerVerticalTilePlane.o: CornerVerticalTilePlane.cpp ${HEADERS_CORNERVERTICALTILEPLANE}
 	${CC} -c CornerVerticalTilePlane.cpp ${INC}
 HorizontalTilePlane.o: HorizontalTilePlane.cpp ${HEADERS_HORIZONTALTILEPLANE}

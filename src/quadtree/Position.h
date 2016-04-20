@@ -10,8 +10,9 @@ class Position : public Point {
 public:
     Position(int x, int y);
     ~Position();
-    int getXForQuadtree() override;
-    int getYForQuadtree() override;
+    int getX();
+    int getY();
+    void print() override;
 
 private:
     int x;

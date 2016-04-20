@@ -1,4 +1,5 @@
 #include "quadtree/Position.h"
+#include <iostream>
 
 Position::Position(int x, int y) {
     this->x = x;
@@ -9,10 +10,14 @@ Position::~Position() {
 
 }
 
-int Position::getXForQuadtree() {
+int Position::getX() {
     return x;
 }
 
-int Position::getYForQuadtree() {
+int Position::getY() {
     return y;
+}
+
+void Position::print() {
+    std::cout << "(" << x << ",\t" << y << ")\n";
 }

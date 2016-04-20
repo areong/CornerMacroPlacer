@@ -4,6 +4,7 @@ HEADERS_CORNERSEQUENCE = \
 	./../cornersequence/CornerSequence.h\
 	./../cornerstitching/Corner.h\
 	./../cornerstitching/CornerHorizontalTilePlane.h\
+	./../cornerstitching/CornerSize.h\
 	./../cornerstitching/CornerVerticalTilePlane.h\
 	./../cornerstitching/HorizontalTilePlane.h\
 	./../cornerstitching/Tile.h\
@@ -11,6 +12,7 @@ HEADERS_CORNERSEQUENCE = \
 	./../cornerstitching/VerticalTilePlane.h\
 	./../floorplan/Macro.h\
 	./../quadtree/Point.h\
+	./../quadtree/PointValue.h\
 	./../quadtree/Quadtree.h
 
 HEADERS_CORNERSEQUENCE_TEST = \

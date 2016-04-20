@@ -3,12 +3,13 @@
 
 #include <iostream>
 
-Corner::Corner(int x, int y, int direction, bool isType1, bool isGapOnHorizontalSide) {
+Corner::Corner(int x, int y, int direction, bool isType1, bool isGapOnHorizontalSide, bool notFromTilePlane) {
     this->x = x;
     this->y = y;
     this->direction = direction;
     this->type1 = isType1;
     this->gapOnHorizontalSide = isGapOnHorizontalSide;
+    this->notFromTilePlane = notFromTilePlane;
     horizontalTile = 0;
     verticalTile = 0;
 
@@ -17,8 +18,6 @@ Corner::Corner(int x, int y, int direction, bool isType1, bool isGapOnHorizontal
     gapSize = 0;
     previousWidth = 0;
     previousHeight = 0;
-
-    removedFromQuadtree = false;
 }
 
 Corner::~Corner() {
@@ -59,6 +58,10 @@ bool Corner::isType1() {
 
 bool Corner::isGapOnHorizontalSide() {
     return gapOnHorizontalSide;
+}
+
+bool Corner::isNotFromTilePlane() {
+    return notFromTilePlane;
 }
 
 int Corner::getX() {
@@ -147,22 +150,6 @@ int Corner::getPreviousHeight() {
 void Corner::updateWidthAndHeightForSorting() {
     previousWidth = width;
     previousHeight = height;
-}
-
-int Corner::getXForQuadtree() {
-    return previousWidth;
-}
-
-int Corner::getYForQuadtree() {
-    return previousHeight;
-}
-
-void Corner::setRemovedFromQuadtree() {
-    removedFromQuadtree = true;
-}
-
-bool Corner::isRemovedFromQuadtree() {
-    return removedFromQuadtree;
 }
 
 void Corner::print() {

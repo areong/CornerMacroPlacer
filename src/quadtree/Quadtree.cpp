@@ -2,13 +2,15 @@
 #include <algorithm>
 #include <iostream>
 #include "quadtree/Point.h"
+#include "quadtree/PointValue.h"
 #include "utils/Utils.h"
 
-Quadtree::Quadtree(int xStart, int yStart, int xEnd, int yEnd) {
+Quadtree::Quadtree(int xStart, int yStart, int xEnd, int yEnd, PointValue *pointValue) {
     this->xStart = xStart;
     this->yStart = yStart;
     this->xEnd = xEnd;
     this->yEnd = yEnd;
+    this->pointValue = pointValue;
     xCenter = (int) ((xStart + xEnd) / 2);
     yCenter = (int) ((yStart + yEnd) / 2);
     lHalfWidth = xCenter - xStart;
@@ -29,6 +31,7 @@ Quadtree::Quadtree(int xStart, int yStart, int xEnd, int yEnd) {
 }
 
 Quadtree::~Quadtree() {
+    delete pointValue;
     delete points;
     delete bl;
     delete br;
@@ -36,35 +39,56 @@ Quadtree::~Quadtree() {
     delete tr;
 }
 
-void Quadtree::insert(Point *point) {
+void Quadtree::insert(Point *point, int x, int y, bool useInputXY) {
     numAllPoints += 1;
+    int x1;
+    int y1;
+    if (useInputXY) {
+        x1 = x;
+        y1 = y;
+    } else {
+        x1 = pointValue->getX(point);
+        y1 = pointValue->getY(point);
+    }
     if (bl == 0) {
-        // The Quadtree does not split. Try to put point here.
         if (points->size() == 0) {
+            // The Quadtree does not split. Try to put point here.
             points->push_back(point);
             return;
         } else {
-            if (point->doesOverlapPoint(points->at(0))) {
+            int x2 = pointValue->getX(points->at(0));
+            int y2 = pointValue->getY(points->at(0));
+            if (x1 == x2 && y1 == y2) {
+                // X and y are same. Add point to this Quadtree.
                 points->push_back(point);
                 return;
             } else {
                 // Create sub Quadtrees and insert points to the sub Quadtrees.
                 // Insert point later.
-                bl = new Quadtree(xStart, yStart, xCenter, yCenter);
-                br = new Quadtree(xCenter, yStart, xEnd, yCenter);
-                tl = new Quadtree(xStart, yCenter, xCenter, yEnd);
-                tr = new Quadtree(xCenter, yCenter, xEnd, yEnd);
-                getSubQuadtreePointIsIn(points->at(0))->insert(points);
+                bl = new Quadtree(xStart, yStart, xCenter, yCenter, pointValue->copy());
+                br = new Quadtree(xCenter, yStart, xEnd, yCenter, pointValue->copy());
+                tl = new Quadtree(xStart, yCenter, xCenter, yEnd, pointValue->copy());
+                tr = new Quadtree(xCenter, yCenter, xEnd, yEnd, pointValue->copy());
+                getSubQuadtreePointIsIn(x2, y2)->insert(points, x2, y2, true);
                 points->clear();
             }
         }
     }
     // Insert point to one of the sub Quadtrees.
-    getSubQuadtreePointIsIn(point)->insert(point);
+    getSubQuadtreePointIsIn(x1, y1)->insert(point, x1, y1, true);
 }
 
-void Quadtree::insert(std::vector<Point *> *points) {
+void Quadtree::insert(std::vector<Point *> *points, int x, int y, bool useInputXY) {
     numAllPoints += points->size();
+    int x1;
+    int y1;
+    if (useInputXY) {
+        x1 = x;
+        y1 = y;
+    } else {
+        x1 = pointValue->getX(points->at(0));
+        y1 = pointValue->getY(points->at(0));
+    }
     if (bl == 0) {
         // The Quadtree does not split. Try to put points here.
         if (this->points->size() == 0) {
@@ -72,56 +96,72 @@ void Quadtree::insert(std::vector<Point *> *points) {
             this->points->insert(this->points->end(), points->begin(), points->end());
             return;
         } else {
-            if (points->at(0)->doesOverlapPoint(this->points->at(0))) {
+            int x2 = pointValue->getX(this->points->at(0));
+            int y2 = pointValue->getY(this->points->at(0));
+            if (x1 == x2 && y1 == y2) {
                 this->points->reserve(this->points->size() + points->size());
                 this->points->insert(this->points->end(), points->begin(), points->end());
                 return;
             } else {
                 // Create sub Quadtrees and insert this->points to the sub Quadtrees.
                 // Insert points later.
-                bl = new Quadtree(xStart, yStart, xCenter, yCenter);
-                br = new Quadtree(xCenter, yStart, xEnd, yCenter);
-                tl = new Quadtree(xStart, yCenter, xCenter, yEnd);
-                tr = new Quadtree(xCenter, yCenter, xEnd, yEnd);
-                getSubQuadtreePointIsIn(this->points->at(0))->insert(this->points);
+                bl = new Quadtree(xStart, yStart, xCenter, yCenter, pointValue->copy());
+                br = new Quadtree(xCenter, yStart, xEnd, yCenter, pointValue->copy());
+                tl = new Quadtree(xStart, yCenter, xCenter, yEnd, pointValue->copy());
+                tr = new Quadtree(xCenter, yCenter, xEnd, yEnd, pointValue->copy());
+                getSubQuadtreePointIsIn(x2, y2)->insert(this->points, x2, y2, true);
                 this->points->clear();
             }
         }
     }
     // Insert points to one of the sub Quadtrees.
-    getSubQuadtreePointIsIn(points->at(0))->insert(points);
+    getSubQuadtreePointIsIn(x1, y1)->insert(points, x1, y1, true);
 
 }
 
-void Quadtree::remove(Point *point) {
+bool Quadtree::remove(Point *point, int x, int y, bool useInputXY) {
     numAllPoints -= 1;
     if (bl == 0) {
         // The Quadtree does not split. Point is in points.
         points->erase(std::find(points->begin(), points->end(), point));
+        return points->empty();
     } else {
         // Remove from sub Quadtrees.
-        getSubQuadtreePointIsIn(point)->remove(point);
-        if (numAllPoints == 1) {
-            // numAllPoints becomes one, merge sub Quadtrees.
-            if (!bl->isEmpty()) {
-                points = bl->getAllPoints();
-            } else if (!br->isEmpty()) {
-                points = br->getAllPoints();
-            } else if (!tl->isEmpty()) {
-                points = tl->getAllPoints();
-            } else {
-                points = tr->getAllPoints();
-            }
-            delete bl;
-            delete br;
-            delete tl;
-            delete tr;
-            bl = 0;
-            br = 0;
-            tl = 0;
-            tr = 0;            
-        } else if (numAllPoints == 0) {
-            // numAllPoints becomes zero, delete sub Quadtrees.
+        bool subQuadtreeBecomesEmpty;
+        int x1;
+        int y1;
+        if (useInputXY) {
+            x1 = x;
+            y1 = y;
+        } else {
+            x1 = pointValue->getX(point);
+            y1 = pointValue->getY(point);
+        }
+        subQuadtreeBecomesEmpty = getSubQuadtreePointIsIn(x1, y1)->remove(point, x1, y1, true);
+        if (!subQuadtreeBecomesEmpty) {
+            return false;
+        }
+        // The sub Quadtree becomes empty.
+        // If the number of empty sub Quadtrees is one or zero,
+        // merge sub Quadtrees.
+        int numEmptySubQuadtrees = 4;
+        Quadtree *nonEmptySubQuadtree;
+        if (!bl->isEmpty()) {
+            numEmptySubQuadtrees -= 1;
+            nonEmptySubQuadtree = bl;
+        } else if (!br->isEmpty()) {
+            numEmptySubQuadtrees -= 1;
+            nonEmptySubQuadtree = br;
+        } else if (!tl->isEmpty()) {
+            numEmptySubQuadtrees -= 1;
+            nonEmptySubQuadtree = tl;
+        } else {
+            numEmptySubQuadtrees -= 1;
+            nonEmptySubQuadtree = tr;
+        }
+        if (numEmptySubQuadtrees == 3) {
+            // Get all Points of nonEmptySubQuadtree and save them in this Quadtree.
+            points = nonEmptySubQuadtree->getAllPoints();
             delete bl;
             delete br;
             delete tl;
@@ -130,6 +170,20 @@ void Quadtree::remove(Point *point) {
             br = 0;
             tl = 0;
             tr = 0;
+            return false;
+        } else if (numEmptySubQuadtrees == 4) {
+            // Delete all sub Quadtrees.
+            delete bl;
+            delete br;
+            delete tl;
+            delete tr;
+            bl = 0;
+            br = 0;
+            tl = 0;
+            tr = 0;
+            return true;
+        } else {
+            return false;
         }
     }
 }
@@ -159,7 +213,7 @@ Point *Quadtree::getPointRandomly() {
 
 Point *Quadtree::getPointRandomlyByX(int x, bool notLessThanX) {
     if (bl == 0) {
-        if (points->at(0)->getXForQuadtree() < x ^ notLessThanX) {
+        if (pointValue->getX(points->at(0)) < x ^ notLessThanX) {
             // Get a Point randomly.
             return points->at(Utils::randint(0, points->size()));
         } else {
@@ -265,7 +319,7 @@ Point *Quadtree::getPointRandomlyByX(int x, bool notLessThanX) {
 
 Point *Quadtree::getPointRandomlyByY(int y, bool notLessThanY) {
     if (bl == 0) {
-        if (points->at(0)->getYForQuadtree() < y ^ notLessThanY) {
+        if (pointValue->getY(points->at(0)) < y ^ notLessThanY) {
             // Get a Point randomly.
             return points->at(Utils::randint(0, points->size()));
         } else {
@@ -371,8 +425,8 @@ Point *Quadtree::getPointRandomlyByY(int y, bool notLessThanY) {
 
 Point *Quadtree::getPointRandomlyByXY(int x, int y, bool notLessThanX, bool notLessThanY) {
     if (bl == 0) {
-        if (points->at(0)->getXForQuadtree() < x ^ notLessThanX &&
-            points->at(0)->getYForQuadtree() < y ^ notLessThanY) {
+        if (pointValue->getX(points->at(0)) < x ^ notLessThanX &&
+            pointValue->getY(points->at(0)) < y ^ notLessThanY) {
             // Get a Point randomly.
             return points->at(Utils::randint(0, points->size()));
         } else {
@@ -594,6 +648,18 @@ void Quadtree::resetNoMatchedPointFound() {
     noMatchedPointFound = false;
 }
 
+std::vector<Point *> *Quadtree::getPointsAtXY(int x, int y) {
+    if (bl == 0) {
+        if (points->size() > 0 && x == pointValue->getX(points->at(0)) && y == pointValue->getY(points->at(0))) {
+            return new std::vector<Point *>(*points);
+        } else {
+            return 0;
+        }
+    } else {
+        return getSubQuadtreePointIsIn(x, y)->getPointsAtXY(x, y);
+    }
+}
+
 std::vector<Point *> *Quadtree::getAllPoints() {
     if (bl == 0) {
         return new std::vector<Point *>(*points);
@@ -618,7 +684,7 @@ std::vector<Point *> *Quadtree::getAllPoints() {
 
 std::vector<Point *> *Quadtree::getPointsByX(int x, bool notLessThanX) {
     if (bl == 0) {
-        if (points->size() > 0 && points->at(0)->getXForQuadtree() < x ^ notLessThanX) {
+        if (points->size() > 0 && pointValue->getX(points->at(0)) < x ^ notLessThanX) {
             return new std::vector<Point *>(*points);
         } else {
             return new std::vector<Point *>();
@@ -681,7 +747,7 @@ std::vector<Point *> *Quadtree::getPointsByX(int x, bool notLessThanX) {
 
 std::vector<Point *> *Quadtree::getPointsByY(int y, bool notLessThanY) {
     if (bl == 0) {
-        if (points->size() > 0 && points->at(0)->getYForQuadtree() < y ^ notLessThanY) {
+        if (points->size() > 0 && pointValue->getY(points->at(0)) < y ^ notLessThanY) {
             return new std::vector<Point *>(*points);
         } else {
             return new std::vector<Point *>();
@@ -745,8 +811,8 @@ std::vector<Point *> *Quadtree::getPointsByY(int y, bool notLessThanY) {
 /*
 std::vector<Point *> *Quadtree::getPointsByXY(int x, int y, bool notLessThanX, bool notLessThanY) {
     if (bl == 0) {
-        if (points->size() > 0 && points->at(0)->getXForQuadtree() < x ^ notLessThanX
-            && points->at(0)->getYForQuadtree() < y ^ notLessThanY) {
+        if (points->size() > 0 && pointValue->getX(points->at(0)) < x ^ notLessThanX
+            && pointValue->getY(points->at(0)) < y ^ notLessThanY) {
             return new std::vector<Point *>(points);
         } else {
             return new std::vector<Point *>();
@@ -814,14 +880,30 @@ void Quadtree::print() {
 // Private
 
 Quadtree *Quadtree::getSubQuadtreePointIsIn(Point *point) {
-    if (point->getXForQuadtree() < xCenter) {
-        if (point->getYForQuadtree() < yCenter) {
+    if (pointValue->getX(point) < xCenter) {
+        if (pointValue->getY(point) < yCenter) {
             return bl;
         } else {
             return tl;
         }
     } else {
-        if (point->getYForQuadtree() < yCenter) {
+        if (pointValue->getY(point) < yCenter) {
+            return br;
+        } else {
+            return tr;
+        }
+    }
+}
+
+Quadtree *Quadtree::getSubQuadtreePointIsIn(int x, int y) {
+    if (x < xCenter) {
+        if (y < yCenter) {
+            return bl;
+        } else {
+            return tl;
+        }
+    } else {
+        if (y < yCenter) {
             return br;
         } else {
             return tr;

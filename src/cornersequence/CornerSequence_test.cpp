@@ -39,26 +39,30 @@ void testCornerSequence_sortMacros() {
 
 void testCornerSequence_basic() {
     std::vector<Macro *> *macros = new std::vector<Macro *>();
-    //macros->push_back(new Macro(60, 10));
-    //macros->push_back(new Macro(20, 70));
-    //macros->push_back(new Macro(30, 30));
+    //std::vector<Corner *> *corners = new std::vector<Corner *>(numMacros, 0);
+    std::vector<Corner *> *corners = new std::vector<Corner *>();
+    macros->push_back(new Macro(60, 10));
+    macros->push_back(new Macro(20, 70));
+    macros->push_back(new Macro(30, 30));
+    corners->push_back(new Corner(0, 0, 0, true, true, true));
+    corners->push_back(new Corner(0, 100, 2, true, true, true));
+    corners->push_back(new Corner(100, 100, 3, true, true, true));
     int numMacros = 4;
     //macros->push_back(new Macro(80, 90));
     //macros->push_back(new Macro(80, 40));
     //macros->push_back(new Macro(10, 70));
     //macros->push_back(new Macro(20, 40));
 
-    macros->push_back(new Macro(15, 25));
-    macros->push_back(new Macro(50, 30));
-    macros->push_back(new Macro(45, 25));
-    macros->push_back(new Macro(50, 5));
+    //macros->push_back(new Macro(15, 25));
+    //macros->push_back(new Macro(50, 30));
+    //macros->push_back(new Macro(45, 25));
+    //macros->push_back(new Macro(50, 5));
 
     //for (int i = 0; i < numMacros; ++i) {
     //    int width = Utils::randint(1, 11) * 5;
     //    int height = Utils::randint(1, 11) * 5;
     //    macros->push_back(new Macro(width, height));
     //}
-    std::vector<Corner *> *corners = new std::vector<Corner *>(numMacros, 0);
 
     std::set<Macro *, CompareMacroWidth> *initialWidthSortedMacros = new std::set<Macro *, CompareMacroWidth>();
     std::set<Macro *, CompareMacroHeight> *initialHeightSortedMacros = new std::set<Macro *, CompareMacroHeight>();

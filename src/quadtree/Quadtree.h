@@ -4,6 +4,7 @@
 #include <vector>
 
 class Point;
+class PointValue;
 
 /*
 A point region quadtree
@@ -14,10 +15,12 @@ public:
     Create a Quadtree with range
     xStart <= x < xEnd and
     yStart <= y < yEnd.
+    pointValue defines how the Quadtree retrieves Points' attributes as x and y.
+    pointValue's assumed input class should match the Points' class.
     */
-    Quadtree(int xStart, int yStart, int xEnd, int yEnd);
+    Quadtree(int xStart, int yStart, int xEnd, int yEnd, PointValue *pointValue);
     /*
-    Delete sub Quadtrees. Do not delete Points.
+    Delete sub Quadtrees and pointValue. Do not delete Points.
     */
     ~Quadtree();
     /*
@@ -27,17 +30,24 @@ public:
     xStart <= point->getX() < xEnd and
     yStart <= point->getY() < yEnd.
     Assume point was not inserted before.
+    If useInputXY is true, input x and y will be used as point's x and y,
+    which avoids calling pointValue to get point's x and y.
     */
-    void insert(Point *point);
+    void insert(Point *point, int x=0, int y=0, bool useInputXY=false);
     /*
     Insert Points with same x and y to the Quadtree.
+    If useInputXY is true, input x and y will be used as point's x and y,
+    which avoids calling pointValue to get point's x and y.
     */
-    void insert(std::vector<Point *> *points);
+    void insert(std::vector<Point *> *points, int x=0, int y=0, bool useInputXY=false);
     /*
     Remove point from the Quadtree.
     Assume point has been inserted to the Quadtree.
+    If useInputXY is true, input x and y will be used as point's x and y,
+    which avoids calling pointValue to get point's x and y.
+    Returns whether the Quadtree becomes empty after removal.
     */
-    void remove(Point *point);
+    bool remove(Point *point, int x=0, int y=0, bool useInputXY=false);
     /*
     Return the number of all Points in the Quadtree and its sub Quadtrees.
     */
@@ -91,6 +101,12 @@ public:
     */
     void resetNoMatchedPointFound();
     /*
+    Get all Points whose x and y are the input x and y respectively.
+    Please delete the returned vector.
+    Return zero if there is no matched Point.
+    */
+    std::vector<Point *> *getPointsAtXY(int x, int y);
+    /*
     Get all Points in the Quadtree.
     Please delete the returned vector.
     */
@@ -123,6 +139,7 @@ private:
     int yStart;
     int xEnd;
     int yEnd;
+    PointValue *pointValue;
     int xCenter;
     int yCenter;
     int lHalfWidth;
@@ -164,6 +181,7 @@ private:
         (xCenter, yCenter) is in tr sub Quadtree.
     */
     Quadtree *getSubQuadtreePointIsIn(Point *point);
+    Quadtree *getSubQuadtreePointIsIn(int x, int y);
     /*
     Get a sub Quadtree according to the input weights.
     Assume weight >= 0.
