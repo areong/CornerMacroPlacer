@@ -57,6 +57,10 @@ public:
     */
     bool isEmpty();
     /*
+    Return if sub Quadtrees exist.
+    */
+    bool doesNotSplit();
+    /*
     Assume there exists Point in the Quadtree.
     Get a Point from the Quadtree and its sub Quadtrees randomly.
     Use the numbers of Points in sub Quadtrees as sub Quadtrees' weights such that

@@ -9,6 +9,7 @@ CornerHorizontalTilePlane::CornerHorizontalTilePlane(int xStart, int yStart, int
     currentlyCreatedCorners = new std::vector<Corner *>();
     currentlyModifiedHorizontalCorners = new std::vector<Corner *>();
     currentlyModifiedVerticalCorners = new std::vector<Corner *>();
+    currentlyChangedToType0Corners = new std::vector<Corner *>();
     currentlyRemovedCorners = new std::vector<Corner *>();
     currentlyDidSplitStartTile = false;
     currentlyDidSplitEndTile = false;
@@ -34,6 +35,7 @@ CornerHorizontalTilePlane::~CornerHorizontalTilePlane() {
     delete currentlyCreatedCorners;
     delete currentlyModifiedHorizontalCorners;
     delete currentlyModifiedVerticalCorners;
+    delete currentlyChangedToType0Corners;
     delete currentlyRemovedCorners;
 }
 
@@ -62,6 +64,7 @@ void CornerHorizontalTilePlane::placeSolidTile(Tile *tile, Tile *startTile) {
     currentlyCreatedCorners->clear();
     currentlyModifiedHorizontalCorners->clear();
     currentlyModifiedVerticalCorners->clear();
+    currentlyChangedToType0Corners->clear();
     currentlyRemovedCorners->clear();
     currentlyDidSplitStartTile = false;
     currentlyDidSplitEndTile = false;
@@ -96,6 +99,7 @@ void CornerHorizontalTilePlane::placeSolidTile(Tile *tile, Tile *startTile) {
         trCorner->setVerticalTile(verticalTile);
         currentlyCreatedCorners->push_back(tlCorner);
         currentlyCreatedCorners->push_back(trCorner);
+        linkCornersFromVerticalTilePlaneToTile(lb);
     } else {
         if (lb->isEmpty()) {
             // Create Corners for lb.
@@ -113,9 +117,17 @@ void CornerHorizontalTilePlane::placeSolidTile(Tile *tile, Tile *startTile) {
                 currentlyCreatedCorners->push_back(trCorner);
             } else {
                 // tlCorner already exists. Check whether to change it to type 0.
-                if (lb->getXStart() == tileXStart) lb->getTlCorner()->setType(false);
+                if (lb->getXStart() == tileXStart) {
+                    tlCorner = lb->getTlCorner();
+                    tlCorner->setType(false);
+                    currentlyChangedToType0Corners->push_back(tlCorner);
+                }
                 // trCorner already exists. Check whether to change it to type 0.
-                if (lb->getXEnd() <= tileXEnd) lb->getTrCorner()->setType(false);
+                if (lb->getXEnd() <= tileXEnd) {
+                    trCorner = lb->getTrCorner();
+                    trCorner->setType(false);
+                    currentlyChangedToType0Corners->push_back(trCorner);
+                }
             }
         }
         if (lb->getXEnd() < tileXEnd) {
@@ -154,7 +166,9 @@ void CornerHorizontalTilePlane::placeSolidTile(Tile *tile, Tile *startTile) {
                     currentlyCreatedCorners->push_back(trCorner);
                 } else {
                     // tlCorner already exists. Change it to type 0.
-                    currentTile->getTlCorner()->setType(false);
+                    tlCorner = currentTile->getTlCorner();
+                    tlCorner->setType(false);
+                    currentlyChangedToType0Corners->push_back(tlCorner);
                     // trCorner already exists. No need to change type.   
                 }
             }
@@ -191,9 +205,17 @@ void CornerHorizontalTilePlane::placeSolidTile(Tile *tile, Tile *startTile) {
                 currentlyCreatedCorners->push_back(blCorner);
             } else {
                 // brCorner already exists. Check whether to change it to type 0.
-                if (rt->getXEnd() == tileXEnd) rt->getBrCorner()->setType(false);
+                if (rt->getXEnd() == tileXEnd) {
+                    brCorner = rt->getBrCorner();
+                    brCorner->setType(false);
+                    currentlyChangedToType0Corners->push_back(brCorner);
+                }
                 // blCorner already exists. Check whether to change it to type 0.
-                if (rt->getXStart() >= tileXStart) rt->getBlCorner()->setType(false);
+                if (rt->getXStart() >= tileXStart) {
+                    blCorner = rt->getBlCorner();
+                    blCorner->setType(false);
+                    currentlyChangedToType0Corners->push_back(blCorner);
+                }
             }
         }
         if (rt->getXStart() > tileXStart) {
@@ -232,7 +254,9 @@ void CornerHorizontalTilePlane::placeSolidTile(Tile *tile, Tile *startTile) {
                     currentlyCreatedCorners->push_back(blCorner);
                 } else {
                     // brCorner already exists. Change it to type 0.
-                    currentTile->getBrCorner()->setType(false);
+                    brCorner = currentTile->getBrCorner();
+                    brCorner->setType(false);
+                    currentlyChangedToType0Corners->push_back(brCorner);
                     // blCorner already exists. No need to change type.
                 }
             }
@@ -262,6 +286,10 @@ std::vector<Corner *> *CornerHorizontalTilePlane::getCurrentlyModifiedHorizontal
 
 std::vector<Corner *> *CornerHorizontalTilePlane::getCurrentlyModifiedVerticalCorners() {
     return currentlyModifiedVerticalCorners;
+}
+
+std::vector<Corner *> *CornerHorizontalTilePlane::getCurrentlyChangedToType0Corners() {
+    return currentlyChangedToType0Corners;
 }
 
 std::vector<Corner *> *CornerHorizontalTilePlane::getCurrentlyRemovedCorners() {
@@ -296,7 +324,8 @@ Tile *CornerHorizontalTilePlane::splitStartTileVertically(Tile *tile, int y) {
     }
 
     // Link Corners from verticalTilePlane to bottomTile.
-    linkCornersFromVerticalTilePlaneToTile(bottomTile);
+    // However at this time bottomTile's Corners are not updated.
+    // Link when updating placed solid Tile's lb in placeSolidTile().
     
     // New Corners of bottomTile will be created after the solid Tile is placed.
     currentlyDidSplitStartTile = true;

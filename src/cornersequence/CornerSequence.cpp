@@ -8,8 +8,6 @@
 #include "floorplan/Macro.h"
 #include "quadtree/Quadtree.h"
 
-#include <iostream>
-
 CornerSequence::CornerSequence(int xStart, int yStart, int xEnd, int yEnd, std::vector<Macro *> *macros, std::vector<Corner *> *corners,
     std::set<Macro *, CompareMacroWidth> *initialWidthSortedMacros,
     std::set<Macro *, CompareMacroHeight> *initialHeightSortedMacros) {
@@ -81,9 +79,6 @@ bool CornerSequence::placeMacrosWithIncrementalUpdate(int startPosition, int bac
         int macroHeight = macro->getHeight();
         Corner *corner = corners->at(i);
 
-        std::cout << macro->getWidth() << " " << macro->getHeight() << "\n";
-        std::cout << sizeQuadtree->getNumAllPoints() << "\n";
-
         // Check whether to select another Corner.
         bool toSelectAnotherCorner = false;
         if (corner == 0) {
@@ -117,7 +112,6 @@ bool CornerSequence::placeMacrosWithIncrementalUpdate(int startPosition, int bac
             corner = static_cast<Corner *>(sizeQuadtree->getPointRandomlyByXY(macroWidth, macroHeight, true, true));
             if (corner == 0) {
                 // No Corner is available.
-                std::cout << "oo\n";
                 placedUnsuccessfully = true;
                 indexPlacedUnsuccessfully = i;
                 break;
@@ -133,8 +127,6 @@ bool CornerSequence::placeMacrosWithIncrementalUpdate(int startPosition, int bac
         int cornerX;
         int cornerY;
         while (true) {
-            std::cout << "while\n";
-            corner->print();
             // Check corner gap size.
             bool cornerGapSizeIsValid = true;
             if (corner->isType1()) {
@@ -184,8 +176,6 @@ bool CornerSequence::placeMacrosWithIncrementalUpdate(int startPosition, int bac
                     macroYEnd = cornerY;
                     break;
                 }
-                std::cout << "(" << macroXStart << ",\t" << macroYStart << ",\t" << macroXEnd << ",\t" << macroYEnd << ")\n";
-                corner->getHorizontalTile()->print();
 
                 // Check overlap.
                 if (cornerDirection <= 1) {
@@ -193,7 +183,6 @@ bool CornerSequence::placeMacrosWithIncrementalUpdate(int startPosition, int bac
                         macroXStart, macroYStart, macroXEnd, macroYEnd,
                         corner->getHorizontalTile())) {
                         // Does not overlap.
-                        corner->print();
                         break;
                     }
                 } else {
@@ -201,7 +190,6 @@ bool CornerSequence::placeMacrosWithIncrementalUpdate(int startPosition, int bac
                         macroXStart, macroYStart, macroXEnd, macroYEnd,
                         corner->getHorizontalTile())) {
                         // Does not overlap.
-                        corner->print();
                         break;
                     }
                 }
@@ -214,7 +202,6 @@ bool CornerSequence::placeMacrosWithIncrementalUpdate(int startPosition, int bac
             corner = static_cast<Corner *>(sizeQuadtree->getPointRandomlyByXY(macroWidth, macroHeight, true, true));
             if (corner == 0) {
                 // No Corner is available.
-                std::cout << "no Corner available\n";
                 placedUnsuccessfully = true;
                 indexPlacedUnsuccessfully = i;
                 break;
@@ -224,7 +211,6 @@ bool CornerSequence::placeMacrosWithIncrementalUpdate(int startPosition, int bac
             break;
         }
         // A valid Corner is selected.
-        corner->print();
         // Insert removed Corners back to quadtrees.
         for (int j = 0; j < temporarilyRemovedCorners->size(); ++j) {
             sizeQuadtree->insert(temporarilyRemovedCorners->at(j));
@@ -233,7 +219,6 @@ bool CornerSequence::placeMacrosWithIncrementalUpdate(int startPosition, int bac
 
         // Update corners->at(i) with the valid Corner.
         corners->at(i) = corner;
-        std::cout << "corners->at(i)\n";
 
         // Place macro at corner.
         macro->setXStart(macroXStart);
@@ -265,7 +250,6 @@ bool CornerSequence::placeMacrosWithIncrementalUpdate(int startPosition, int bac
             break;
         }
         cornerHorizontalTilePlane->placeSolidTileGivenBothStartTiles(horizontalTile, startHorizontalTile, startVerticalTile);
-        std::cout << "place horizontal\n";
         startHorizontalTile = horizontalTile;
         switch (cornerDirection) {
         case 0:
@@ -286,14 +270,12 @@ bool CornerSequence::placeMacrosWithIncrementalUpdate(int startPosition, int bac
             break;
         }
         cornerVerticalTilePlane->placeSolidTileGivenBothStartTiles(verticalTile, startVerticalTile, startHorizontalTile);
-        std::cout << "place vertical\n";
         // Remove macro from sets.
         widthSortedMacros->erase(macro);
         heightSortedMacros->erase(macro);
         // Calculate Corners' width and height.
         cornerHorizontalTilePlane->calculateCurrentCornersWidthAndHeight();
         cornerVerticalTilePlane->calculateCurrentCornersWidthAndHeight();
-        std::cout << "lalala\n";
 
         // Update quadtrees.
         updateQuadtrees();
@@ -324,99 +306,79 @@ CornerVerticalTilePlane *CornerSequence::getCornerVerticalTilePlane() {
     return cornerVerticalTilePlane;
 }
 
+Quadtree *CornerSequence::getPositionQuadtree() {
+    return positionQuadtree;
+}
+
 void CornerSequence::updateQuadtrees() {
-    std::cout << "quadtree horizontal\n";
     std::vector<Corner *> *currentlyCreatedCorners = cornerHorizontalTilePlane->getCurrentlyCreatedCorners();
     std::vector<Corner *> *currentlyModifiedHorizontalCorners = cornerHorizontalTilePlane->getCurrentlyModifiedHorizontalCorners();
     std::vector<Corner *> *currentlyModifiedVerticalCorners = cornerHorizontalTilePlane->getCurrentlyModifiedVerticalCorners();
     std::vector<Corner *> *currentlyRemovedCorners = cornerHorizontalTilePlane->getCurrentlyRemovedCorners();
-    std::cout << "currentlyCreatedCorners:\n";
     for (int j = 0; j < currentlyCreatedCorners->size(); ++j) {
         Corner *createdCorner = currentlyCreatedCorners->at(j);
-        createdCorner->print();
-        createdCorner->getHorizontalTile()->print();
-        createdCorner->getVerticalTile()->print();
         createdCorner->updateWidthAndHeightForSorting();
-        std::cout << "insert()\n";
-        std::cout << createdCorner->getPreviousWidth() << " " << createdCorner->getPreviousHeight() << "\n";
         sizeQuadtree->insert(createdCorner);
         positionQuadtree->insert(createdCorner);
-        std::cout << "insert() end\n";
     }
-    std::cout << "currentlyModifiedHorizontalCorners:\n";
     for (int j = 0; j < currentlyModifiedHorizontalCorners->size(); ++j) {
         Corner *modifiedCorner = currentlyModifiedHorizontalCorners->at(j);
-        modifiedCorner->print();
         sizeQuadtree->remove(modifiedCorner);
         modifiedCorner->updateWidthAndHeightForSorting();
         sizeQuadtree->insert(modifiedCorner);
     }
-    std::cout << "currentlyModifiedVerticalCorners:\n";
     for (int j = 0; j < currentlyModifiedVerticalCorners->size(); ++j) {
         Corner *modifiedCorner = currentlyModifiedVerticalCorners->at(j);
-        modifiedCorner->print();
         if (modifiedCorner->isType1()) {
             sizeQuadtree->remove(modifiedCorner);
             modifiedCorner->updateWidthAndHeightForSorting();
             sizeQuadtree->insert(modifiedCorner);
         }
     }
-    std::cout << "currentlyRemovedCorners:\n";
     for (int j = 0; j < currentlyRemovedCorners->size(); ++j) {
         Corner *removedCorner = currentlyRemovedCorners->at(j);
-        removedCorner->print();
         sizeQuadtree->remove(removedCorner);
         positionQuadtree->remove(removedCorner);
         delete removedCorner;
     }
-    std::cout << "quadtree vertical\n";
     currentlyCreatedCorners = cornerVerticalTilePlane->getCurrentlyCreatedCorners();
     currentlyModifiedVerticalCorners = cornerVerticalTilePlane->getCurrentlyModifiedVerticalCorners();
     currentlyModifiedHorizontalCorners = cornerVerticalTilePlane->getCurrentlyModifiedHorizontalCorners();
+    std::vector<Corner *> *currentlyChangedToType0Corners = cornerVerticalTilePlane->getCurrentlyChangedToType0Corners();
     currentlyRemovedCorners = cornerVerticalTilePlane->getCurrentlyRemovedCorners();
-    std::cout << "currentlyCreatedCorners:\n";
     for (int j = 0; j < currentlyCreatedCorners->size(); ++j) {
         Corner *createdCorner = currentlyCreatedCorners->at(j);
-        createdCorner->print();
-        createdCorner->getHorizontalTile()->print();
-        createdCorner->getVerticalTile()->print();
         if (createdCorner->isType1()) {
-            std::cout << "updateWidthAndHeightForSorting()\n";
             createdCorner->updateWidthAndHeightForSorting();
-            std::cout << "insert()\n";
-            std::cout << createdCorner->getPreviousWidth() << " " << createdCorner->getPreviousHeight() << "\n";
             sizeQuadtree->insert(createdCorner);
             positionQuadtree->insert(createdCorner);
-            std::cout << "insert() end\n";
         }
     }
-    std::cout << "currentlyModifiedVerticalCorners:\n";
     for (int j = 0; j < currentlyModifiedVerticalCorners->size(); ++j) {
         Corner *modifiedCorner = currentlyModifiedVerticalCorners->at(j);
-        modifiedCorner->print();
         if (modifiedCorner->isType1()) {
             sizeQuadtree->remove(modifiedCorner);
             modifiedCorner->updateWidthAndHeightForSorting();
             sizeQuadtree->insert(modifiedCorner);
         }
     }
-    std::cout << "currentlyModifiedHorizontalCorners:\n";
     for (int j = 0; j < currentlyModifiedHorizontalCorners->size(); ++j) {
         Corner *modifiedCorner = currentlyModifiedHorizontalCorners->at(j);
-        modifiedCorner->print();
         sizeQuadtree->remove(modifiedCorner);
         modifiedCorner->updateWidthAndHeightForSorting();
         sizeQuadtree->insert(modifiedCorner);
     }
-    std::cout << "currentlyRemovedCorners:\n";
+    for (int j = 0; j < currentlyChangedToType0Corners->size(); ++j) {
+        Corner *changedToType0Corner = currentlyChangedToType0Corners->at(j);
+        sizeQuadtree->remove(changedToType0Corner);
+        positionQuadtree->remove(changedToType0Corner);
+    }
     for (int j = 0; j < currentlyRemovedCorners->size(); ++j) {
         Corner *removedCorner = currentlyRemovedCorners->at(j);
-        removedCorner->print();
         if (removedCorner->isType1()) {
             sizeQuadtree->remove(removedCorner);
             positionQuadtree->remove(removedCorner);
         }
         delete removedCorner;
     }
-    std::cout << "end for\n";
 }

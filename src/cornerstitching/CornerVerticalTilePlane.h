@@ -42,6 +42,7 @@ public:
     std::vector<Corner *> *getCurrentlyCreatedCorners();
     std::vector<Corner *> *getCurrentlyModifiedVerticalCorners();
     std::vector<Corner *> *getCurrentlyModifiedHorizontalCorners();
+    std::vector<Corner *> *getCurrentlyChangedToType0Corners();
     std::vector<Corner *> *getCurrentlyRemovedCorners();
     void deleteCurrentlyRemovedCorners();
 
@@ -65,6 +66,7 @@ private:
     std::vector<Corner *> *currentlyCreatedCorners;
     std::vector<Corner *> *currentlyModifiedVerticalCorners;
     std::vector<Corner *> *currentlyModifiedHorizontalCorners;
+    std::vector<Corner *> *currentlyChangedToType0Corners;
     std::vector<Corner *> *currentlyRemovedCorners;
     // Indicate whether splitStartTileVertically() is called.
     bool currentlyDidSplitStartTile;

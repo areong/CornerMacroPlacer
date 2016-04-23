@@ -69,6 +69,7 @@ public:
     
     CornerHorizontalTilePlane *getCornerHorizontalTilePlane();
     CornerVerticalTilePlane *getCornerVerticalTilePlane();
+    Quadtree *getPositionQuadtree();
 
 private:
     std::vector<Macro *> *macros;

@@ -4,8 +4,6 @@
 // Temporary
 #include "cornerstitching/SortedTiles.h"
 
-#include <iostream>
-
 //struct CompareTileHeight {
 //    bool operator() (const Tile *tile1, const Tile *tile2) const {
 //        return tile1->getPreviousHeight() < tile2->getPreviousHeight();
@@ -110,8 +108,6 @@ void VerticalTilePlane::placeSolidTile(Tile *tile, Tile *startTile) {
     // Update overlapping Tiles.
     bool atStartTile = true;
     while (true) {
-        ////currentTile->print();
-        //////currentTile->printFourNeighbors();
         if (currentTile->getYStart() <= yStart) {
             // It is an empty Tile under the placed Tile.
             // Check if it is the end Tile.
@@ -125,13 +121,7 @@ void VerticalTilePlane::placeSolidTile(Tile *tile, Tile *startTile) {
                     // Split the end Tile.
                     // currentTile becomes the leftTile after splitting.
                     Tile *rightTile = currentTile;
-                    ////currentTile->print();
-                    //////currentTile->printFourNeighbors();
                     currentTile = splitEndTileHorizontally(currentTile, xEnd, lefterUpTile);
-                    ////currentTile->print();
-                    //////currentTile->printFourNeighbors();
-                    ////rightTile->print();
-                    //////rightTile->printFourNeighbors();
                     checkMergingAtEndTile = false;
                 }
             } else {
@@ -307,10 +297,6 @@ Tile *VerticalTilePlane::splitStartTileHorizontally(Tile *tile, int x) {
 }
 
 Tile *VerticalTilePlane::splitEndTileHorizontally(Tile *tile, int x, Tile *lefterUpTile) {
-    //std::cout << "splitEndTileHorizontally()\n";
-    //tile->print();
-    //tile->printFourNeighbors();
-    ////lefterUpTile->print();
     int yStart = tile->getYStart();
     int yEnd = tile->getYEnd();
     int xStart = tile->getXStart();
@@ -321,14 +307,10 @@ Tile *VerticalTilePlane::splitEndTileHorizontally(Tile *tile, int x, Tile *lefte
     sortedEmptyTiles->insert(leftTile);
 
     // Update links of these two Tiles.
-    ////tile->getLb()->print();
-    //////tile->getBl()->print();
-    ////std::cout << (tile->getBl() == 0) << "\n";
     leftTile->setLb(tile->getLb());
     leftTile->setBl(tile->getBl());
     leftTile->setTr(tile);
     tile->setBl(leftTile);
-    ////leftTile->getTr()->print();
 
     // Update tile->lb, leftTile->rt and links of neighbors.
     // Top side
@@ -448,7 +430,6 @@ Tile *VerticalTilePlane::separateTileVertically(Tile *tile, Tile *insertedTile, 
 }
 
 void VerticalTilePlane::shrinkTileToTop(Tile *tile, Tile *insertedTile, Tile *lefterUpTile) {
-    ////std::cout << "shrinkTileToTop()\n";
     int yStart = tile->getYStart();
     int yEnd = tile->getYEnd();
     int xStart = tile->getXStart();
@@ -504,7 +485,6 @@ void VerticalTilePlane::shrinkTileToTop(Tile *tile, Tile *insertedTile, Tile *le
 }
 
 void VerticalTilePlane::shrinkTileToBottom(Tile *tile, Tile *insertedTile) {
-    //std::cout << "shrinkTileToBottom()\n";
     int yStart = tile->getYStart();
     int yEnd = tile->getYEnd();
     int xStart = tile->getXStart();
@@ -549,10 +529,8 @@ void VerticalTilePlane::shrinkTileToBottom(Tile *tile, Tile *insertedTile) {
         tile->setRt(insertedTile);
     } else {
         while (currentTile->getYStart() >= y) {
-            //currentTile->print();
             currentTile = currentTile->getLb();
         }
-        //currentTile->print();
         tile->setTr(currentTile);
         tile->setRt(insertedTile);
     }

@@ -51,8 +51,8 @@ void Quadtree::insert(Point *point, int x, int y, bool useInputXY) {
         y1 = pointValue->getY(point);
     }
     if (bl == 0) {
+        // The Quadtree does not split. Try to put point here.
         if (points->size() == 0) {
-            // The Quadtree does not split. Try to put point here.
             points->push_back(point);
             return;
         } else {
@@ -127,7 +127,6 @@ bool Quadtree::remove(Point *point, int x, int y, bool useInputXY) {
         return points->empty();
     } else {
         // Remove from sub Quadtrees.
-        bool subQuadtreeBecomesEmpty;
         int x1;
         int y1;
         if (useInputXY) {
@@ -137,29 +136,32 @@ bool Quadtree::remove(Point *point, int x, int y, bool useInputXY) {
             x1 = pointValue->getX(point);
             y1 = pointValue->getY(point);
         }
-        subQuadtreeBecomesEmpty = getSubQuadtreePointIsIn(x1, y1)->remove(point, x1, y1, true);
-        if (!subQuadtreeBecomesEmpty) {
+        if (!getSubQuadtreePointIsIn(x1, y1)->remove(point, x1, y1, true)) {
             return false;
         }
         // The sub Quadtree becomes empty.
         // If the number of empty sub Quadtrees is one or zero,
+        // and the non-empty sub Quadtree does not split,
         // merge sub Quadtrees.
         int numEmptySubQuadtrees = 4;
         Quadtree *nonEmptySubQuadtree;
         if (!bl->isEmpty()) {
             numEmptySubQuadtrees -= 1;
             nonEmptySubQuadtree = bl;
-        } else if (!br->isEmpty()) {
+        }
+        if (!br->isEmpty()) {
             numEmptySubQuadtrees -= 1;
             nonEmptySubQuadtree = br;
-        } else if (!tl->isEmpty()) {
+        }
+        if (!tl->isEmpty()) {
             numEmptySubQuadtrees -= 1;
             nonEmptySubQuadtree = tl;
-        } else {
+        }
+        if (!tr->isEmpty()) {
             numEmptySubQuadtrees -= 1;
             nonEmptySubQuadtree = tr;
         }
-        if (numEmptySubQuadtrees == 3) {
+        if (numEmptySubQuadtrees == 3 && nonEmptySubQuadtree->doesNotSplit()) {
             // Get all Points of nonEmptySubQuadtree and save them in this Quadtree.
             points = nonEmptySubQuadtree->getAllPoints();
             delete bl;
@@ -194,6 +196,10 @@ int Quadtree::getNumAllPoints() {
 
 bool Quadtree::isEmpty() {
     return numAllPoints == 0;
+}
+
+bool Quadtree::doesNotSplit() {
+    return bl == 0;
 }
 
 Point *Quadtree::getPointRandomly() {
