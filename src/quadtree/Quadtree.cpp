@@ -163,6 +163,7 @@ bool Quadtree::remove(Point *point, int x, int y, bool useInputXY) {
         }
         if (numEmptySubQuadtrees == 3 && nonEmptySubQuadtree->doesNotSplit()) {
             // Get all Points of nonEmptySubQuadtree and save them in this Quadtree.
+            delete points;
             points = nonEmptySubQuadtree->getAllPoints();
             delete bl;
             delete br;

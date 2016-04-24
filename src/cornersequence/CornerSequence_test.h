@@ -6,6 +6,7 @@ class TilePlane;
 void displayTilePlane2(TilePlane *tilePlane);
 void testCornerSequence_sortMacros();
 void testCornerSequence_basic();
+void testCornerSequence_memoryLeak();
 void testCornerSequence();
 
 #endif

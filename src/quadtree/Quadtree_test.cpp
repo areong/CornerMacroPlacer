@@ -4,6 +4,7 @@
 #include "quadtree/Position.h"
 #include "quadtree/PositionValue.h"
 #include "quadtree/Quadtree.h"
+#include "utils/Utils.h"
 
 void testQuadtree_basic() {
     Quadtree *quadtree = new Quadtree(0, 0, 101, 101, new PositionValue());
@@ -65,6 +66,31 @@ void testQuadtree_basic() {
     //}
 }
 
+void testQuadtree_memoryLeak() {
+    std::vector<Position *> *positions = new std::vector<Position *>();
+    for (int i = 0; i < 1000; ++i) {
+        positions->push_back(new Position(Utils::randint(0, 101), Utils::randint(0, 101)));
+    }
+
+    for (int iLoop = 0; iLoop < 10000; ++iLoop) {
+        Quadtree *quadtree = new Quadtree(0, 0, 101, 101, new PositionValue());
+        for (int i = 0; i < positions->size(); ++i) {
+            quadtree->insert(positions->at(i));
+        }
+        for (int i = 0; i < positions->size(); ++i) {
+            //quadtree->remove(quadtree->getPointRandomly());
+            quadtree->remove(positions->at(i));
+        }
+        delete quadtree;
+    }
+
+    for (int i = 0; i < positions->size(); ++i) {
+        delete positions->at(i);
+    }
+    delete positions;
+}
+
 void testQuadtree() {
-    testQuadtree_basic();
+    //testQuadtree_basic();
+    testQuadtree_memoryLeak();
 }

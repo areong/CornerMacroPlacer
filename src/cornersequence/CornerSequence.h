@@ -19,19 +19,31 @@ placeMacros(), placeMacrosWithIncrementalUpdate(), getBackup(), and copy().
 class CornerSequence {
 public:
     /*
-    Input layout range, a sequence of Macros and a sequence of Corners.
-    Assume the two vectors have the same size.
-    Assume all non-zero Corners in corners are already exists in CornerSequence's TilePlanes.
-    Corners in corners can be zero pointers.
-    @param widthSortedMacros, macroSortedByHeight
+    @param  xStart, yStart, xEnd, yEnd
+        The area range for placing Macros.
+    @param  numMacros
+        The number of Macros to be placed.
+    @param  widthSortedMacros, macroSortedByHeight
         Two sets containing sorted all macros. The two sets should not be deleted.
         The two sets will not and should not be modified.
         Their copies are modified in the CornerSequence.
     */
-    CornerSequence(int xStart, int yStart, int xEnd, int yEnd, std::vector<Macro *> *macros, std::vector<Corner *> *corners,
+    CornerSequence(int xStart, int yStart, int xEnd, int yEnd, int numMacros,
         std::set<Macro *, CompareMacroWidth> *initialWidthSortedMacros,
         std::set<Macro *, CompareMacroHeight> *initialHeightSortedMacros);
     ~CornerSequence();
+    /*
+    Please call this method numMacros times, where
+    numMacros is the input of CornerSequence's constructor.
+    @param corner
+        If corner is zero, another Corner will replace it.
+        Else if corner->notFromTilePlane is true, the Corner with the same
+        x, y and direction will replace corner, and then corner will be deleted.
+        The above operations are performed in placeMacros...().
+        Else, assume corner comes from the CornerHorizontal/VerticalTilePlane
+        of this CornerSequence.
+    */
+    void addMacroCornerPair(Macro *macro, Corner *corner);
     /*
     Place macros from the first Macro.
     @return false if macros cannot be placed without overlap within boundary.

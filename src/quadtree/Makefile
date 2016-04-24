@@ -22,7 +22,8 @@ HEADERS_QUADTREE_TEST = \
 	./../quadtree/Position.h\
 	./../quadtree/PositionValue.h\
 	./../quadtree/Quadtree.h\
-	./../quadtree/Quadtree_test.h
+	./../quadtree/Quadtree_test.h\
+	./../utils/Utils.h
 
 all:
 	make Position.o

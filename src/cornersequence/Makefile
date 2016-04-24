@@ -4,6 +4,7 @@ HEADERS_CORNERSEQUENCE = \
 	./../cornersequence/CornerSequence.h\
 	./../cornerstitching/Corner.h\
 	./../cornerstitching/CornerHorizontalTilePlane.h\
+	./../cornerstitching/CornerPosition.h\
 	./../cornerstitching/CornerSize.h\
 	./../cornerstitching/CornerVerticalTilePlane.h\
 	./../cornerstitching/HorizontalTilePlane.h\

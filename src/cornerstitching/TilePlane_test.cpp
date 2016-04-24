@@ -12,20 +12,100 @@
 #include <iostream>
 
 void testTilePlane_memoryLeak() {
-    for (int iLoop = 0; iLoop < 100000; ++iLoop) {
-        CornerHorizontalTilePlane *cornerHorizontalTilePlane = new CornerHorizontalTilePlane(0, 0, 100, 100);
-        CornerVerticalTilePlane *cornerVerticalTilePlane = new CornerVerticalTilePlane(0, 0, 100, 100);
+    for (int iLoop = 0; iLoop < 10000; ++iLoop) {
+        CornerHorizontalTilePlane *cornerHorizontalTilePlane = new CornerHorizontalTilePlane(0, 0, 200, 200);
+        CornerVerticalTilePlane *cornerVerticalTilePlane = new CornerVerticalTilePlane(0, 0, 200, 200);
         cornerHorizontalTilePlane->coupleWithCornerVerticalTilePlane(cornerVerticalTilePlane);
         std::vector<Tile *> *horizontalTiles = new std::vector<Tile *>();
         std::vector<Tile *> *verticalTiles = new std::vector<Tile *>();
-        horizontalTiles->push_back(new Tile(0, 40, 50, 90, true));
-        horizontalTiles->push_back(new Tile(80, 50, 90, 100, true));
-        horizontalTiles->push_back(new Tile(60, 40, 70, 60, true));
-        horizontalTiles->push_back(new Tile(50, 10, 100, 30, true));
-        verticalTiles->push_back(new Tile(0, 40, 50, 90, true));
-        verticalTiles->push_back(new Tile(80, 50, 90, 100, true));
-        verticalTiles->push_back(new Tile(60, 40, 70, 60, true));
-        verticalTiles->push_back(new Tile(50, 10, 100, 30, true));
+        //horizontalTiles->push_back(new Tile(0, 40, 50, 90, true));
+        //horizontalTiles->push_back(new Tile(80, 50, 90, 100, true));
+        //horizontalTiles->push_back(new Tile(60, 40, 70, 60, true));
+        //horizontalTiles->push_back(new Tile(50, 10, 100, 30, true));
+        //verticalTiles->push_back(new Tile(0, 40, 50, 90, true));
+        //verticalTiles->push_back(new Tile(80, 50, 90, 100, true));
+        //verticalTiles->push_back(new Tile(60, 40, 70, 60, true));
+        //verticalTiles->push_back(new Tile(50, 10, 100, 30, true));
+        horizontalTiles->push_back(new Tile(165, 0, 200, 50, true));
+        verticalTiles->push_back(new Tile(165, 0, 200, 50, true));
+        horizontalTiles->push_back(new Tile(0, 0, 5, 5, true));
+        verticalTiles->push_back(new Tile(0, 0, 5, 5, true));
+        horizontalTiles->push_back(new Tile(0, 190, 30, 200, true));
+        verticalTiles->push_back(new Tile(0, 190, 30, 200, true));
+        horizontalTiles->push_back(new Tile(175, 50, 200, 95, true));
+        verticalTiles->push_back(new Tile(175, 50, 200, 95, true));
+        horizontalTiles->push_back(new Tile(145, 0, 165, 10, true));
+        verticalTiles->push_back(new Tile(145, 0, 165, 10, true));
+        horizontalTiles->push_back(new Tile(195, 95, 200, 135, true));
+        verticalTiles->push_back(new Tile(195, 95, 200, 135, true));
+        horizontalTiles->push_back(new Tile(115, 0, 145, 30, true));
+        verticalTiles->push_back(new Tile(115, 0, 145, 30, true));
+        horizontalTiles->push_back(new Tile(135, 30, 165, 80, true));
+        verticalTiles->push_back(new Tile(135, 30, 165, 80, true));
+        horizontalTiles->push_back(new Tile(80, 0, 115, 10, true));
+        verticalTiles->push_back(new Tile(80, 0, 115, 10, true));
+        horizontalTiles->push_back(new Tile(55, 0, 80, 35, true));
+        verticalTiles->push_back(new Tile(55, 0, 80, 35, true));
+        horizontalTiles->push_back(new Tile(90, 30, 135, 55, true));
+        verticalTiles->push_back(new Tile(90, 30, 135, 55, true));
+        horizontalTiles->push_back(new Tile(5, 0, 45, 30, true));
+        verticalTiles->push_back(new Tile(5, 0, 45, 30, true));
+        horizontalTiles->push_back(new Tile(85, 10, 90, 35, true));
+        verticalTiles->push_back(new Tile(85, 10, 90, 35, true));
+        horizontalTiles->push_back(new Tile(95, 55, 135, 100, true));
+        verticalTiles->push_back(new Tile(95, 55, 135, 100, true));
+        horizontalTiles->push_back(new Tile(65, 35, 90, 65, true));
+        verticalTiles->push_back(new Tile(65, 35, 90, 65, true));
+        horizontalTiles->push_back(new Tile(185, 195, 200, 200, true));
+        verticalTiles->push_back(new Tile(185, 195, 200, 200, true));
+        horizontalTiles->push_back(new Tile(0, 175, 30, 190, true));
+        verticalTiles->push_back(new Tile(0, 175, 30, 190, true));
+        horizontalTiles->push_back(new Tile(0, 30, 10, 40, true));
+        verticalTiles->push_back(new Tile(0, 30, 10, 40, true));
+        horizontalTiles->push_back(new Tile(30, 30, 55, 65, true));
+        verticalTiles->push_back(new Tile(30, 30, 55, 65, true));
+        horizontalTiles->push_back(new Tile(195, 150, 200, 195, true));
+        verticalTiles->push_back(new Tile(195, 150, 200, 195, true));
+        horizontalTiles->push_back(new Tile(55, 65, 95, 75, true));
+        verticalTiles->push_back(new Tile(55, 65, 95, 75, true));
+        horizontalTiles->push_back(new Tile(165, 135, 200, 150, true));
+        verticalTiles->push_back(new Tile(165, 135, 200, 150, true));
+        horizontalTiles->push_back(new Tile(140, 80, 175, 90, true));
+        verticalTiles->push_back(new Tile(140, 80, 175, 90, true));
+        horizontalTiles->push_back(new Tile(180, 115, 195, 135, true));
+        verticalTiles->push_back(new Tile(180, 115, 195, 135, true));
+        horizontalTiles->push_back(new Tile(160, 95, 180, 135, true));
+        verticalTiles->push_back(new Tile(160, 95, 180, 135, true));
+        horizontalTiles->push_back(new Tile(30, 190, 80, 200, true));
+        verticalTiles->push_back(new Tile(30, 190, 80, 200, true));
+        horizontalTiles->push_back(new Tile(45, 65, 55, 105, true));
+        verticalTiles->push_back(new Tile(45, 65, 55, 105, true));
+        horizontalTiles->push_back(new Tile(130, 135, 165, 150, true));
+        verticalTiles->push_back(new Tile(130, 135, 165, 150, true));
+        horizontalTiles->push_back(new Tile(55, 35, 65, 60, true));
+        verticalTiles->push_back(new Tile(55, 35, 65, 60, true));
+        horizontalTiles->push_back(new Tile(190, 150, 195, 185, true));
+        verticalTiles->push_back(new Tile(190, 150, 195, 185, true));
+        horizontalTiles->push_back(new Tile(80, 180, 85, 200, true));
+        verticalTiles->push_back(new Tile(80, 180, 85, 200, true));
+        horizontalTiles->push_back(new Tile(10, 65, 45, 95, true));
+        verticalTiles->push_back(new Tile(10, 65, 45, 95, true));
+        horizontalTiles->push_back(new Tile(15, 95, 45, 135, true));
+        verticalTiles->push_back(new Tile(15, 95, 45, 135, true));
+        horizontalTiles->push_back(new Tile(55, 75, 95, 80, true));
+        verticalTiles->push_back(new Tile(55, 75, 95, 80, true));
+        horizontalTiles->push_back(new Tile(140, 90, 160, 130, true));
+        verticalTiles->push_back(new Tile(140, 90, 160, 130, true));
+        horizontalTiles->push_back(new Tile(55, 100, 100, 110, true));
+        verticalTiles->push_back(new Tile(55, 100, 100, 110, true));
+        horizontalTiles->push_back(new Tile(30, 165, 80, 190, true));
+        verticalTiles->push_back(new Tile(30, 165, 80, 190, true));
+        horizontalTiles->push_back(new Tile(45, 110, 70, 140, true));
+        verticalTiles->push_back(new Tile(45, 110, 70, 140, true));
+        horizontalTiles->push_back(new Tile(0, 135, 30, 175, true));
+        verticalTiles->push_back(new Tile(0, 135, 30, 175, true));
+        horizontalTiles->push_back(new Tile(70, 110, 120, 155, true));
+        verticalTiles->push_back(new Tile(70, 110, 120, 155, true));
 
         for (int i = 0; i < horizontalTiles->size(); ++i) {
             Tile *startHorizontalTile = cornerHorizontalTilePlane->findTile(horizontalTiles->at(i)->getXStart(),
@@ -385,6 +465,6 @@ void displayTilePlane(TilePlane *tilePlane) {
 void testTilePlane() {
     //testTilePlane_HorizontalTilePlane();
     //testTilePlane_sortTiles();
-    testTilePlane_CornerHorizontalTilePlane();
-    //testTilePlane_memoryLeak();
+    //testTilePlane_CornerHorizontalTilePlane();
+    testTilePlane_memoryLeak();
 }

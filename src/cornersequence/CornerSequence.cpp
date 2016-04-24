@@ -8,11 +8,13 @@
 #include "floorplan/Macro.h"
 #include "quadtree/Quadtree.h"
 
-CornerSequence::CornerSequence(int xStart, int yStart, int xEnd, int yEnd, std::vector<Macro *> *macros, std::vector<Corner *> *corners,
+CornerSequence::CornerSequence(int xStart, int yStart, int xEnd, int yEnd, int numMacros,
     std::set<Macro *, CompareMacroWidth> *initialWidthSortedMacros,
     std::set<Macro *, CompareMacroHeight> *initialHeightSortedMacros) {
-    this->macros = macros;
-    this->corners = corners;
+    macros = new std::vector<Macro *>();
+    corners = new std::vector<Corner *>();
+    macros->reserve(numMacros);
+    corners->reserve(numMacros);
     cornerHorizontalTilePlane = new CornerHorizontalTilePlane(xStart, yStart, xEnd, yEnd);
     cornerVerticalTilePlane = new CornerVerticalTilePlane(xStart, yStart, xEnd, yEnd);
     cornerHorizontalTilePlane->coupleWithCornerVerticalTilePlane(cornerVerticalTilePlane);
@@ -48,19 +50,25 @@ CornerSequence::CornerSequence(int xStart, int yStart, int xEnd, int yEnd, std::
 }
 
 CornerSequence::~CornerSequence() {
+    delete macros;
     for (int i = indexPlacedUnsuccessfully + 1; i < corners->size(); ++i) {
         Corner *corner = corners->at(i);
         if (corner != 0 && corner->isNotFromTilePlane()) {
             delete corner;
         }
     }
-
+    delete corners;
     delete cornerHorizontalTilePlane;
     delete cornerVerticalTilePlane;
     delete sizeQuadtree;
     delete positionQuadtree;
     delete widthSortedMacros;
     delete heightSortedMacros;
+}
+
+void CornerSequence::addMacroCornerPair(Macro *macro, Corner *corner) {
+    macros->push_back(macro);
+    corners->push_back(corner);
 }
 
 bool CornerSequence::placeMacrosWithoutIncrementalUpdate() {
