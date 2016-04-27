@@ -68,6 +68,7 @@ HEADERS_TILEPLANE_TEST = \
 	./../cornerstitching/TilePlane_test.h\
 	./../cornerstitching/VerticalTilePlane.h\
 	./../quadtree/Point.h\
+	./../utils/Utils.h\
 	./../view/FloorplanWindow.h\
 	./../view/Window.h
 

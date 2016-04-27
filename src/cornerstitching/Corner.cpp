@@ -152,6 +152,10 @@ void Corner::updateWidthAndHeightForSorting() {
     previousHeight = height;
 }
 
+Corner *Corner::copyAsNotFromTilePlane() {
+    return new Corner(x, y, direction, true, true, true);
+}
+
 void Corner::print() {
     std::cout << "(" << x << ",\t" << y << ",\t" << width << ",\t" << height << ",\t" << direction << ",\t" << type1 << ",\t" << gapOnHorizontalSide << ")\n";
 }

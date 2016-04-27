@@ -16,6 +16,10 @@ public:
     void setYEnd(int yEnd);
     int getYEnd();
 
+    // test
+
+    void print() const;
+
 private:
     int width;
     int height;

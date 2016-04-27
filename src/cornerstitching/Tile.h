@@ -17,6 +17,7 @@ public:
     int getYEnd();
     int getWidth() const;
     int getHeight() const;
+    int getArea();
 
     // The two methods are used as sorting keys.
     int getPreviousWidth() const;
@@ -40,6 +41,12 @@ public:
     Tile *getLb();
     bool isSolid();
     bool isEmpty();
+    void setTemporarilySolid();
+    bool isTemporarilySolid();
+    void setGroupId(int groupId);
+    int getGroupId();
+    bool hasGroupId();
+    bool hasNoGroupId();
 
     // The following methods are for Corners.
 
@@ -128,6 +135,8 @@ private:
     Tile *bl;
     Tile *lb;
     bool solid;
+    bool temporarilySolid;  // Represent wasted region.
+    int groupId;    // Used in calculating empty space areas. It is -1 by default.
 
     // The following attributes are for Corners.
     // These are used only if the Tile is empty.
@@ -148,6 +157,18 @@ private:
     Corner *brCorner;
     Corner *tlCorner;
     Corner *trCorner;
+};
+
+struct CompareTileWidth {
+    bool operator() (const Tile *tile1, const Tile *tile2) const {
+        return (tile1->getPreviousWidth() < tile2->getPreviousWidth());
+    }
+};
+
+struct CompareTileHeight {
+    bool operator() (const Tile *tile1, const Tile *tile2) const {
+        return tile1->getPreviousHeight() < tile2->getPreviousHeight();
+    }
 };
 
 #endif

@@ -13,6 +13,8 @@ Tile::Tile(int xStart, int yStart, int xEnd, int yEnd, bool isSolid) {
     previousWidth = width;
     previousHeight = height;
     solid = isSolid;
+    temporarilySolid = false;
+    groupId = -1;
     tr = 0;
     rt = 0;
     bl = 0;
@@ -87,6 +89,10 @@ int Tile::getHeight() const {
     return height;
 }
 
+int Tile::getArea() {
+    return width * height;
+}
+
 int Tile::getPreviousWidth() const {
     return previousWidth;
 }
@@ -138,6 +144,30 @@ bool Tile::isSolid() {
 
 bool Tile::isEmpty() {
     return !solid;
+}
+
+void Tile::setTemporarilySolid() {
+    temporarilySolid = true;
+}
+
+bool Tile::isTemporarilySolid() {
+    return temporarilySolid;
+}
+
+void Tile::setGroupId(int groupId) {
+    this->groupId = groupId;
+}
+
+int Tile::getGroupId() {
+    return groupId;
+}
+
+bool Tile::hasGroupId() {
+    return groupId > -1;
+}
+
+bool Tile::hasNoGroupId() {
+    return groupId == -1;
 }
 
 void Tile::setBottomBlocked(bool blocked, bool fullyBlocked) {
@@ -485,11 +515,15 @@ void Tile::print() {
 
 void Tile::printFourNeighbors() {
     std::cout << "  tr: ";
-    tr->print();
+    if (tr != 0) tr->print();
+    else std::cout << "0\n";
     std::cout << "  rt: ";
-    rt->print();
+    if (rt != 0) rt->print();
+    else std::cout << "0\n";
     std::cout << "  bl: ";
-    bl->print();
+    if (bl != 0) bl->print();
+    else std::cout << "0\n";
     std::cout << "  lb: ";
-    lb->print();
+    if (lb != 0) lb->print();
+    else std::cout << "0\n";
 }

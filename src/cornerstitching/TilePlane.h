@@ -10,6 +10,10 @@ class TilePlane {
 public:
     TilePlane(int xStart, int yStart, int xEnd, int yEnd);
     ~TilePlane();
+    int getXStart();
+    int getYStart();
+    int getXEnd();
+    int getYEnd();
     Tile *getTopLeftMostTile();
     Tile *getBottomRightMostTile();
     /*

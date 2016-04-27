@@ -8,9 +8,15 @@
 #include "floorplan/Macro.h"
 #include "quadtree/Quadtree.h"
 
+#include <iostream>
+
+// Temporary
+#include "floorplan/SortedMacros.h"
+
 CornerSequence::CornerSequence(int xStart, int yStart, int xEnd, int yEnd, int numMacros,
-    std::set<Macro *, CompareMacroWidth> *initialWidthSortedMacros,
-    std::set<Macro *, CompareMacroHeight> *initialHeightSortedMacros) {
+    //std::set<Macro *, CompareMacroWidth> *initialWidthSortedMacros,
+    //std::set<Macro *, CompareMacroHeight> *initialHeightSortedMacros) {
+    SortedMacros *initialWidthSortedMacros, SortedMacros *initialHeightSortedMacros) {
     macros = new std::vector<Macro *>();
     corners = new std::vector<Corner *>();
     macros->reserve(numMacros);
@@ -43,8 +49,10 @@ CornerSequence::CornerSequence(int xStart, int yStart, int xEnd, int yEnd, int n
 
     this->initialWidthSortedMacros = initialWidthSortedMacros;
     this->initialHeightSortedMacros = initialHeightSortedMacros;
-    widthSortedMacros = new std::set<Macro *, CompareMacroWidth>(*initialWidthSortedMacros);
-    heightSortedMacros = new std::set<Macro *, CompareMacroHeight>(*initialHeightSortedMacros);
+    //widthSortedMacros = new std::set<Macro *, CompareMacroWidth>(*initialWidthSortedMacros);
+    //heightSortedMacros = new std::set<Macro *, CompareMacroHeight>(*initialHeightSortedMacros);
+    widthSortedMacros = new SortedMacros(initialWidthSortedMacros);
+    heightSortedMacros = new SortedMacros(initialHeightSortedMacros);
 
     indexPlacedUnsuccessfully = corners->size();
 }
@@ -71,6 +79,26 @@ void CornerSequence::addMacroCornerPair(Macro *macro, Corner *corner) {
     corners->push_back(corner);
 }
 
+int CornerSequence::getNumMacros() {
+    return macros->size();
+}
+
+void CornerSequence::swapMacros(int i, int j) {
+    Macro *ithMacro = macros->at(i);
+    macros->at(i) = macros->at(j);
+    macros->at(j) = ithMacro;
+}
+
+void CornerSequence::changeCorner(int i) {
+    Corner *ithCorner = corners->at(i);
+    if (ithCorner != 0) {
+        if (ithCorner->isNotFromTilePlane()) {
+            delete ithCorner;
+        }
+        corners->at(i) = 0;
+    }
+}
+
 bool CornerSequence::placeMacrosWithoutIncrementalUpdate() {
     return placeMacrosWithIncrementalUpdate(0, -1);
 }
@@ -82,10 +110,25 @@ bool CornerSequence::placeMacrosWithIncrementalUpdate(int startPosition, int bac
     std::vector<Corner *> *temporarilyRemovedCorners = new std::vector<Corner *>();
     
     for (int i = startPosition; i < macros->size(); ++i) {
+        //std::cout << i << "\n";
         Macro *macro = macros->at(i);
         int macroWidth = macro->getWidth();
         int macroHeight = macro->getHeight();
         Corner *corner = corners->at(i);
+
+        //std::cout << "begin Macro " << i << "\n";
+        //std::cout << "smallest width emtpy Tile:  ";
+        //cornerHorizontalTilePlane->getEmptyTileWithSmallestWidth()->print();
+        //std::cout << "smallest height empty Tile: ";
+        //cornerVerticalTilePlane->getEmptyTileWithSmallestHeight()->print();
+        //std::cout << "smallest width Macro: ";
+        //////(*widthSortedMacros->begin())->print();
+        //widthSortedMacros->getSmallest()->print();
+        //std::cout << "smallest height Macro: ";
+        ////(*heightSortedMacros->begin())->print();
+        //heightSortedMacros->getSmallest()->print();
+
+        //fillInWastedRegion();
 
         // Check whether to select another Corner.
         bool toSelectAnotherCorner = false;
@@ -259,24 +302,24 @@ bool CornerSequence::placeMacrosWithIncrementalUpdate(int startPosition, int bac
         }
         cornerHorizontalTilePlane->placeSolidTileGivenBothStartTiles(horizontalTile, startHorizontalTile, startVerticalTile);
         startHorizontalTile = horizontalTile;
-        switch (cornerDirection) {
-        case 0:
-            // Bl
-            startVerticalTile = corner->getVerticalTile();
-            break;
-        case 1:
-            // Br
-            startVerticalTile = cornerVerticalTilePlane->findTile(macroXStart, macroYStart, corner->getVerticalTile());
-            break;
-        case 2:
-            // Tl
-            startVerticalTile = corner->getVerticalTile();
-            break;
-        case 3:
-            // Tr
-            startVerticalTile = cornerVerticalTilePlane->findTile(macroXStart, macroYStart, corner->getVerticalTile());
-            break;
-        }
+        //switch (cornerDirection) {
+        //case 0:
+        //    // Bl
+        //    startVerticalTile = corner->getVerticalTile();
+        //    break;
+        //case 1:
+        //    // Br
+        //    startVerticalTile = cornerVerticalTilePlane->findTile(macroXStart, macroYStart, corner->getVerticalTile());
+        //    break;
+        //case 2:
+        //    // Tl
+        //    startVerticalTile = corner->getVerticalTile();
+        //    break;
+        //case 3:
+        //    // Tr
+        //    startVerticalTile = cornerVerticalTilePlane->findTile(macroXStart, macroYStart, corner->getVerticalTile());
+        //    break;
+        //}
         cornerVerticalTilePlane->placeSolidTileGivenBothStartTiles(verticalTile, startVerticalTile, startHorizontalTile);
         // Remove macro from sets.
         widthSortedMacros->erase(macro);
@@ -294,8 +337,29 @@ bool CornerSequence::placeMacrosWithIncrementalUpdate(int startPosition, int bac
     return !placedUnsuccessfully;
 }
 
-void CornerSequence::placeMacrosByValidCorners() {
-
+void CornerSequence::setMacrosPositionByCorners() {
+    for (int i = 0; i < macros->size(); ++i) {
+        Macro *macro = macros->at(i);
+        Corner *corner = corners->at(i);
+        switch (corner->getDirection()) {
+        case 0:
+            macro->setXStart(corner->getX());
+            macro->setYStart(corner->getY());
+            break;
+        case 1:
+            macro->setXEnd(corner->getX());
+            macro->setYStart(corner->getY());
+            break;
+        case 2:
+            macro->setXStart(corner->getX());
+            macro->setYEnd(corner->getY());
+            break;
+        case 3:
+            macro->setXEnd(corner->getX());
+            macro->setYEnd(corner->getY());
+            break;
+        }
+    }
 }
 
 CornerSequence *CornerSequence::getPartiallyPlacedBackup() {
@@ -303,7 +367,20 @@ CornerSequence *CornerSequence::getPartiallyPlacedBackup() {
 }
 
 CornerSequence *CornerSequence::copy() {
-    return 0;
+    CornerSequence *copiedCornerSequence = new CornerSequence(
+        cornerHorizontalTilePlane->getXStart(),
+        cornerHorizontalTilePlane->getYStart(),
+        cornerHorizontalTilePlane->getXEnd(),
+        cornerHorizontalTilePlane->getYEnd(),
+        macros->size(), initialWidthSortedMacros, initialHeightSortedMacros);
+    for (int i = 0; i < macros->size(); ++i) {
+        Corner *corner = corners->at(i);
+        if (corner != 0) {
+            corner = corner->copyAsNotFromTilePlane();
+        }
+        copiedCornerSequence->addMacroCornerPair(macros->at(i), corner);
+    }
+    return copiedCornerSequence;
 }
 
 CornerHorizontalTilePlane *CornerSequence::getCornerHorizontalTilePlane() {
@@ -388,5 +465,103 @@ void CornerSequence::updateQuadtrees() {
             positionQuadtree->remove(removedCorner);
         }
         delete removedCorner;
+    }
+}
+
+void CornerSequence::fillInWastedRegion() {
+    std::cout << "fillInWastedRegion()\n";
+    int smallestMacroWidth = widthSortedMacros->getSmallest()->getWidth();
+    int smallestMacroHeight = heightSortedMacros->getSmallest()->getHeight();
+    while (true) {
+        int numFills = 0;
+        // Try to fill a horizontal empty Tile.
+        Tile *emptyTile = cornerHorizontalTilePlane->getEmptyTileWithSmallestWidth();
+        if (emptyTile != 0 && emptyTile->getWidth() < smallestMacroWidth) {
+            std::cout << "fill horizontalTile\n";
+            emptyTile->print();
+            Tile *horizontalTile = new Tile(emptyTile->getXStart(), emptyTile->getYStart(),
+                emptyTile->getXEnd(), emptyTile->getYEnd(), true);
+            Tile *verticalTile = new Tile(emptyTile->getXStart(), emptyTile->getYStart(),
+                emptyTile->getXEnd(), emptyTile->getYEnd(), true);
+            horizontalTile->setTemporarilySolid();
+            verticalTile->setTemporarilySolid();
+            // Find startVerticalTile.
+            Corner *corner = emptyTile->getBlCorner();
+            Tile *startVerticalTile;
+            if (corner == 0) {
+                corner = emptyTile->getTlCorner();
+            }
+            if (corner != 0) {
+                startVerticalTile = corner->getVerticalTile();
+            } else {
+                // If emptyTile has no Corner, than emptyTile's lb and rt
+                // are empty Tiles, and lb has top Corners and rt has bottom Corners.
+                startVerticalTile = cornerVerticalTilePlane->findTile(emptyTile->getXStart(), emptyTile->getYStart(),
+                    emptyTile->getRt()->getBlCorner()->getVerticalTile());
+            }
+            // Place horizontalTile.
+            std::cout << "place horizontal\n";
+            cornerHorizontalTilePlane->placeSolidTileGivenBothStartTiles(horizontalTile, emptyTile, startVerticalTile);
+            // Place verticalTile.
+            std::cout << "place vertical\n";
+            cornerVerticalTilePlane->placeSolidTileGivenBothStartTiles(verticalTile, horizontalTile, startVerticalTile);
+
+            cornerHorizontalTilePlane->calculateCurrentCornersWidthAndHeight();
+            cornerVerticalTilePlane->calculateCurrentCornersWidthAndHeight();
+            std::cout << "updateQuadtrees()\n";
+            updateQuadtrees();
+            std::cout << "updateQuadtrees() end\n";
+
+            numFills += 1;
+        }
+        // Try to fill a vertical empty Tile.
+        emptyTile = cornerVerticalTilePlane->getEmptyTileWithSmallestHeight();
+        if (emptyTile != 0 && emptyTile->getHeight() < smallestMacroHeight) {
+            std::cout << "fill verticalTile\n";
+            emptyTile->print();
+            Tile *horizontalTile = new Tile(emptyTile->getXStart(), emptyTile->getYStart(),
+                emptyTile->getXEnd(), emptyTile->getYEnd(), true);
+            Tile *verticalTile = new Tile(emptyTile->getXStart(), emptyTile->getYStart(),
+                emptyTile->getXEnd(), emptyTile->getYEnd(), true);
+            horizontalTile->setTemporarilySolid();
+            verticalTile->setTemporarilySolid();
+            // Find startHorizontalTile.
+            Corner *corner = emptyTile->getBlCorner();
+            Tile *startHorizontalTile;
+            if (corner == 0) {
+                corner = emptyTile->getBrCorner();
+            }
+            if (corner != 0) {
+                corner->print();
+                startHorizontalTile = corner->getHorizontalTile();
+                cornerHorizontalTilePlane->getBottomRightMostTile()->print();
+            } else {
+                // If emptyTile has no Corner, than emptyTile's bl and tr
+                // are empty Tiles, and bl has right Corners and tr has left Corners.
+                startHorizontalTile = cornerHorizontalTilePlane->findTile(emptyTile->getXStart(), emptyTile->getYStart(),
+                    emptyTile->getTr()->getBlCorner()->getHorizontalTile());
+            }
+            // Place horizontalTile.
+            std::cout << "place horizontal\n";
+            horizontalTile->print();
+            startHorizontalTile->print();
+            startHorizontalTile->printFourNeighbors();
+            cornerHorizontalTilePlane->placeSolidTileGivenBothStartTiles(horizontalTile, startHorizontalTile, emptyTile);
+            // Place verticalTile.
+            std::cout << "place vertical\n";
+            cornerVerticalTilePlane->placeSolidTileGivenBothStartTiles(verticalTile, horizontalTile, emptyTile);
+
+            cornerHorizontalTilePlane->calculateCurrentCornersWidthAndHeight();
+            cornerVerticalTilePlane->calculateCurrentCornersWidthAndHeight();
+            std::cout << "updateQuadtrees()\n";
+            updateQuadtrees();
+            std::cout << "updateQuadtrees() end\n";
+
+            numFills += 1;
+        }
+        // Continue or not.
+        if (numFills == 0) {
+            break;
+        }
     }
 }

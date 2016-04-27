@@ -5,7 +5,7 @@
 #include "cornerstitching/TilePlane.h"
 
 class Tile;
-//class CompareTileWidth;
+//struct CompareTileWidth;
 
 // Temporary
 class SortedTiles;
@@ -49,6 +49,7 @@ public:
     /*
     Get the Tile with the smallest width.
     This method does not modify the TilePlane.
+    Return zero if there is no empty Tile.
     */
     Tile *getEmptyTileWithSmallestWidth();
 
@@ -59,7 +60,7 @@ protected:
     */
     std::vector<Tile *> *currentlyRemovedTiles;
     //// Empty Tiles sorted by width.
-    //std::set<Tile *, CompareTileWidth> *sortedEmptyTiles;
+    //std::multiset<Tile *, CompareTileWidth> *sortedEmptyTiles;
     // Temporary
     SortedTiles *sortedEmptyTiles;
 

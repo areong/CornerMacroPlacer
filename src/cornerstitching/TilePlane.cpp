@@ -42,6 +42,22 @@ TilePlane::~TilePlane() {
     delete topBoundaryTile;
 }
 
+int TilePlane::getXStart() {
+    return tilePlaneXStart;
+}
+
+int TilePlane::getYStart() {
+    return tilePlaneYStart;
+}
+
+int TilePlane::getXEnd() {
+    return tilePlaneXEnd;
+}
+
+int TilePlane::getYEnd() {
+    return tilePlaneYEnd;
+}
+
 Tile *TilePlane::getTopLeftMostTile() {
     return leftBoundaryTile->getTr();
 }

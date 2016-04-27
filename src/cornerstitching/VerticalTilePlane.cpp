@@ -4,22 +4,28 @@
 // Temporary
 #include "cornerstitching/SortedTiles.h"
 
-//struct CompareTileHeight {
-//    bool operator() (const Tile *tile1, const Tile *tile2) const {
-//        return tile1->getPreviousHeight() < tile2->getPreviousHeight();
-//    }
-//};
-
 VerticalTilePlane::VerticalTilePlane(int xStart, int yStart, int xEnd, int yEnd) : TilePlane(xStart, yStart, xEnd, yEnd) {
     currentlyRemovedTiles = new std::vector<Tile *>();
-    //sortedEmptyTiles = new std::set<Tile *, CompareTileHeight>();
+    //sortedEmptyTiles = new std::multiset<Tile *, CompareTileHeight>();
     sortedEmptyTiles = new SortedTiles(false);
     sortedEmptyTiles->insert(getTopLeftMostTile());
+
+    emptyTileGroups = new std::vector<std::vector<Tile *> *>();
+    emptyTileGroupConnectivities = new std::vector<int>();
+    emptyTileGroupAreas = new std::vector<int>();
+    largestAreaEmptyTileGroupId = 0;
 }
 
 VerticalTilePlane::~VerticalTilePlane() {
     delete currentlyRemovedTiles;
     delete sortedEmptyTiles;
+
+    for (int i = 0; i < emptyTileGroups->size(); ++i) {
+        delete emptyTileGroups->at(i);
+    }
+    delete emptyTileGroups;
+    delete emptyTileGroupConnectivities;
+    delete emptyTileGroupAreas;
 }
 
 Tile *VerticalTilePlane::findTile(int x, int y, Tile *startTile) {
@@ -251,6 +257,169 @@ void VerticalTilePlane::placeSolidTile(Tile *tile, Tile *startTile) {
 Tile *VerticalTilePlane::getEmptyTileWithSmallestHeight() {
     //return *(sortedEmptyTiles->begin());
     return sortedEmptyTiles->getSmallest();
+}
+
+void VerticalTilePlane::calculateEmptySpaceAreas() {
+    //// Clear data.
+    //for (int i = 0; i < emptyTileGroups->size(); ++i) {
+    //    delete emptyTileGroups->at(i);
+    //}
+    //emptyTileGroups->clear();
+    //emptyTileGroupConnectivities->clear();
+    //emptyTileGroupAreas->clear();
+
+    // Use this for a new group of connected empty Tiles.
+    int newestGroupId = -1;
+
+    // Traverse Tiles to group empty Tiles.
+    std::vector<Tile *> *discoveredTiles = new std::vector<Tile *>();
+    discoveredTiles->push_back(getTopLeftMostTile());
+    Tile *currentTile;
+    while (discoveredTiles->size() > 0) {
+        currentTile = discoveredTiles->back();
+        discoveredTiles->pop_back();
+        
+        // Traverse on a Tile.
+        int currentTileGroupId = -1;
+        if (currentTile->isEmpty() || currentTile->isTemporarilySolid()) {
+            if (currentTile->hasNoGroupId()) {
+                // Increase newestGroupId and extend vectors.
+                newestGroupId += 1;
+                emptyTileGroups->push_back(new std::vector<Tile *>());
+                emptyTileGroupConnectivities->push_back(-1);
+                emptyTileGroupAreas->push_back(0);
+
+                // Set groupId.
+                currentTile->setGroupId(newestGroupId);
+            }
+            // Whether currentTile just got groupId or alread has one,
+            // save its groupId and add currentTile to the group.
+            currentTileGroupId = currentTile->getGroupId();
+            emptyTileGroups->at(currentTileGroupId)->push_back(currentTile);
+        }
+
+        // Get neighbors at right.
+        std::vector<Tile *> *rightTiles = new std::vector<Tile *>();
+        int currentTileYStart = currentTile->getYStart();
+        if (currentTileGroupId > -1) {
+            // currentTile is a space. Try to set right Tiles' groupId.
+            if (currentTile->getXEnd() < tilePlaneXEnd) {
+                Tile *currentNeighbor = currentTile->getTr();
+                // The first right Tile
+                // Among right Tiles, only the first one,
+                // if it is a space and have larger yEnd, can already have groupId.
+                // (It is not necessary to check yEnd.)
+                int groupIdForRightTiles = currentTileGroupId;
+                if (currentNeighbor->isEmpty() || currentNeighbor->isTemporarilySolid()) {
+                    if (currentNeighbor->hasGroupId()) {
+                        // Its groupId is different from currentTileGroupId,
+                        // which means the two groups actually belong to one group.
+                        // Store the smaller groupId for other right Tiles, and
+                        // store this relation in emptyTileGroupConnectivities.
+                        int currentNeighborGroupId = currentNeighbor->getGroupId();
+                        if (currentTileGroupId > currentNeighborGroupId) {
+                            groupIdForRightTiles = currentNeighborGroupId;
+                            // Update emptyTileGroupConnectivities.
+                            int connectedToGroupId = emptyTileGroupConnectivities->at(currentTileGroupId);
+                            if (connectedToGroupId == -1 || currentNeighborGroupId < connectedToGroupId) {
+                                emptyTileGroupConnectivities->at(currentTileGroupId) = currentNeighborGroupId;
+                            }
+                        } else {
+                            // currentNeighborGroupId > currentTileGroupId.
+                            // Update emptyTileGroupConnectivities.
+                            int connectedToGroupId = emptyTileGroupConnectivities->at(currentNeighborGroupId);
+                            if (connectedToGroupId == -1 || currentTileGroupId < connectedToGroupId) {
+                                emptyTileGroupConnectivities->at(currentNeighborGroupId) = currentTileGroupId;
+                            }
+                        }
+                    } else {
+                        // Set groupId.
+                        currentNeighbor->setGroupId(groupIdForRightTiles);
+                    }
+                }
+    
+                // Other right Tiles
+                while (currentNeighbor->getYStart() >= currentTileYStart) {
+                    rightTiles->push_back(currentNeighbor);
+    
+                    // Set groupId if currentNeighbor is a space.
+                    // It is impossible that currentNeighbor already has groupId.
+                    if (currentNeighbor->isEmpty() || currentNeighbor->isTemporarilySolid()) {
+                        currentNeighbor->setGroupId(groupIdForRightTiles);
+                    }
+    
+                    currentNeighbor = currentNeighbor->getLb();
+                }
+                if (currentNeighbor->isEmpty() || currentNeighbor->isTemporarilySolid()) {
+                    if (currentNeighbor->getYEnd() > currentTileYStart) {
+                        // The last right Tile is empty and connected.
+                        // Though it will not be included in rightTiles,
+                        // set its groupId too.
+                        currentNeighbor->setGroupId(groupIdForRightTiles);
+                    }
+                }
+            }
+        } else {
+            // currentTile is not a space, do not set right Tiles' groupId.
+            if (currentTile->getXEnd() < tilePlaneXEnd) {
+                Tile *currentNeighbor = currentTile->getTr();
+                while (currentNeighbor->getYStart() >= currentTileYStart) {
+                    rightTiles->push_back(currentNeighbor);
+                    currentNeighbor = currentNeighbor->getLb();
+                }
+            }
+        }
+        // Push currentTile->lb to discoveredTiles.
+        if (discoveredTiles->size() == 0 && currentTileYStart > tilePlaneYStart) {
+            discoveredTiles->push_back(currentTile->getLb());
+        }
+        // Push rightTiles to discoveredTiles in inverse order.
+        for (int i = rightTiles->size() - 1; i >= 0; --i) {
+            discoveredTiles->push_back(rightTiles->at(i));
+        }
+        delete rightTiles;
+    }
+    delete discoveredTiles;
+
+    // Merge groups.
+    for (int i = 0; i < emptyTileGroups->size(); ++i) {
+        int connectedToGroupId = emptyTileGroupConnectivities->at(i);
+        if (connectedToGroupId == -1) {
+            continue;
+        }
+        // Find the ultimate connectedToGroupId.
+        while (emptyTileGroupConnectivities->at(connectedToGroupId) > -1) {
+            connectedToGroupId = emptyTileGroupConnectivities->at(connectedToGroupId);
+        }
+        emptyTileGroupConnectivities->at(i) = connectedToGroupId;
+        // Merge vectors.
+        std::vector<Tile *> *thisGroup = emptyTileGroups->at(i);
+        std::vector<Tile *> *goalGroup = emptyTileGroups->at(connectedToGroupId);
+        goalGroup->reserve(goalGroup->size() + thisGroup->size());
+        goalGroup->insert(goalGroup->end(), thisGroup->begin(), thisGroup->end());
+        thisGroup->clear();
+    }
+
+    // Calculate areas.
+    for (int iGroup = 0; iGroup < emptyTileGroups->size(); ++iGroup) {
+        std::vector<Tile *> *thisGroup = emptyTileGroups->at(iGroup);
+        for (int i = 0; i < thisGroup->size(); ++i) {
+            emptyTileGroupAreas->at(iGroup) += thisGroup->at(i)->getArea();
+        }
+    }
+
+    // Find the group with the largest area.
+    int largestArea = 0;
+    for (int i = 0; i < emptyTileGroupAreas->size(); ++i) {
+        if (emptyTileGroupAreas->at(i) > largestArea) {
+            largestAreaEmptyTileGroupId = i;
+            largestArea = emptyTileGroupAreas->at(i);
+        }
+    }
+}
+
+int VerticalTilePlane::getLargestEmptySpaceArea() {
+    return emptyTileGroupAreas->at(largestAreaEmptyTileGroupId);
 }
 
 Tile *VerticalTilePlane::splitStartTileHorizontally(Tile *tile, int x) {

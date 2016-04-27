@@ -16,6 +16,9 @@ public:
     ~SortedTiles();
     void insert(Tile *tile);
     void erase(Tile *tile);
+    /*
+    Return zero if there is no Tile.
+    */
     Tile *getSmallest();
     void print();
 

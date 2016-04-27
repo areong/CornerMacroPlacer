@@ -4,15 +4,9 @@
 // Temporary
 #include "cornerstitching/SortedTiles.h"
 
-//struct CompareTileWidth {
-//    bool operator() (const Tile *tile1, const Tile *tile2) const {
-//        return tile1->getPreviousWidth() < tile2->getPreviousWidth();
-//    }
-//};
-
 HorizontalTilePlane::HorizontalTilePlane(int xStart, int yStart, int xEnd, int yEnd) : TilePlane(xStart, yStart, xEnd, yEnd) {
     currentlyRemovedTiles = new std::vector<Tile *>();
-    //sortedEmptyTiles = new std::set<Tile *, CompareTileWidth>();
+    //sortedEmptyTiles = new std::multiset<Tile *, CompareTileWidth>();
     sortedEmptyTiles = new SortedTiles(true);
     sortedEmptyTiles->insert(getTopLeftMostTile());
 }

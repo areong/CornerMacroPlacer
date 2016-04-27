@@ -1,5 +1,7 @@
 #include "floorplan/Macro.h"
 
+#include <iostream>
+
 Macro::Macro(int width, int height) {
     this->width = width;
     this->height = height;
@@ -50,4 +52,9 @@ void Macro::setYEnd(int yEnd) {
 
 int Macro::getYEnd() {
     return yEnd;
+}
+
+void Macro::print() const {
+    std::cout << "(" << width << ", " << height << ", " << xStart << ", "
+        << yStart << ", " << xEnd << ", " << yEnd <<")\n";
 }

@@ -12,11 +12,14 @@
 
 #include <set>
 
+// Temporary
+#include "floorplan/SortedMacros.h"
+
 void displayTilePlane2(TilePlane *tilePlane) {
     FloorplanWindow *window = FloorplanWindow::createInstance(0);
     window->setWindowSize(1024, 768);
     window->setTilePlane(tilePlane);
-    window->setXYRange(0, 0, 200, 200);
+    window->setXYRange(0, 0, 100, 100);
     window->initialize();
     window->runMainLoop();
 }
@@ -38,10 +41,10 @@ void testCornerSequence_sortMacros() {
 }
 
 void testCornerSequence_basic() {
-    int numMacros = 40;
+    int numMacros = 0;
     std::vector<Macro *> *macros = new std::vector<Macro *>();
-    std::vector<Corner *> *corners = new std::vector<Corner *>(numMacros, 0);
-    //std::vector<Corner *> *corners = new std::vector<Corner *>();
+    //std::vector<Corner *> *corners = new std::vector<Corner *>(numMacros, 0);
+    std::vector<Corner *> *corners = new std::vector<Corner *>();
     //macros->push_back(new Macro(60, 10));
     //corners->push_back(new Corner(0, 0, 0, true, true, true));
     
@@ -66,26 +69,26 @@ void testCornerSequence_basic() {
     //macros->push_back(new Macro(45, 25));
     //macros->push_back(new Macro(50, 5));
 
-    //macros->push_back(new Macro(15, 5));
-    //corners->push_back(new Corner(100, 100, 3, true, true, true));
-    //macros->push_back(new Macro(20, 50));
-    //corners->push_back(new Corner(85, 100, 3, true, true, true));
-    //macros->push_back(new Macro(45, 20));
-    //corners->push_back(new Corner(0, 100, 2, true, true, true));
-    //macros->push_back(new Macro(30, 25));
-    //corners->push_back(new Corner(100, 50, 3, true, true, true));
-    //macros->push_back(new Macro(40, 30));
-    //corners->push_back(new Corner(0, 0, 0, true, true, true));
-    //macros->push_back(new Macro(10, 45));
-    //corners->push_back(new Corner(65, 100, 3, true, true, true));
-    //macros->push_back(new Macro(40, 30));
-    //corners->push_back(new Corner(0, 80, 2, true, true, true));
-    //macros->push_back(new Macro(30, 5));
-    //corners->push_back(new Corner(40, 0, 0, true, true, true));
-    //macros->push_back(new Macro(40, 10));
-    //corners->push_back(new Corner(100, 5, 1, true, true, true));
-    //macros->push_back(new Macro(20, 25));
-    //corners->push_back(new Corner(70, 50, 3, true, true, true));
+    macros->push_back(new Macro(15, 5));
+    corners->push_back(new Corner(100, 100, 3, true, true, true));
+    macros->push_back(new Macro(20, 50));
+    corners->push_back(new Corner(85, 100, 3, true, true, true));
+    macros->push_back(new Macro(45, 20));
+    corners->push_back(new Corner(0, 100, 2, true, true, true));
+    macros->push_back(new Macro(30, 25));
+    corners->push_back(new Corner(100, 50, 3, true, true, true));
+    macros->push_back(new Macro(40, 30));
+    corners->push_back(new Corner(0, 0, 0, true, true, true));
+    macros->push_back(new Macro(10, 45));
+    corners->push_back(new Corner(65, 100, 3, true, true, true));
+    macros->push_back(new Macro(40, 30));
+    corners->push_back(new Corner(0, 80, 2, true, true, true));
+    macros->push_back(new Macro(30, 5));
+    corners->push_back(new Corner(40, 0, 0, true, true, true));
+    macros->push_back(new Macro(40, 10));
+    corners->push_back(new Corner(100, 5, 1, true, true, true));
+    macros->push_back(new Macro(20, 25));
+    corners->push_back(new Corner(70, 50, 3, true, true, true));
 
     for (int i = numMacros; i > 0; --i) {
         int width = Utils::randint(1, 11) * 5;
@@ -105,14 +108,16 @@ void testCornerSequence_basic() {
     //              << ", true, true, true));\n";
     //}
 
-    std::set<Macro *, CompareMacroWidth> *initialWidthSortedMacros = new std::set<Macro *, CompareMacroWidth>();
-    std::set<Macro *, CompareMacroHeight> *initialHeightSortedMacros = new std::set<Macro *, CompareMacroHeight>();
+    //std::set<Macro *, CompareMacroWidth> *initialWidthSortedMacros = new std::set<Macro *, CompareMacroWidth>();
+    //std::set<Macro *, CompareMacroHeight> *initialHeightSortedMacros = new std::set<Macro *, CompareMacroHeight>();
+    SortedMacros *initialWidthSortedMacros = new SortedMacros(true);
+    SortedMacros *initialHeightSortedMacros = new SortedMacros(false);
     for (int i = 0; i < macros->size(); ++i) {
         initialWidthSortedMacros->insert(macros->at(i));
         initialHeightSortedMacros->insert(macros->at(i));
     }
 
-    CornerSequence *cornerSequence = new CornerSequence(0, 0, 200, 200, macros->size(),
+    CornerSequence *cornerSequence = new CornerSequence(0, 0, 100, 100, macros->size(),
         initialWidthSortedMacros, initialHeightSortedMacros);
     for (int i = 0; i < macros->size(); ++i) {
         cornerSequence->addMacroCornerPair(macros->at(i), corners->at(i));
@@ -160,8 +165,10 @@ void testCornerSequence_basic() {
     //    testCorner->getVerticalTile()->print();
     //}
 
-    displayTilePlane2(cornerSequence->getCornerHorizontalTilePlane());
-    //displayTilePlane2(cornerSequence->getCornerVerticalTilePlane());
+    cornerSequence->getCornerVerticalTilePlane()->calculateEmptySpaceAreas();
+
+    //displayTilePlane2(cornerSequence->getCornerHorizontalTilePlane());
+    displayTilePlane2(cornerSequence->getCornerVerticalTilePlane());
 
     delete cornerSequence;
     delete corners;
@@ -175,61 +182,63 @@ void testCornerSequence_memoryLeak() {
     int numMacros = 40;
     std::vector<Macro *> *macros = new std::vector<Macro *>();
     std::vector<Corner *> *corners = new std::vector<Corner *>();
-    for (int i = numMacros; i > 0; --i) {
-        int width = Utils::randint(1, 11) * 5;
-        int height = Utils::randint(1, 11) * 5;
-        macros->push_back(new Macro(width, height));
-        //std::cout << "macros->push_back(new Macro(" << width << ", " << height << "));\n";
-    }
-    //macros->push_back(new Macro(35, 50));
-    //macros->push_back(new Macro(5, 5));
-    //macros->push_back(new Macro(30, 10));
-    //macros->push_back(new Macro(25, 45));
-    //macros->push_back(new Macro(20, 10));
-    //macros->push_back(new Macro(5, 40));
-    //macros->push_back(new Macro(30, 30));
-    //macros->push_back(new Macro(30, 50));
-    //macros->push_back(new Macro(35, 10));
-    //macros->push_back(new Macro(25, 35));
-    //macros->push_back(new Macro(45, 25));
-    //macros->push_back(new Macro(40, 30));
-    //macros->push_back(new Macro(5, 25));
-    //macros->push_back(new Macro(40, 45));
-    //macros->push_back(new Macro(25, 30));
-    //macros->push_back(new Macro(15, 5));
-    //macros->push_back(new Macro(30, 15));
-    //macros->push_back(new Macro(10, 10));
-    //macros->push_back(new Macro(25, 35));
-    //macros->push_back(new Macro(5, 45));
-    //macros->push_back(new Macro(40, 10));
-    //macros->push_back(new Macro(35, 15));
-    //macros->push_back(new Macro(35, 10));
-    //macros->push_back(new Macro(15, 20));
-    //macros->push_back(new Macro(20, 40));
-    //macros->push_back(new Macro(50, 10));
-    //macros->push_back(new Macro(10, 40));
-    //macros->push_back(new Macro(35, 15));
-    //macros->push_back(new Macro(10, 25));
-    //macros->push_back(new Macro(5, 35));
-    //macros->push_back(new Macro(5, 20));
-    //macros->push_back(new Macro(35, 30));
-    //macros->push_back(new Macro(30, 40));
-    //macros->push_back(new Macro(40, 5));
-    //macros->push_back(new Macro(20, 40));
-    //macros->push_back(new Macro(45, 10));
-    //macros->push_back(new Macro(50, 25));
-    //macros->push_back(new Macro(25, 30));
-    //macros->push_back(new Macro(30, 40));
-    //macros->push_back(new Macro(50, 45));
+    //for (int i = numMacros; i > 0; --i) {
+    //    int width = Utils::randint(1, 11) * 5;
+    //    int height = Utils::randint(1, 11) * 5;
+    //    macros->push_back(new Macro(width, height));
+    //    //std::cout << "macros->push_back(new Macro(" << width << ", " << height << "));\n";
+    //}
+    macros->push_back(new Macro(35, 50));
+    macros->push_back(new Macro(5, 5));
+    macros->push_back(new Macro(30, 10));
+    macros->push_back(new Macro(25, 45));
+    macros->push_back(new Macro(20, 10));
+    macros->push_back(new Macro(5, 40));
+    macros->push_back(new Macro(30, 30));
+    macros->push_back(new Macro(30, 50));
+    macros->push_back(new Macro(35, 10));
+    macros->push_back(new Macro(25, 35));
+    macros->push_back(new Macro(45, 25));
+    macros->push_back(new Macro(40, 30));
+    macros->push_back(new Macro(5, 25));
+    macros->push_back(new Macro(40, 45));
+    macros->push_back(new Macro(25, 30));
+    macros->push_back(new Macro(15, 5));
+    macros->push_back(new Macro(30, 15));
+    macros->push_back(new Macro(10, 10));
+    macros->push_back(new Macro(25, 35));
+    macros->push_back(new Macro(5, 45));
+    macros->push_back(new Macro(40, 10));
+    macros->push_back(new Macro(35, 15));
+    macros->push_back(new Macro(35, 10));
+    macros->push_back(new Macro(15, 20));
+    macros->push_back(new Macro(20, 40));
+    macros->push_back(new Macro(50, 10));
+    macros->push_back(new Macro(10, 40));
+    macros->push_back(new Macro(35, 15));
+    macros->push_back(new Macro(10, 25));
+    macros->push_back(new Macro(5, 35));
+    macros->push_back(new Macro(5, 20));
+    macros->push_back(new Macro(35, 30));
+    macros->push_back(new Macro(30, 40));
+    macros->push_back(new Macro(40, 5));
+    macros->push_back(new Macro(20, 40));
+    macros->push_back(new Macro(45, 10));
+    macros->push_back(new Macro(50, 25));
+    macros->push_back(new Macro(25, 30));
+    macros->push_back(new Macro(30, 40));
+    macros->push_back(new Macro(50, 45));
 
-    std::set<Macro *, CompareMacroWidth> *initialWidthSortedMacros = new std::set<Macro *, CompareMacroWidth>();
-    std::set<Macro *, CompareMacroHeight> *initialHeightSortedMacros = new std::set<Macro *, CompareMacroHeight>();
+    //std::set<Macro *, CompareMacroWidth> *initialWidthSortedMacros = new std::set<Macro *, CompareMacroWidth>();
+    //std::set<Macro *, CompareMacroHeight> *initialHeightSortedMacros = new std::set<Macro *, CompareMacroHeight>();
+    SortedMacros *initialWidthSortedMacros = new SortedMacros(true);
+    SortedMacros *initialHeightSortedMacros = new SortedMacros(false);
     for (int i = 0; i < macros->size(); ++i) {
         initialWidthSortedMacros->insert(macros->at(i));
         initialHeightSortedMacros->insert(macros->at(i));
     }
 
-    for (int iLoop = 0; iLoop < 10000; ++iLoop) {
+    for (int iLoop = 0; iLoop < 1; ++iLoop) {
         //corners->clear();
         //corners->push_back(new Corner(200, 0, 1, true, true, true));
         //corners->push_back(new Corner(0, 0, 0, true, true, true));
@@ -279,7 +288,7 @@ void testCornerSequence_memoryLeak() {
             //cornerSequence->addMacroCornerPair(macros->at(i), corners->at(i));
         }
         cornerSequence->placeMacrosWithIncrementalUpdate(0, -1);
-        //displayTilePlane2(cornerSequence->getCornerHorizontalTilePlane());
+        displayTilePlane2(cornerSequence->getCornerHorizontalTilePlane());
         delete cornerSequence;
     }
 
@@ -292,6 +301,6 @@ void testCornerSequence_memoryLeak() {
 
 void testCornerSequence() {
     //testCornerSequence_sortMacros();
-    //testCornerSequence_basic();
-    testCornerSequence_memoryLeak();
+    testCornerSequence_basic();
+    //testCornerSequence_memoryLeak();
 }

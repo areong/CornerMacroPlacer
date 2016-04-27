@@ -46,7 +46,11 @@ void SortedTiles::erase(Tile *tile) {
 }
 
 Tile *SortedTiles::getSmallest() {
-    return tiles->front();
+    if (tiles->size() > 0) {
+        return tiles->front();
+    } else {
+        return 0;
+    }
 }
 
 void SortedTiles::print() {

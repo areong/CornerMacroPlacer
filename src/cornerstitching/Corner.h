@@ -54,6 +54,10 @@ public:
     This method assigns width and height to previousWidth and previousHeight respectively.
     */
     void updateWidthAndHeightForSorting();
+    /*
+    Return a new Corner which only copies x, y and direction. The Corner is notFromTilePlane.
+    */
+    Corner *copyAsNotFromTilePlane();
 
     // test
 

@@ -1,7 +1,7 @@
 #ifndef CORNERSEQUENCE_CORNERSEQUENCE_H_
 #define CORNERSEQUENCE_CORNERSEQUENCE_H_
 
-#include <set>
+//#include <set>
 #include <vector>
 #include "floorplan/Macro.h"
 
@@ -10,6 +10,9 @@ class CornerHorizontalTilePlane;
 class CornerVerticalTilePlane;
 class Macro;
 class Quadtree;
+
+// Temporary
+class SortedMacros;
 
 /*
 A corner stitching defined corner sequence.
@@ -29,8 +32,9 @@ public:
         Their copies are modified in the CornerSequence.
     */
     CornerSequence(int xStart, int yStart, int xEnd, int yEnd, int numMacros,
-        std::set<Macro *, CompareMacroWidth> *initialWidthSortedMacros,
-        std::set<Macro *, CompareMacroHeight> *initialHeightSortedMacros);
+    //    std::set<Macro *, CompareMacroWidth> *initialWidthSortedMacros,
+    //    std::set<Macro *, CompareMacroHeight> *initialHeightSortedMacros);
+        SortedMacros *initialWidthSortedMacros, SortedMacros *initialHeightSortedMacros);
     ~CornerSequence();
     /*
     Please call this method numMacros times, where
@@ -44,6 +48,19 @@ public:
         of this CornerSequence.
     */
     void addMacroCornerPair(Macro *macro, Corner *corner);
+    /*
+    Return the number of Macros.
+    */
+    int getNumMacros();
+    /*
+    Swap the position of ith Macro and jth Macro on the sequence.
+    */
+    void swapMacros(int i, int j);
+    /*
+    Change ith Corner to another Corner by assigning it zero.
+    If the Corner isNotFromTilePlane, it will be deleted.
+    */
+    void changeCorner(int i);
     /*
     Place macros from the first Macro.
     @return false if macros cannot be placed without overlap within boundary.
@@ -60,10 +77,12 @@ public:
     */
     bool placeMacrosWithIncrementalUpdate(int startPosition, int backupPosition);
     /*
-    Set macros' position by corners. Do no modify TilePlanes, Quadtree and anything else.
+    Set Macros' position by corners.
+    TilePlanes, Quadtree and anything else are not modified.
     Assume placeMacrosWith/WithoutIncrementalUpdate has been called and it returned true.
+    Thus every Corner is assumed not to be zero.
     */
-    void placeMacrosByValidCorners();
+    void setMacrosPositionByCorners();
     /*
     Get the backup CornerSequence created last time placeMacrosWithIncrementalUpdate() was called.
     A backup not only copied macros and corners, but also copied partially constructed TilePlanes.
@@ -72,8 +91,9 @@ public:
     */
     CornerSequence *getPartiallyPlacedBackup();
     /*
-    Return a new CornerSequence that copied macros and corners.
-    Other things such as TilePlanes are not copied.
+    Return a new CornerSequence where macros and corners are copied.
+    The Macros are not placed and the Corners are notFromTilePlane.
+    This method is designed to be used with placeMacrosWithoutIncrementalUpdate().
     */
     CornerSequence *copy();
 
@@ -91,18 +111,28 @@ private:
     Quadtree *sizeQuadtree;
     Quadtree *positionQuadtree;
 
-    std::set<Macro *, CompareMacroWidth> *initialWidthSortedMacros;
-    std::set<Macro *, CompareMacroHeight> *initialHeightSortedMacros;
-    std::set<Macro *, CompareMacroWidth> *widthSortedMacros;
-    std::set<Macro *, CompareMacroHeight> *heightSortedMacros;
+    //std::set<Macro *, CompareMacroWidth> *initialWidthSortedMacros;
+    //std::set<Macro *, CompareMacroHeight> *initialHeightSortedMacros;
+    //std::set<Macro *, CompareMacroWidth> *widthSortedMacros;
+    //std::set<Macro *, CompareMacroHeight> *heightSortedMacros;
+    SortedMacros *initialWidthSortedMacros;
+    SortedMacros *initialHeightSortedMacros;
+    SortedMacros *widthSortedMacros;
+    SortedMacros *heightSortedMacros;
 
     int indexPlacedUnsuccessfully;
 
     /*
-    Update sizeQuadtree with created, modified and removed Corners.
+    Update sizeQuadtree and positionQuadtree with created, modified
+    changedToType0 and removed Corners.
     Delete removed Corners.
     */
     void updateQuadtrees();
+    /*
+    Some Tiles will never be placed by any not-yet-placed Macros.
+    Set these Tiles to temporarilySolid.
+    */
+    void fillInWastedRegion();
 };
 
 #endif

@@ -5,7 +5,7 @@
 #include "cornerstitching/TilePlane.h"
 
 class Tile;
-//class CompareTileWidth;
+//struct CompareTileHeight;
 
 // Temporary
 class SortedTiles;
@@ -49,8 +49,22 @@ public:
     /*
     Get the Tile with the smallest height.
     This method does not modify the TilePlane.
+    Return zero if there is no empty Tile.
     */
     Tile *getEmptyTileWithSmallestHeight();
+    /*
+    In the following content, 'empty' means 'emtpy and temporarily solid'.
+    Define an empty space as a group of empty Tiles where any pair of Tiles are directly
+    or indirectly connected to each other, and none of the Tiles connects to any
+    empty Tile not belonging to the group.
+    Two Tiles are said to connect to each other if they share one side partially or totally.
+    Sharing only one point is not said to be connected.
+    This method collect empty Tiles into groups and calculate the area of each group.
+    CAUTION: Do not call this method more than once because resetting all Tiles' groupId
+    is not implemented.
+    */
+    void calculateEmptySpaceAreas();
+    int getLargestEmptySpaceArea();
 
 protected:
     /*
@@ -59,9 +73,14 @@ protected:
     */
     std::vector<Tile *> *currentlyRemovedTiles;
     //// Empty Tiles sorted by height.
-    //std::set<Tile *, CompareTileHeight> *sortedEmptyTiles;
+    //std::multiset<Tile *, CompareTileHeight> *sortedEmptyTiles;
     // Temporary
     SortedTiles *sortedEmptyTiles;
+
+    std::vector<std::vector<Tile *> *> *emptyTileGroups;
+    std::vector<int> *emptyTileGroupConnectivities;
+    std::vector<int> *emptyTileGroupAreas;
+    int largestAreaEmptyTileGroupId;
 
     /*
     Split startTile into a left Tile and a right Tile at x.
