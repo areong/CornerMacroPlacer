@@ -1,4 +1,3 @@
-CC = g++ -std=c++11
 INC = -I ./../
 HEADERS_POSITION = \
 	./../quadtree/Point.h\
@@ -30,13 +29,13 @@ all:
 	make PositionValue.o
 	make Quadtree.o
 	make Quadtree_test.o
-Position.o: Position.cpp ${HEADERS_POSITION}
-	${CC} -c Position.cpp ${INC}
-PositionValue.o: PositionValue.cpp ${HEADERS_POSITIONVALUE}
-	${CC} -c PositionValue.cpp ${INC}
-Quadtree.o: Quadtree.cpp ${HEADERS_QUADTREE}
-	${CC} -c Quadtree.cpp ${INC}
-Quadtree_test.o: Quadtree_test.cpp ${HEADERS_QUADTREE_TEST}
-	${CC} -c Quadtree_test.cpp ${INC}
+Position.o: Position.cpp $(HEADERS_POSITION)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c Position.cpp $(INC)
+PositionValue.o: PositionValue.cpp $(HEADERS_POSITIONVALUE)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c PositionValue.cpp $(INC)
+Quadtree.o: Quadtree.cpp $(HEADERS_QUADTREE)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c Quadtree.cpp $(INC)
+Quadtree_test.o: Quadtree_test.cpp $(HEADERS_QUADTREE_TEST)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c Quadtree_test.cpp $(INC)
 clean: 
 	rm *.o

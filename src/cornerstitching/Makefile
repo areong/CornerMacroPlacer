@@ -1,4 +1,3 @@
-CC = g++ -std=c++11
 INC = -I ./../
 HEADERS_CORNER = \
 	./../cornerstitching/Corner.h\
@@ -95,29 +94,29 @@ all:
 	make TilePlane_test.o
 	make TraversalTaskCollectAllTiles.o
 	make VerticalTilePlane.o
-Corner.o: Corner.cpp ${HEADERS_CORNER}
-	${CC} -c Corner.cpp ${INC}
-CornerHorizontalTilePlane.o: CornerHorizontalTilePlane.cpp ${HEADERS_CORNERHORIZONTALTILEPLANE}
-	${CC} -c CornerHorizontalTilePlane.cpp ${INC}
-CornerPosition.o: CornerPosition.cpp ${HEADERS_CORNERPOSITION}
-	${CC} -c CornerPosition.cpp ${INC}
-CornerSize.o: CornerSize.cpp ${HEADERS_CORNERSIZE}
-	${CC} -c CornerSize.cpp ${INC}
-CornerVerticalTilePlane.o: CornerVerticalTilePlane.cpp ${HEADERS_CORNERVERTICALTILEPLANE}
-	${CC} -c CornerVerticalTilePlane.cpp ${INC}
-HorizontalTilePlane.o: HorizontalTilePlane.cpp ${HEADERS_HORIZONTALTILEPLANE}
-	${CC} -c HorizontalTilePlane.cpp ${INC}
-SortedTiles.o: SortedTiles.cpp ${HEADERS_SORTEDTILES}
-	${CC} -c SortedTiles.cpp ${INC}
-Tile.o: Tile.cpp ${HEADERS_TILE}
-	${CC} -c Tile.cpp ${INC}
-TilePlane.o: TilePlane.cpp ${HEADERS_TILEPLANE}
-	${CC} -c TilePlane.cpp ${INC}
-TilePlane_test.o: TilePlane_test.cpp ${HEADERS_TILEPLANE_TEST}
-	${CC} -c TilePlane_test.cpp ${INC}
-TraversalTaskCollectAllTiles.o: TraversalTaskCollectAllTiles.cpp ${HEADERS_TRAVERSALTASKCOLLECTALLTILES}
-	${CC} -c TraversalTaskCollectAllTiles.cpp ${INC}
-VerticalTilePlane.o: VerticalTilePlane.cpp ${HEADERS_VERTICALTILEPLANE}
-	${CC} -c VerticalTilePlane.cpp ${INC}
+Corner.o: Corner.cpp $(HEADERS_CORNER)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c Corner.cpp $(INC)
+CornerHorizontalTilePlane.o: CornerHorizontalTilePlane.cpp $(HEADERS_CORNERHORIZONTALTILEPLANE)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c CornerHorizontalTilePlane.cpp $(INC)
+CornerPosition.o: CornerPosition.cpp $(HEADERS_CORNERPOSITION)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c CornerPosition.cpp $(INC)
+CornerSize.o: CornerSize.cpp $(HEADERS_CORNERSIZE)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c CornerSize.cpp $(INC)
+CornerVerticalTilePlane.o: CornerVerticalTilePlane.cpp $(HEADERS_CORNERVERTICALTILEPLANE)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c CornerVerticalTilePlane.cpp $(INC)
+HorizontalTilePlane.o: HorizontalTilePlane.cpp $(HEADERS_HORIZONTALTILEPLANE)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c HorizontalTilePlane.cpp $(INC)
+SortedTiles.o: SortedTiles.cpp $(HEADERS_SORTEDTILES)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c SortedTiles.cpp $(INC)
+Tile.o: Tile.cpp $(HEADERS_TILE)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c Tile.cpp $(INC)
+TilePlane.o: TilePlane.cpp $(HEADERS_TILEPLANE)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c TilePlane.cpp $(INC)
+TilePlane_test.o: TilePlane_test.cpp $(HEADERS_TILEPLANE_TEST)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c TilePlane_test.cpp $(INC)
+TraversalTaskCollectAllTiles.o: TraversalTaskCollectAllTiles.cpp $(HEADERS_TRAVERSALTASKCOLLECTALLTILES)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c TraversalTaskCollectAllTiles.cpp $(INC)
+VerticalTilePlane.o: VerticalTilePlane.cpp $(HEADERS_VERTICALTILEPLANE)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c VerticalTilePlane.cpp $(INC)
 clean: 
 	rm *.o

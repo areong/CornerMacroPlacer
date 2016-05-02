@@ -9,7 +9,7 @@ class TraversalTask;
 class TilePlane {
 public:
     TilePlane(int xStart, int yStart, int xEnd, int yEnd);
-    ~TilePlane();
+    virtual ~TilePlane();
     int getXStart();
     int getYStart();
     int getXEnd();
@@ -35,6 +35,7 @@ protected:
     int tilePlaneYStart;
     int tilePlaneXEnd;
     int tilePlaneYEnd;
+    int tilePlaneArea;
     Tile *leftBoundaryTile;
     Tile *rightBoundaryTile;
     Tile *bottomBoundaryTile;

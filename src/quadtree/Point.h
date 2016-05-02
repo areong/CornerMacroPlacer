@@ -3,6 +3,7 @@
 
 class Point {
 public:
+    virtual ~Point() {}
     virtual void print() = 0;
 };
 

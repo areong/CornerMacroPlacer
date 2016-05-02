@@ -1,7 +1,7 @@
 #include "view/FloorplanWindow.h"
 #include <GL/glew.h>
 #include <GL/freeglut.h>
-//#include "model/Floorplan.h"
+#include "floorplan/Floorplan.h"
 #include "view/FloorplanView.h"
 #include "view/TilePlaneView.h"
 
@@ -28,15 +28,15 @@ FloorplanWindow::~FloorplanWindow() {
 }
 
 void FloorplanWindow::setXYRangeByFloorplan() {
-    //setXYRange(floorplan->getMinBinsX(), floorplan->getMaxBinsX(),
-    //    floorplan->getMinBinsY(), floorplan->getMaxBinsY());
+    setXYRange(floorplan->getFloorplanXStart(), floorplan->getFloorplanYStart(),
+        floorplan->getFloorplanXEnd(), floorplan->getFloorplanYEnd());
 }
 
 void FloorplanWindow::display() {
     glutReshapeWindow(windowWidth, windowHeight);
     glClear(GL_COLOR_BUFFER_BIT);
-    //floorplanView->display();
-    tilePlaneView->display();
+    floorplanView->display();
+    //tilePlaneView->display();
     glFlush();
 }
 

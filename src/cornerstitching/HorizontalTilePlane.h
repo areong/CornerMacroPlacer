@@ -13,7 +13,7 @@ class SortedTiles;
 class HorizontalTilePlane : public TilePlane {
 public:
     HorizontalTilePlane(int xStart, int yStart, int xEnd, int yEnd);
-    ~HorizontalTilePlane();
+    virtual ~HorizontalTilePlane();
     /*
     Find the Tile where (x, y) is in.
     @return The Tile such that

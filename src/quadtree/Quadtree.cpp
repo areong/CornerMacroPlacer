@@ -220,7 +220,7 @@ Point *Quadtree::getPointRandomly() {
 
 Point *Quadtree::getPointRandomlyByX(int x, bool notLessThanX) {
     if (bl == 0) {
-        if (pointValue->getX(points->at(0)) < x ^ notLessThanX) {
+        if ((pointValue->getX(points->at(0)) < x) ^ notLessThanX) {
             // Get a Point randomly.
             return points->at(Utils::randint(0, points->size()));
         } else {
@@ -326,7 +326,7 @@ Point *Quadtree::getPointRandomlyByX(int x, bool notLessThanX) {
 
 Point *Quadtree::getPointRandomlyByY(int y, bool notLessThanY) {
     if (bl == 0) {
-        if (pointValue->getY(points->at(0)) < y ^ notLessThanY) {
+        if ((pointValue->getY(points->at(0)) < y) ^ notLessThanY) {
             // Get a Point randomly.
             return points->at(Utils::randint(0, points->size()));
         } else {
@@ -432,8 +432,8 @@ Point *Quadtree::getPointRandomlyByY(int y, bool notLessThanY) {
 
 Point *Quadtree::getPointRandomlyByXY(int x, int y, bool notLessThanX, bool notLessThanY) {
     if (bl == 0) {
-        if (pointValue->getX(points->at(0)) < x ^ notLessThanX &&
-            pointValue->getY(points->at(0)) < y ^ notLessThanY) {
+        if ((pointValue->getX(points->at(0)) < x) ^ notLessThanX &&
+            (pointValue->getY(points->at(0)) < y) ^ notLessThanY) {
             // Get a Point randomly.
             return points->at(Utils::randint(0, points->size()));
         } else {
@@ -691,7 +691,7 @@ std::vector<Point *> *Quadtree::getAllPoints() {
 
 std::vector<Point *> *Quadtree::getPointsByX(int x, bool notLessThanX) {
     if (bl == 0) {
-        if (points->size() > 0 && pointValue->getX(points->at(0)) < x ^ notLessThanX) {
+        if ((points->size() > 0 && pointValue->getX(points->at(0)) < x) ^ notLessThanX) {
             return new std::vector<Point *>(*points);
         } else {
             return new std::vector<Point *>();
@@ -754,7 +754,7 @@ std::vector<Point *> *Quadtree::getPointsByX(int x, bool notLessThanX) {
 
 std::vector<Point *> *Quadtree::getPointsByY(int y, bool notLessThanY) {
     if (bl == 0) {
-        if (points->size() > 0 && pointValue->getY(points->at(0)) < y ^ notLessThanY) {
+        if ((points->size() > 0 && pointValue->getY(points->at(0)) < y) ^ notLessThanY) {
             return new std::vector<Point *>(*points);
         } else {
             return new std::vector<Point *>();
@@ -818,8 +818,8 @@ std::vector<Point *> *Quadtree::getPointsByY(int y, bool notLessThanY) {
 /*
 std::vector<Point *> *Quadtree::getPointsByXY(int x, int y, bool notLessThanX, bool notLessThanY) {
     if (bl == 0) {
-        if (points->size() > 0 && pointValue->getX(points->at(0)) < x ^ notLessThanX
-            && pointValue->getY(points->at(0)) < y ^ notLessThanY) {
+        if (points->size() > 0 && (pointValue->getX(points->at(0)) < x) ^ notLessThanX
+            && (pointValue->getY(points->at(0)) < y) ^ notLessThanY) {
             return new std::vector<Point *>(points);
         } else {
             return new std::vector<Point *>();

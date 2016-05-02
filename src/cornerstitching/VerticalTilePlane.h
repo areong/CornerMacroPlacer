@@ -13,7 +13,7 @@ class SortedTiles;
 class VerticalTilePlane : public TilePlane {
 public:
     VerticalTilePlane(int xStart, int yStart, int xEnd, int yEnd);
-    ~VerticalTilePlane();
+    virtual ~VerticalTilePlane();
     /*
     Find the Tile where (x, y) is in.
     @return The Tile such that
@@ -65,6 +65,10 @@ public:
     */
     void calculateEmptySpaceAreas();
     int getLargestEmptySpaceArea();
+    /*
+    Return tilePlaneArea - largestEmptySpaceArea.
+    */
+    int getMacrosOccupiedRegionArea();
 
 protected:
     /*

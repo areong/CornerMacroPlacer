@@ -54,12 +54,12 @@ CornerSequence::CornerSequence(int xStart, int yStart, int xEnd, int yEnd, int n
     widthSortedMacros = new SortedMacros(initialWidthSortedMacros);
     heightSortedMacros = new SortedMacros(initialHeightSortedMacros);
 
-    indexPlacedUnsuccessfully = corners->size();
+    indexPlacedUnsuccessfully = numMacros;
 }
 
 CornerSequence::~CornerSequence() {
     delete macros;
-    for (int i = indexPlacedUnsuccessfully + 1; i < corners->size(); ++i) {
+    for (int i = 0; i < corners->size(); ++i) {
         Corner *corner = corners->at(i);
         if (corner != 0 && corner->isNotFromTilePlane()) {
             delete corner;
@@ -146,10 +146,6 @@ bool CornerSequence::placeMacrosWithIncrementalUpdate(int startPosition, int bac
                     if (foundCorner->getDirection() == inputCorner->getDirection()) {
                         // The matched Corner is found.
                         corner = foundCorner;
-                        delete inputCorner;
-                            // If foundCorner ends up being unsuccessfully placed at,
-                            // Corners after it will be deleted in ~CornerSeqence
-                            // if they are notFromTilePlane.
                         break;
                     }
                     // No matched Corner is found.
@@ -157,6 +153,10 @@ bool CornerSequence::placeMacrosWithIncrementalUpdate(int startPosition, int bac
                 }
                 delete foundCorners;
             }
+            delete inputCorner;
+            corners->at(i) = 0;
+            // If macro ends up being unsuccessfully placed,
+            // notFromTilePlane Corners after corner will be deleted in ~CornerSeqence().
         }
 
         if (toSelectAnotherCorner) {
@@ -268,8 +268,9 @@ bool CornerSequence::placeMacrosWithIncrementalUpdate(int startPosition, int bac
         }
         temporarilyRemovedCorners->clear();
 
-        // Update corners->at(i) with the valid Corner.
-        corners->at(i) = corner;
+        // Copy the valid Corner and replace corners->at(i)
+        // because the valid Corner will be deleted after macro is placed.
+        corners->at(i) = corner->copyAsNotFromTilePlane();
 
         // Place macro at corner.
         macro->setXStart(macroXStart);
@@ -362,8 +363,12 @@ void CornerSequence::setMacrosPositionByCorners() {
     }
 }
 
-CornerSequence *CornerSequence::getPartiallyPlacedBackup() {
-    return 0;
+void CornerSequence::calculateEmptySpaceAreas() {
+    cornerVerticalTilePlane->calculateEmptySpaceAreas();
+}
+
+int CornerSequence::getMacrosOccupiedRegionArea() {
+    return cornerVerticalTilePlane->getMacrosOccupiedRegionArea();
 }
 
 CornerSequence *CornerSequence::copy() {
@@ -381,6 +386,18 @@ CornerSequence *CornerSequence::copy() {
         copiedCornerSequence->addMacroCornerPair(macros->at(i), corner);
     }
     return copiedCornerSequence;
+}
+
+CornerSequence *CornerSequence::getPartiallyPlacedBackup() {
+    return 0;
+}
+
+std::vector<Macro *> *CornerSequence::getMacros() {
+    return macros;
+}
+
+std::vector<Corner *> *CornerSequence::getCorners() {
+    return corners;
 }
 
 CornerHorizontalTilePlane *CornerSequence::getCornerHorizontalTilePlane() {

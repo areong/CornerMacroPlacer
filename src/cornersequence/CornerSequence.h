@@ -3,7 +3,6 @@
 
 //#include <set>
 #include <vector>
-#include "floorplan/Macro.h"
 
 class Corner;
 class CornerHorizontalTilePlane;
@@ -83,22 +82,28 @@ public:
     Thus every Corner is assumed not to be zero.
     */
     void setMacrosPositionByCorners();
-    /*
-    Get the backup CornerSequence created last time placeMacrosWithIncrementalUpdate() was called.
-    A backup not only copied macros and corners, but also copied partially constructed TilePlanes.
-    Return zero if placeMacrosWithIncrementalUpdate() was never called, or
-    there is no backup available
-    */
-    CornerSequence *getPartiallyPlacedBackup();
+    void calculateEmptySpaceAreas();
+    int getMacrosOccupiedRegionArea();
     /*
     Return a new CornerSequence where macros and corners are copied.
+    Please delete the returned CornerSequence.
     The Macros are not placed and the Corners are notFromTilePlane.
     This method is designed to be used with placeMacrosWithoutIncrementalUpdate().
     */
     CornerSequence *copy();
+    /*
+    Get the backup CornerSequence created last time placeMacrosWithIncrementalUpdate() was called.
+    Please delete the returned CornerSequence.
+    A backup not only copied macros and corners, but also copied partially constructed TilePlanes.
+    Return zero if placeMacrosWithIncrementalUpdate() was never called, or
+    there is no backup available.
+    */
+    CornerSequence *getPartiallyPlacedBackup();
 
     // test
     
+    std::vector<Macro *> *getMacros();
+    std::vector<Corner *> *getCorners();
     CornerHorizontalTilePlane *getCornerHorizontalTilePlane();
     CornerVerticalTilePlane *getCornerVerticalTilePlane();
     Quadtree *getPositionQuadtree();

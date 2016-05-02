@@ -422,6 +422,10 @@ int VerticalTilePlane::getLargestEmptySpaceArea() {
     return emptyTileGroupAreas->at(largestAreaEmptyTileGroupId);
 }
 
+int VerticalTilePlane::getMacrosOccupiedRegionArea() {
+    return tilePlaneArea - emptyTileGroupAreas->at(largestAreaEmptyTileGroupId);
+}
+
 Tile *VerticalTilePlane::splitStartTileHorizontally(Tile *tile, int x) {
     int yEnd = tile->getYEnd();
     int xStart = tile->getXStart();

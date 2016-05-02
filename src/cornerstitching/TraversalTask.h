@@ -5,6 +5,7 @@ class Tile;
 
 class TraversalTask {
 public:
+    virtual ~TraversalTask() {}
     virtual void doWhenTraversing(Tile *tile) = 0;    
 };
 

@@ -9,6 +9,7 @@ TilePlane::TilePlane(int xStart, int yStart, int xEnd, int yEnd) {
     this->tilePlaneYStart = yStart;
     this->tilePlaneXEnd = xEnd;
     this->tilePlaneYEnd = yEnd;
+    tilePlaneArea = (xEnd - xStart) * (yEnd - yStart);
     leftBoundaryTile = new Tile(xStart - 1, yStart, xStart, yEnd, true);
     rightBoundaryTile = new Tile(xEnd, yStart, xEnd + 1, yEnd, true);
     bottomBoundaryTile = new Tile(xStart - 1, yStart - 1, xEnd + 1, yStart, true);

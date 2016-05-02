@@ -1,11 +1,13 @@
-CC = g++ -std=c++11
 INC = -I ./../
 HEADERS_FLOORPLANVIEW = \
+	./../floorplan/Floorplan.h\
+	./../floorplan/Macro.h\
 	./../view/FloorplanView.h\
 	./../view/View.h\
 	./../view/Window.h
 
 HEADERS_FLOORPLANWINDOW = \
+	./../floorplan/Floorplan.h\
 	./../view/FloorplanView.h\
 	./../view/FloorplanWindow.h\
 	./../view/TilePlaneView.h\
@@ -33,15 +35,15 @@ all:
 	make TilePlaneView.o
 	make View.o
 	make Window.o
-FloorplanView.o: FloorplanView.cpp ${HEADERS_FLOORPLANVIEW}
-	${CC} -c FloorplanView.cpp ${INC}
-FloorplanWindow.o: FloorplanWindow.cpp ${HEADERS_FLOORPLANWINDOW}
-	${CC} -c FloorplanWindow.cpp ${INC}
-TilePlaneView.o: TilePlaneView.cpp ${HEADERS_TILEPLANEVIEW}
-	${CC} -c TilePlaneView.cpp ${INC}
-View.o: View.cpp ${HEADERS_VIEW}
-	${CC} -c View.cpp ${INC}
-Window.o: Window.cpp ${HEADERS_WINDOW}
-	${CC} -c Window.cpp ${INC}
+FloorplanView.o: FloorplanView.cpp $(HEADERS_FLOORPLANVIEW)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c FloorplanView.cpp $(INC)
+FloorplanWindow.o: FloorplanWindow.cpp $(HEADERS_FLOORPLANWINDOW)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c FloorplanWindow.cpp $(INC)
+TilePlaneView.o: TilePlaneView.cpp $(HEADERS_TILEPLANEVIEW)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c TilePlaneView.cpp $(INC)
+View.o: View.cpp $(HEADERS_VIEW)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c View.cpp $(INC)
+Window.o: Window.cpp $(HEADERS_WINDOW)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c Window.cpp $(INC)
 clean: 
 	rm *.o

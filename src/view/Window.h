@@ -1,10 +1,13 @@
 #ifndef VIEW_WINDOW_H_
 #define VIEW_WINDOW_H_
 
+#include <string>
+
 class Window {
 public:
     Window();
-    ~Window();
+    virtual ~Window();
+    void setWindowTitle(std::string title);
     void setWindowSize(int width, int height);
     /*
     Recalculate the given x y range according to the window size
@@ -47,6 +50,7 @@ public:
         float r, float g, float b);
 
 protected:
+    std::string windowTitle;
     int windowWidth;
     int windowHeight;
     int rangeXStart;

@@ -1,4 +1,3 @@
-CC = g++ -std=c++11
 INC = -I ./../
 HEADERS_CORNERSEQUENCE = \
 	./../cornersequence/CornerSequence.h\
@@ -37,9 +36,9 @@ HEADERS_CORNERSEQUENCE_TEST = \
 all:
 	make CornerSequence.o
 	make CornerSequence_test.o
-CornerSequence.o: CornerSequence.cpp ${HEADERS_CORNERSEQUENCE}
-	${CC} -c CornerSequence.cpp ${INC}
-CornerSequence_test.o: CornerSequence_test.cpp ${HEADERS_CORNERSEQUENCE_TEST}
-	${CC} -c CornerSequence_test.cpp ${INC}
+CornerSequence.o: CornerSequence.cpp $(HEADERS_CORNERSEQUENCE)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c CornerSequence.cpp $(INC)
+CornerSequence_test.o: CornerSequence_test.cpp $(HEADERS_CORNERSEQUENCE_TEST)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c CornerSequence_test.cpp $(INC)
 clean: 
 	rm *.o

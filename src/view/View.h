@@ -6,7 +6,7 @@ class Window;
 class View {
 public:
     View(Window *window);
-    ~View();
+    virtual ~View();
     virtual void display() = 0;
 
 protected:

@@ -3,6 +3,7 @@
 #include <GL/freeglut.h>
 
 Window::Window() {
+    windowTitle = "Window";
     windowWidth = 1;
     windowHeight = 1;
     rangeXStart = 0;
@@ -13,6 +14,10 @@ Window::Window() {
 
 Window::~Window() {
 
+}
+
+void Window::setWindowTitle(std::string title) {
+    windowTitle = title;
 }
 
 void Window::setWindowSize(int width, int height) {
@@ -45,12 +50,12 @@ void Window::setXYRange(int xStart, int yStart, int xEnd, int yEnd) {
 void Window::initialize() {
     // Dummy input
     int argc = 0;
-    char **argv;
+    char **argv = 0;
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
     glutInitWindowSize(windowWidth, windowHeight);
     glutInitWindowPosition(100, 100);
-    glutCreateWindow("Hello");
+    glutCreateWindow(windowTitle.c_str());
     glClearColor(0.0, 0.0, 0.0, 0.0);
 
     glMatrixMode(GL_PROJECTION);
