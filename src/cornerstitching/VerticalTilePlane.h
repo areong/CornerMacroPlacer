@@ -69,6 +69,12 @@ public:
     Return tilePlaneArea - largestEmptySpaceArea.
     */
     int getMacrosOccupiedRegionArea();
+    /*
+    Return density, which is largest empty space area divided by its bounding box's area.
+    If the empty space is a rectangle, the density is one.
+    Please call calculateEmptySpaceAreas() first.
+    */
+    double calculateLargestEmptySpaceDensity();
 
 protected:
     /*
@@ -76,10 +82,10 @@ protected:
     They are deleted at the end of placeSolidTile().
     */
     std::vector<Tile *> *currentlyRemovedTiles;
-    //// Empty Tiles sorted by height.
-    //std::multiset<Tile *, CompareTileHeight> *sortedEmptyTiles;
-    // Temporary
-    SortedTiles *sortedEmptyTiles;
+    ////// Empty Tiles sorted by height.
+    ////std::multiset<Tile *, CompareTileHeight> *sortedEmptyTiles;
+    //// Temporary
+    //SortedTiles *sortedEmptyTiles;
 
     std::vector<std::vector<Tile *> *> *emptyTileGroups;
     std::vector<int> *emptyTileGroupConnectivities;

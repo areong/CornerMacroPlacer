@@ -59,10 +59,10 @@ protected:
     They are deleted at the end of placeSolidTile().
     */
     std::vector<Tile *> *currentlyRemovedTiles;
-    //// Empty Tiles sorted by width.
-    //std::multiset<Tile *, CompareTileWidth> *sortedEmptyTiles;
-    // Temporary
-    SortedTiles *sortedEmptyTiles;
+    ////// Empty Tiles sorted by width.
+    ////std::multiset<Tile *, CompareTileWidth> *sortedEmptyTiles;
+    //// Temporary
+    //SortedTiles *sortedEmptyTiles;
 
     /*
     Split startTile into a bottom Tile and a top Tile at y.

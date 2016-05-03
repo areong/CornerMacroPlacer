@@ -22,6 +22,16 @@ HEADERS_FLOORPLANSTATE = \
 	./../sa/FloorplanState.h\
 	./../sa/State.h
 
+HEADERS_LARGESTEMPTYSPACESHAPE = \
+	./../cornersequence/CornerSequence.h\
+	./../cornerstitching/CornerVerticalTilePlane.h\
+	./../cornerstitching/TilePlane.h\
+	./../cornerstitching/VerticalTilePlane.h\
+	./../sa/CostFunction.h\
+	./../sa/FloorplanState.h\
+	./../sa/LargestEmptySpaceShape.h\
+	./../sa/State.h
+
 HEADERS_MACROSOCCUPIEDREGIONAREA = \
 	./../cornersequence/CornerSequence.h\
 	./../sa/CostFunction.h\
@@ -58,6 +68,7 @@ HEADERS_SIMULATEDANNEALING_TEST = \
 	./../sa/ChangeCorner.h\
 	./../sa/CostFunction.h\
 	./../sa/FloorplanState.h\
+	./../sa/LargestEmptySpaceShape.h\
 	./../sa/MacrosOccupiedRegionArea.h\
 	./../sa/Operation.h\
 	./../sa/RefreshFloorplanWindow.h\
@@ -89,6 +100,7 @@ all:
 	make AnnealingScheduleRatioDecrease.o
 	make ChangeCorner.o
 	make FloorplanState.o
+	make LargestEmptySpaceShape.o
 	make MacrosOccupiedRegionArea.o
 	make RefreshFloorplanWindow.o
 	make SimulatedAnnealing.o
@@ -104,6 +116,8 @@ ChangeCorner.o: ChangeCorner.cpp $(HEADERS_CHANGECORNER)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ChangeCorner.cpp $(INC)
 FloorplanState.o: FloorplanState.cpp $(HEADERS_FLOORPLANSTATE)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c FloorplanState.cpp $(INC)
+LargestEmptySpaceShape.o: LargestEmptySpaceShape.cpp $(HEADERS_LARGESTEMPTYSPACESHAPE)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c LargestEmptySpaceShape.cpp $(INC)
 MacrosOccupiedRegionArea.o: MacrosOccupiedRegionArea.cpp $(HEADERS_MACROSOCCUPIEDREGIONAREA)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c MacrosOccupiedRegionArea.cpp $(INC)
 RefreshFloorplanWindow.o: RefreshFloorplanWindow.cpp $(HEADERS_REFRESHFLOORPLANWINDOW)

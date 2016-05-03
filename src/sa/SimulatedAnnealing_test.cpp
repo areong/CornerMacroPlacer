@@ -8,6 +8,7 @@
 #include "sa/AnnealingScheduleRatioDecrease.h"
 #include "sa/ChangeCorner.h"
 #include "sa/FloorplanState.h"
+#include "sa/LargestEmptySpaceShape.h"
 #include "sa/MacrosOccupiedRegionArea.h"
 #include "sa/RefreshFloorplanWindow.h"
 #include "sa/SimulatedAnnealing.h"
@@ -20,12 +21,12 @@ void testSimulatedAnnealing_annealCornerSequence() {
     int numMacros = 40;
     int floorplanXStart = 0;
     int floorplanYStart = 0;
-    int floorplanXEnd = 200;
-    int floorplanYEnd = 200;
+    int floorplanXEnd = 2000;
+    int floorplanYEnd = 2000;
     Floorplan *floorplan = new Floorplan(floorplanXStart, floorplanYStart, floorplanXEnd, floorplanYEnd);
     for (int i = numMacros; i > 0; --i) {
-        int width = Utils::randint(1, 11) * 5;
-        int height = Utils::randint(1, 11) * 5;
+        int width = Utils::randint(1, 101) * 5;
+        int height = Utils::randint(1, 101) * 5;
         floorplan->addMovableMacro(new Macro(width, height));
     }
     //floorplan->addMovableMacro(new Macro(15, 5));
@@ -65,23 +66,24 @@ void testSimulatedAnnealing_annealCornerSequence() {
     SimulatedAnnealing *sa = new SimulatedAnnealing();
     sa->addOperation(new SwapMacros(macros->size()));
     sa->addOperation(new ChangeCorner(macros->size()));
-    sa->addCostFunction(new MacrosOccupiedRegionArea(), 1);
+    sa->addCostFunction(new MacrosOccupiedRegionArea(), 10);
+    sa->addCostFunction(new LargestEmptySpaceShape(), 1);
     sa->normalizeCostFunctionWeights();
-    //sa->calculateCostFunctionAverageCosts(state, 1000);
+    sa->calculateCostFunctionAverageCosts(state, 1000);
     sa->setAnnealingSchedule(new AnnealingScheduleRatioDecrease(0.9));
     sa->initializeTemperature(state, 1000, 0.85);
 
     // FloorplanWindow
     FloorplanWindow *window = FloorplanWindow::createInstance(floorplan);
     window->setWindowTitle("CornerMacroPlacer");
-    window->setWindowSize(1024, 768);
+    window->setWindowSize(768, 768);
     window->setXYRangeByFloorplan();
     window->initialize();
     window->runMainLoopEvent();
     sa->addTemperatureListener(new RefreshFloorplanWindow(window, floorplan));
 
     // Anneal
-    sa->annealWithoutIncrementalUpdate(state, 1000, 0.001, 0.9, 60);
+    sa->annealWithoutIncrementalUpdate(state, 1000, 0.001, 0.9, 300);
 }
 
 void testSimulatedAnnealing() {
