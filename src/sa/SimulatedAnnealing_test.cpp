@@ -25,8 +25,8 @@ void testSimulatedAnnealing_annealCornerSequence() {
     int floorplanYEnd = 2000;
     Floorplan *floorplan = new Floorplan(floorplanXStart, floorplanYStart, floorplanXEnd, floorplanYEnd);
     for (int i = numMacros; i > 0; --i) {
-        int width = Utils::randint(1, 101) * 5;
-        int height = Utils::randint(1, 101) * 5;
+        int width = Utils::randint(1, 81) * 5;
+        int height = Utils::randint(1, 81) * 5;
         floorplan->addMovableMacro(new Macro(width, height));
     }
     //floorplan->addMovableMacro(new Macro(15, 5));
@@ -39,7 +39,14 @@ void testSimulatedAnnealing_annealCornerSequence() {
     //floorplan->addMovableMacro(new Macro(30, 5));
     //floorplan->addMovableMacro(new Macro(40, 10));
     //floorplan->addMovableMacro(new Macro(20, 25));
+
+    floorplan->addFixedMacro(new Macro(1000, 100, 500, 500));
+    floorplan->addFixedMacro(new Macro(100, 400, 500, 600));
+    floorplan->addFixedMacro(new Macro(1000, 100, 500, 1400));
+    floorplan->addFixedMacro(new Macro(100, 400, 1400, 1000));
+
     std::vector<Macro *> *macros = floorplan->getMovableMacros();
+    std::vector<Macro *> *fixedMacros = floorplan->getFixedMacros();
 
     int area = 0;
     for (int i = 0; i < macros->size(); ++i) {
@@ -57,6 +64,9 @@ void testSimulatedAnnealing_annealCornerSequence() {
     CornerSequence *cornerSequence = new CornerSequence(floorplanXStart, floorplanYStart,
         floorplanXEnd, floorplanYEnd, macros->size(),
         initialWidthSortedMacros, initialHeightSortedMacros);
+    for (int i = 0; i < fixedMacros->size(); ++i) {
+        cornerSequence->addFixedMacro(fixedMacros->at(i));
+    }
     for (int i = 0; i < macros->size(); ++i) {
         cornerSequence->addMacroCornerPair(macros->at(i), 0);
     }

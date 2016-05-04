@@ -17,6 +17,7 @@ CornerSequence::CornerSequence(int xStart, int yStart, int xEnd, int yEnd, int n
     //std::set<Macro *, CompareMacroWidth> *initialWidthSortedMacros,
     //std::set<Macro *, CompareMacroHeight> *initialHeightSortedMacros) {
     SortedMacros *initialWidthSortedMacros, SortedMacros *initialHeightSortedMacros) {
+    fixedMacros = new std::vector<Macro *>();
     macros = new std::vector<Macro *>();
     corners = new std::vector<Corner *>();
     macros->reserve(numMacros);
@@ -51,8 +52,10 @@ CornerSequence::CornerSequence(int xStart, int yStart, int xEnd, int yEnd, int n
     this->initialHeightSortedMacros = initialHeightSortedMacros;
     //widthSortedMacros = new std::set<Macro *, CompareMacroWidth>(*initialWidthSortedMacros);
     //heightSortedMacros = new std::set<Macro *, CompareMacroHeight>(*initialHeightSortedMacros);
-    widthSortedMacros = new SortedMacros(initialWidthSortedMacros);
-    heightSortedMacros = new SortedMacros(initialHeightSortedMacros);
+    //widthSortedMacros = new SortedMacros(initialWidthSortedMacros);
+    //heightSortedMacros = new SortedMacros(initialHeightSortedMacros);
+    widthSortedMacros = new SortedMacros(true);
+    heightSortedMacros = new SortedMacros(true);
 
     indexPlacedUnsuccessfully = numMacros;
 }
@@ -70,8 +73,12 @@ CornerSequence::~CornerSequence() {
     delete cornerVerticalTilePlane;
     delete sizeQuadtree;
     delete positionQuadtree;
-    delete widthSortedMacros;
+    //delete widthSortedMacros;
     delete heightSortedMacros;
+}
+
+void CornerSequence::addFixedMacro(Macro *macro) {
+    fixedMacros->push_back(macro);
 }
 
 void CornerSequence::addMacroCornerPair(Macro *macro, Corner *corner) {
@@ -96,6 +103,31 @@ void CornerSequence::changeCorner(int i) {
             delete ithCorner;
         }
         corners->at(i) = 0;
+    }
+}
+
+void CornerSequence::placeFixedMacros() {
+    for (int i = 0; i < fixedMacros->size(); ++i) {
+        Macro *macro = fixedMacros->at(i);
+        int tileXStart = macro->getXStart();
+        int tileYStart = macro->getYStart();
+        int tileXEnd = macro->getXEnd();
+        int tileYEnd = macro->getYEnd();
+        Tile *horizontalTile = new Tile(tileXStart, tileYStart, tileXEnd, tileYEnd, true);
+        Tile *verticalTile = new Tile(tileXStart, tileYStart, tileXEnd, tileYEnd, true);
+        Tile *startHorizontalTile = cornerHorizontalTilePlane->findTile(tileXStart, tileYStart,
+            cornerHorizontalTilePlane->getTopLeftMostTile());
+        Tile *startVerticalTile = cornerVerticalTilePlane->findTile(tileXStart, tileYStart,
+            cornerVerticalTilePlane->getTopLeftMostTile());
+        cornerHorizontalTilePlane->placeSolidTileGivenBothStartTiles(horizontalTile,
+            startHorizontalTile, startVerticalTile);
+        startHorizontalTile = horizontalTile;
+        cornerVerticalTilePlane->placeSolidTileGivenBothStartTiles(verticalTile,
+            startVerticalTile, startHorizontalTile);
+
+        cornerHorizontalTilePlane->calculateCurrentCornersWidthAndHeight();
+        cornerVerticalTilePlane->calculateCurrentCornersWidthAndHeight();
+        updateQuadtrees();
     }
 }
 
@@ -323,8 +355,8 @@ bool CornerSequence::placeMacrosWithIncrementalUpdate(int startPosition, int bac
         //}
         cornerVerticalTilePlane->placeSolidTileGivenBothStartTiles(verticalTile, startVerticalTile, startHorizontalTile);
         // Remove macro from sets.
-        widthSortedMacros->erase(macro);
-        heightSortedMacros->erase(macro);
+        //widthSortedMacros->erase(macro);
+        //heightSortedMacros->erase(macro);
         // Calculate Corners' width and height.
         cornerHorizontalTilePlane->calculateCurrentCornersWidthAndHeight();
         cornerVerticalTilePlane->calculateCurrentCornersWidthAndHeight();
@@ -378,6 +410,9 @@ CornerSequence *CornerSequence::copy() {
         cornerHorizontalTilePlane->getXEnd(),
         cornerHorizontalTilePlane->getYEnd(),
         macros->size(), initialWidthSortedMacros, initialHeightSortedMacros);
+    for (int i = 0; i < fixedMacros->size(); ++i) {
+        copiedCornerSequence->addFixedMacro(fixedMacros->at(i));
+    }
     for (int i = 0; i < macros->size(); ++i) {
         Corner *corner = corners->at(i);
         if (corner != 0) {

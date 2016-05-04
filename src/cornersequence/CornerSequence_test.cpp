@@ -19,7 +19,7 @@ void displayTilePlane2(TilePlane *tilePlane) {
     FloorplanWindow *window = FloorplanWindow::createInstance(0);
     window->setWindowSize(1024, 768);
     window->setTilePlane(tilePlane);
-    window->setXYRange(-100, -100, 100, 100);
+    window->setXYRange(0, 0, 100, 100);
     window->initialize();
     window->runMainLoop();
 }
@@ -279,24 +279,34 @@ void testCornerSequence_memoryLeak() {
     //corners->push_back(new Corner(45, 110, 0, true, true, true));
     //corners->push_back(new Corner(30, 135, 1, true, true, true));
     //corners->push_back(new Corner(70, 110, 0, true, true, true));
-    CornerSequence *cornerSequence = new CornerSequence(-100, -100, 100, 100, macros->size(),
+    CornerSequence *cornerSequence = new CornerSequence(0, 0, 100, 100, macros->size(),
         initialWidthSortedMacros, initialHeightSortedMacros);
+
+    cornerSequence->addFixedMacro(new Macro(30, 30, 30, 30));
+
     for (int i = 0; i < macros->size(); ++i) {
-        cornerSequence->addMacroCornerPair(macros->at(i), 0);
+        //cornerSequence->addMacroCornerPair(macros->at(i), 0);
     }
+
+    cornerSequence->placeFixedMacros();
     std::cout << cornerSequence->placeMacrosWithIncrementalUpdate(0, -1) << "\n";
-    for (int iLoop = 0; iLoop < 1; ++iLoop) {
-        CornerSequence *copiedCornerSequence = cornerSequence->copy();
-        //for (int i = 0; i < macros->size(); ++i) {
-        //    cornerSequence->addMacroCornerPair(macros->at(i), 0);
-        //    //cornerSequence->addMacroCornerPair(macros->at(i), corners->at(i));
-        //}
-        copiedCornerSequence->placeMacrosWithIncrementalUpdate(0, -1);
-        if (iLoop == 0) {
-            displayTilePlane2(copiedCornerSequence->getCornerHorizontalTilePlane());
-        }
-        delete copiedCornerSequence;
-    }
+    CornerVerticalTilePlane *cornerVerticalTilePlane = cornerSequence->getCornerVerticalTilePlane();
+    cornerVerticalTilePlane->calculateEmptySpaceAreas();
+
+    displayTilePlane2(cornerSequence->getCornerHorizontalTilePlane());
+
+    //for (int iLoop = 0; iLoop < 1; ++iLoop) {
+    //    CornerSequence *copiedCornerSequence = cornerSequence->copy();
+    //    //for (int i = 0; i < macros->size(); ++i) {
+    //    //    cornerSequence->addMacroCornerPair(macros->at(i), 0);
+    //    //    //cornerSequence->addMacroCornerPair(macros->at(i), corners->at(i));
+    //    //}
+    //    copiedCornerSequence->placeMacrosWithIncrementalUpdate(0, -1);
+    //    if (iLoop == 0) {
+    //        displayTilePlane2(copiedCornerSequence->getCornerHorizontalTilePlane());
+    //    }
+    //    delete copiedCornerSequence;
+    //}
 
     for (int i = 0; i < macros->size(); ++i) {
         delete macros->at(i);

@@ -31,6 +31,7 @@ CornerSequence *FloorplanState::getCornerSequence() {
 }
 
 bool FloorplanState::doAfterBeingOperatedWithoutIncrementalUpdate() {
+    cornerSequence->placeFixedMacros();
     return cornerSequence->placeMacrosWithoutIncrementalUpdate();
 }
 

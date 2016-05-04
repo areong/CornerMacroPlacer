@@ -16,6 +16,8 @@ public:
     int getFloorplanYStart();
     int getFloorplanXEnd();
     int getFloorplanYEnd();
+    void addFixedMacro(Macro *macro);
+    std::vector<Macro *> *getFixedMacros();
     void addMovableMacro(Macro *macro);
     std::vector<Macro *> *getMovableMacros();
 
@@ -24,6 +26,7 @@ private:
     int floorplanYStart;
     int floorplanXEnd;
     int floorplanYEnd;
+    std::vector<Macro *> *fixedMacros;
     std::vector<Macro *> *movableMacros;
 };
 

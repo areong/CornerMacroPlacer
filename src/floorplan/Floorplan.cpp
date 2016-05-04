@@ -1,6 +1,7 @@
 #include "floorplan/Floorplan.h"
 
 Floorplan::Floorplan(int xStart, int yStart, int xEnd, int yEnd) {
+    fixedMacros = new std::vector<Macro *>();
     movableMacros = new std::vector<Macro *>();
     floorplanXStart = xStart;
     floorplanYStart = yStart;
@@ -9,6 +10,7 @@ Floorplan::Floorplan(int xStart, int yStart, int xEnd, int yEnd) {
 }
 
 Floorplan::~Floorplan() {
+    delete fixedMacros;
     delete movableMacros;
 }
 
@@ -26,6 +28,14 @@ int Floorplan::getFloorplanXEnd() {
 
 int Floorplan::getFloorplanYEnd() {
     return floorplanYEnd;
+}
+
+void Floorplan::addFixedMacro(Macro *macro) {
+    fixedMacros->push_back(macro);
+}
+
+std::vector<Macro *> *Floorplan::getFixedMacros() {
+    return fixedMacros;
 }
 
 void Floorplan::addMovableMacro(Macro *macro) {

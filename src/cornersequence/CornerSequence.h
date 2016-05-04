@@ -35,6 +35,7 @@ public:
     //    std::set<Macro *, CompareMacroHeight> *initialHeightSortedMacros);
         SortedMacros *initialWidthSortedMacros, SortedMacros *initialHeightSortedMacros);
     ~CornerSequence();
+    void addFixedMacro(Macro *macro);
     /*
     Please call this method numMacros times, where
     numMacros is the input of CornerSequence's constructor.
@@ -60,6 +61,7 @@ public:
     If the Corner isNotFromTilePlane, it will be deleted.
     */
     void changeCorner(int i);
+    void placeFixedMacros();
     /*
     Place macros from the first Macro.
     @return false if macros cannot be placed without overlap within boundary.
@@ -109,6 +111,7 @@ public:
     Quadtree *getPositionQuadtree();
 
 private:
+    std::vector<Macro *> *fixedMacros;
     std::vector<Macro *> *macros;
     std::vector<Corner *> *corners;
     CornerHorizontalTilePlane *cornerHorizontalTilePlane;

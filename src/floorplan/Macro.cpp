@@ -2,9 +2,11 @@
 
 #include <iostream>
 
-Macro::Macro(int width, int height) {
+Macro::Macro(int width, int height, int xStart, int yStart) {
     this->width = width;
     this->height = height;
+    setXStart(xStart);
+    setYStart(yStart);
 }
 
 Macro::~Macro() {

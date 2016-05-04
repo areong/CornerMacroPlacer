@@ -311,7 +311,9 @@ void VerticalTilePlane::calculateEmptySpaceAreas() {
                 // (It is not necessary to check yEnd.)
                 int groupIdForRightTiles = currentTileGroupId;
                 if (currentNeighbor->isEmpty() || currentNeighbor->isTemporarilySolid()) {
-                    if (currentNeighbor->hasGroupId()) {
+                    // Check whether it already has groupId and the groupId is different.
+                    // The groupId is the same if the connected empty Tiles forms a loop.
+                    if (currentNeighbor->hasGroupId() && currentNeighbor->getGroupId() != currentTileGroupId) {
                         // Its groupId is different from currentTileGroupId,
                         // which means the two groups actually belong to one group.
                         // Store the smaller groupId for other right Tiles, and

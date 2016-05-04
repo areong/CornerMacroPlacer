@@ -166,6 +166,7 @@ void SimulatedAnnealing::annealWithoutIncrementalUpdate(State *state, int numMov
     double currentCost = calculateCost(currentState);
     bestState = currentState;
     double lowestCost = currentCost;
+    int count = 0;
     while (true) {
         int countRejection = 0;
         averageCostChange = 0;
@@ -207,9 +208,12 @@ void SimulatedAnnealing::annealWithoutIncrementalUpdate(State *state, int numMov
         for (int i = 0; i < temperatureListeners->size(); i++) {
             temperatureListeners->at(i)->onUpdate();
         }
-        std::cout << "rejectionRatio: " << (double) countRejection / (double) numMovesPerTemperature
-            << "\t" << "lowestCost: " << lowestCost
-            << "\t" << "bestState: " << bestState << "\n";
+        std::cout << count
+            << "\t" << "reject: " << (double) countRejection / (double) numMovesPerTemperature
+            << "\t" << "low: " << lowestCost
+            << "\t" << "best: " << bestState
+            << "\t" << "t: " << (clock() - timeStart) / (double) CLOCKS_PER_SEC << "\n";
+        count += 1;
 
         // Termination conditions
         if ((double) countRejection / (double) numMovesPerTemperature > rejectionRatioLimit ||

@@ -465,7 +465,7 @@ void displayTilePlane(TilePlane *tilePlane) {
 
 void testTilePlane() {
     //testTilePlane_HorizontalTilePlane();
-    testTilePlane_sortTiles();
-    //testTilePlane_CornerHorizontalTilePlane();
+    //testTilePlane_sortTiles();
+    testTilePlane_CornerHorizontalTilePlane();
     //testTilePlane_memoryLeak();
 }

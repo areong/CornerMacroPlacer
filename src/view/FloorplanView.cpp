@@ -15,6 +15,13 @@ FloorplanView::~FloorplanView() {
 
 void FloorplanView::display() {
     std::vector<Macro *> *movableMacros = floorplan->getMovableMacros();
+    std::vector<Macro *> *fixedMacros = floorplan->getFixedMacros();
+    for (int i = 0; i < fixedMacros->size(); ++i) {
+        Macro *macro = fixedMacros->at(i);
+        window->drawRectangle(macro->getXStart(), macro->getYStart(),
+            macro->getXEnd(), macro->getYEnd(),
+            0.5, 0.1, 0, 1, 1, 1);
+    }
     for (int i = 0; i < movableMacros->size(); ++i) {
         Macro *macro = movableMacros->at(i);
         window->drawRectangle(macro->getXStart(), macro->getYStart(),

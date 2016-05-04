@@ -3,7 +3,7 @@
 
 class Macro {
 public:
-    Macro(int width, int height);
+    Macro(int width, int height, int xStart=0, int yStart=0);
     ~Macro();
     int getWidth() const;
     int getHeight() const;
