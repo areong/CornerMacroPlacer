@@ -1,6 +1,9 @@
 #ifndef UTILS_UTILS_H_
 #define UTILS_UTILS_H_
 
+#include <string>
+#include <vector>
+
 class Utils {
 public:
     Utils();
@@ -18,6 +21,15 @@ public:
     Return random integer in [start, end).
     */
     static int randint(int start, int end);
+    /*
+    Split a string to a vector of strings.
+    PLEASE DELETE the returned vector.
+    @return A vector of strings.
+    @param source The string to split.
+    @param splitter Split the string at characters matching one of the characters
+                    in splitter.
+    */
+    static std::vector<std::string> *splitString(std::string source, std::string splitter);
 };
 
 #endif

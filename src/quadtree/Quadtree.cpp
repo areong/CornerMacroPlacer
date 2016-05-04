@@ -230,7 +230,7 @@ Point *Quadtree::getPointRandomlyByX(int x, bool notLessThanX) {
         }
     } else {
         // Select a sub Quadtree randomly with weights being their number of Points
-        // multiplied by their rlap area
+        // multiplied by their overlap area
         // and get a Point randomly from the sub Quadtree.
         double ratioL;
         double ratioR;
@@ -443,7 +443,7 @@ Point *Quadtree::getPointRandomlyByXY(int x, int y, bool notLessThanX, bool notL
         }
     } else {
         // Select a sub Quadtree randomly with weights being their number of Points
-        // multiplied by their rlap area
+        // multiplied by their overlap area
         // and get a Point randomly from the sub Quadtree.
         double ratioL;
         double ratioR;

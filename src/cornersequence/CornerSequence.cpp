@@ -399,7 +399,7 @@ void CornerSequence::calculateEmptySpaceAreas() {
     cornerVerticalTilePlane->calculateEmptySpaceAreas();
 }
 
-int CornerSequence::getMacrosOccupiedRegionArea() {
+double CornerSequence::getMacrosOccupiedRegionArea() {
     return cornerVerticalTilePlane->getMacrosOccupiedRegionArea();
 }
 

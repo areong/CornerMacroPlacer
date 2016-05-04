@@ -17,7 +17,7 @@ public:
     int getYEnd();
     int getWidth() const;
     int getHeight() const;
-    int getArea();
+    double getArea();
 
     // The two methods are used as sorting keys.
     int getPreviousWidth() const;

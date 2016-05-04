@@ -12,7 +12,7 @@ VerticalTilePlane::VerticalTilePlane(int xStart, int yStart, int xEnd, int yEnd)
 
     emptyTileGroups = new std::vector<std::vector<Tile *> *>();
     emptyTileGroupConnectivities = new std::vector<int>();
-    emptyTileGroupAreas = new std::vector<int>();
+    emptyTileGroupAreas = new std::vector<double>();
     largestAreaEmptyTileGroupId = 0;
 }
 
@@ -411,7 +411,7 @@ void VerticalTilePlane::calculateEmptySpaceAreas() {
     }
 
     // Find the group with the largest area.
-    int largestArea = 0;
+    double largestArea = 0;
     for (int i = 0; i < emptyTileGroupAreas->size(); ++i) {
         if (emptyTileGroupAreas->at(i) > largestArea) {
             largestAreaEmptyTileGroupId = i;
@@ -420,19 +420,19 @@ void VerticalTilePlane::calculateEmptySpaceAreas() {
     }
 }
 
-int VerticalTilePlane::getLargestEmptySpaceArea() {
+double VerticalTilePlane::getLargestEmptySpaceArea() {
     return emptyTileGroupAreas->at(largestAreaEmptyTileGroupId);
 }
 
-int VerticalTilePlane::getMacrosOccupiedRegionArea() {
+double VerticalTilePlane::getMacrosOccupiedRegionArea() {
     return tilePlaneArea - emptyTileGroupAreas->at(largestAreaEmptyTileGroupId);
 }
 
 double VerticalTilePlane::calculateLargestEmptySpaceDensity() {
-    int minX = 1e8;
-    int minY = 1e8;
-    int maxX = -1e8;
-    int maxY = -1e8;
+    int minX = 1e9;
+    int minY = 1e9;
+    int maxX = -1e9;
+    int maxY = -1e9;
     std::vector<Tile *> *largestEmptySpaceTiles = emptyTileGroups->at(largestAreaEmptyTileGroupId);
     for (int i = 0; i < largestEmptySpaceTiles->size(); ++i) {
         Tile *tile = largestEmptySpaceTiles->at(i);

@@ -2,6 +2,7 @@ INC = -I ./../
 HEADERS_FLOORPLANVIEW = \
 	./../floorplan/Floorplan.h\
 	./../floorplan/Macro.h\
+	./../floorplan/Module.h\
 	./../view/FloorplanView.h\
 	./../view/View.h\
 	./../view/Window.h

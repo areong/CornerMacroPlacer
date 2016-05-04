@@ -35,7 +35,7 @@ protected:
     int tilePlaneYStart;
     int tilePlaneXEnd;
     int tilePlaneYEnd;
-    int tilePlaneArea;
+    double tilePlaneArea;
     Tile *leftBoundaryTile;
     Tile *rightBoundaryTile;
     Tile *bottomBoundaryTile;

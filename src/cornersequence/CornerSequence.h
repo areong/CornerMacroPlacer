@@ -85,7 +85,7 @@ public:
     */
     void setMacrosPositionByCorners();
     void calculateEmptySpaceAreas();
-    int getMacrosOccupiedRegionArea();
+    double getMacrosOccupiedRegionArea();
     /*
     Return a new CornerSequence where macros and corners are copied.
     Please delete the returned CornerSequence.

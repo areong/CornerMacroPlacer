@@ -16,17 +16,16 @@
 #include "utils/Utils.h"
 #include "view/FloorplanWindow.h"
 
-void testSimulatedAnnealing_annealCornerSequence() {
-    // Floorplan
-    int numMacros = 40;
+Floorplan *testSimulatedAnnealing_createFloorplan() {
+    int numMacros = 120;
     int floorplanXStart = 0;
     int floorplanYStart = 0;
     int floorplanXEnd = 2000;
     int floorplanYEnd = 2000;
     Floorplan *floorplan = new Floorplan(floorplanXStart, floorplanYStart, floorplanXEnd, floorplanYEnd);
     for (int i = numMacros; i > 0; --i) {
-        int width = Utils::randint(1, 81) * 5;
-        int height = Utils::randint(1, 81) * 5;
+        int width = Utils::randint(1, 61) * 5;
+        int height = Utils::randint(1, 61) * 5;
         floorplan->addMovableMacro(new Macro(width, height));
     }
     //floorplan->addMovableMacro(new Macro(15, 5));
@@ -40,17 +39,28 @@ void testSimulatedAnnealing_annealCornerSequence() {
     //floorplan->addMovableMacro(new Macro(40, 10));
     //floorplan->addMovableMacro(new Macro(20, 25));
 
-    floorplan->addFixedMacro(new Macro(1000, 100, 500, 500));
-    floorplan->addFixedMacro(new Macro(100, 400, 500, 600));
-    floorplan->addFixedMacro(new Macro(1000, 100, 500, 1400));
-    floorplan->addFixedMacro(new Macro(100, 400, 1400, 1000));
+    floorplan->addFixedMacro(new Macro(1000, 100, 400, 400));
+    floorplan->addFixedMacro(new Macro(100, 400, 400, 500));
+    floorplan->addFixedMacro(new Macro(1000, 100, 600, 1500));
+    floorplan->addFixedMacro(new Macro(100, 400, 1500, 1100));
 
+    return floorplan;
+}
+
+void testSimulatedAnnealing_annealCornerSequence(int argc, char **argv) {
+    // Floorplan
+    //Floorplan *floorplan = testSimulatedAnnealing_createFloorplan();
+    Floorplan *floorplan = Floorplan::createFromBookshelfFiles(argv[1]);
+    int floorplanXStart = floorplan->getFloorplanXStart();
+    int floorplanYStart = floorplan->getFloorplanYStart();
+    int floorplanXEnd = floorplan->getFloorplanXEnd();
+    int floorplanYEnd = floorplan->getFloorplanYEnd();
     std::vector<Macro *> *macros = floorplan->getMovableMacros();
     std::vector<Macro *> *fixedMacros = floorplan->getFixedMacros();
 
-    int area = 0;
+    double area = 0;
     for (int i = 0; i < macros->size(); ++i) {
-        area += macros->at(i)->getWidth() * macros->at(i)->getHeight();
+        area += (double) macros->at(i)->getWidth() * (double) macros->at(i)->getHeight();
     }
     std::cout << "sum Macros area: " << area << "\n";
 
@@ -96,6 +106,6 @@ void testSimulatedAnnealing_annealCornerSequence() {
     sa->annealWithoutIncrementalUpdate(state, 1000, 0.001, 0.9, 300);
 }
 
-void testSimulatedAnnealing() {
-    testSimulatedAnnealing_annealCornerSequence();
+void testSimulatedAnnealing(int argc, char **argv) {
+    testSimulatedAnnealing_annealCornerSequence(argc, argv);
 }

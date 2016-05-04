@@ -89,8 +89,8 @@ int Tile::getHeight() const {
     return height;
 }
 
-int Tile::getArea() {
-    return width * height;
+double Tile::getArea() {
+    return (double) width * (double) height;
 }
 
 int Tile::getPreviousWidth() const {

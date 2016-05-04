@@ -4,11 +4,11 @@
 #include "sa/SimulatedAnnealing_test.h"
 #include "utils/Utils.h"
 
-int main() {
+int main(int argc, char **argv) {
     Utils::run_srand();
     //testTilePlane();
     //testQuadtree();
     //testCornerSequence();
-    testSimulatedAnnealing();
+    testSimulatedAnnealing(argc, argv);
     return 0;
 }

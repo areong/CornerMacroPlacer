@@ -64,11 +64,11 @@ public:
     is not implemented.
     */
     void calculateEmptySpaceAreas();
-    int getLargestEmptySpaceArea();
+    double getLargestEmptySpaceArea();
     /*
     Return tilePlaneArea - largestEmptySpaceArea.
     */
-    int getMacrosOccupiedRegionArea();
+    double getMacrosOccupiedRegionArea();
     /*
     Return density, which is largest empty space area divided by its bounding box's area.
     If the empty space is a rectangle, the density is one.
@@ -89,8 +89,8 @@ protected:
 
     std::vector<std::vector<Tile *> *> *emptyTileGroups;
     std::vector<int> *emptyTileGroupConnectivities;
-    std::vector<int> *emptyTileGroupAreas;
-    int largestAreaEmptyTileGroupId;
+    std::vector<double> *emptyTileGroupAreas;
+    double largestAreaEmptyTileGroupId;
 
     /*
     Split startTile into a left Tile and a right Tile at x.

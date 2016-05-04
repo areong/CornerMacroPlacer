@@ -11,6 +11,7 @@ HEADERS_CORNERSEQUENCE = \
 	./../cornerstitching/TilePlane.h\
 	./../cornerstitching/VerticalTilePlane.h\
 	./../floorplan/Macro.h\
+	./../floorplan/Module.h\
 	./../floorplan/SortedMacros.h\
 	./../quadtree/Point.h\
 	./../quadtree/PointValue.h\
@@ -27,6 +28,7 @@ HEADERS_CORNERSEQUENCE_TEST = \
 	./../cornerstitching/TilePlane.h\
 	./../cornerstitching/VerticalTilePlane.h\
 	./../floorplan/Macro.h\
+	./../floorplan/Module.h\
 	./../floorplan/SortedMacros.h\
 	./../quadtree/Point.h\
 	./../utils/Utils.h\

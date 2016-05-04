@@ -18,6 +18,7 @@ HEADERS_FLOORPLANSTATE = \
 	./../cornersequence/CornerSequence.h\
 	./../cornerstitching/Corner.h\
 	./../floorplan/Macro.h\
+	./../floorplan/Module.h\
 	./../quadtree/Point.h\
 	./../sa/FloorplanState.h\
 	./../sa/State.h
@@ -62,6 +63,7 @@ HEADERS_SIMULATEDANNEALING_TEST = \
 	./../cornersequence/CornerSequence.h\
 	./../floorplan/Floorplan.h\
 	./../floorplan/Macro.h\
+	./../floorplan/Module.h\
 	./../floorplan/SortedMacros.h\
 	./../sa/AnnealingSchedule.h\
 	./../sa/AnnealingScheduleRatioDecrease.h\

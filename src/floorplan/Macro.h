@@ -1,9 +1,11 @@
 #ifndef FLOORPLAN_MACRO_H_
 #define FLOORPLAN_MACRO_H_
 
-class Macro {
+#include "floorplan/Module.h"
+
+class Macro : public Module {
 public:
-    Macro(int width, int height, int xStart=0, int yStart=0);
+    Macro(int width, int height, int xStart=0, int yStart=0, std::string name="");
     ~Macro();
     int getWidth() const;
     int getHeight() const;
@@ -15,6 +17,8 @@ public:
     int getXEnd();
     void setYEnd(int yEnd);
     int getYEnd();
+    double getPinsOriginX() override;
+    double getPinsOriginY() override;
 
     // test
 

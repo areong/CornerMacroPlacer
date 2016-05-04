@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-Macro::Macro(int width, int height, int xStart, int yStart) {
+Macro::Macro(int width, int height, int xStart, int yStart, std::string name) : Module(name) {
     this->width = width;
     this->height = height;
     setXStart(xStart);
@@ -54,6 +54,14 @@ void Macro::setYEnd(int yEnd) {
 
 int Macro::getYEnd() {
     return yEnd;
+}
+
+double Macro::getPinsOriginX() {
+    return xStart;
+}
+
+double Macro::getPinsOriginY() {
+    return yStart;
 }
 
 void Macro::print() const {
