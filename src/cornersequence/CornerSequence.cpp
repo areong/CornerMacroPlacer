@@ -27,7 +27,7 @@ CornerSequence::CornerSequence(int xStart, int yStart, int xEnd, int yEnd, int n
     cornerHorizontalTilePlane->coupleWithCornerVerticalTilePlane(cornerVerticalTilePlane);
     cornerHorizontalTilePlane->calculateCurrentCornersWidthAndHeight();
     cornerVerticalTilePlane->calculateCurrentCornersWidthAndHeight();
-    sizeQuadtree = new Quadtree(xStart, yStart, xEnd + 1, yEnd + 1, new CornerSize()); // +1 for containing Corners with the size of floorplan.
+    sizeQuadtree = new Quadtree(0, 0, xEnd - xStart + 1, yEnd - yStart + 1, new CornerSize()); // +1 for containing Corners with the size of floorplan.
     positionQuadtree = new Quadtree(xStart, yStart, xEnd + 1, yEnd + 1, new CornerPosition());
 
     // Insert Corners to quadtrees.

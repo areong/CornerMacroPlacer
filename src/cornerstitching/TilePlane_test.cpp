@@ -135,8 +135,12 @@ void testTilePlane_memoryLeak() {
 }
 
 void testTilePlane_CornerHorizontalTilePlane() {
-    CornerHorizontalTilePlane *cornerHorizontalTilePlane = new CornerHorizontalTilePlane(0, 0, 100, 100);
-    CornerVerticalTilePlane *cornerVerticalTilePlane = new CornerVerticalTilePlane(0, 0, 100, 100);
+    int floorplanXStart = -9;
+    int floorplanYStart = -9;
+    int floorplanXEnd = 101;
+    int floorplanYEnd = 101;
+    CornerHorizontalTilePlane *cornerHorizontalTilePlane = new CornerHorizontalTilePlane(floorplanXStart, floorplanYStart, floorplanXEnd, floorplanYEnd);
+    CornerVerticalTilePlane *cornerVerticalTilePlane = new CornerVerticalTilePlane(floorplanXStart, floorplanYStart, floorplanXEnd, floorplanYEnd);
     cornerHorizontalTilePlane->coupleWithCornerVerticalTilePlane(cornerVerticalTilePlane);
     std::vector<Tile *> *horizontalTiles = new std::vector<Tile *>();
     std::vector<Tile *> *verticalTiles = new std::vector<Tile *>();
@@ -316,13 +320,17 @@ void testTilePlane_CornerHorizontalTilePlane() {
 
     }
 
-    displayTilePlane(cornerHorizontalTilePlane);
-    //displayTilePlane(cornerVerticalTilePlane);
+    displayTilePlane(cornerHorizontalTilePlane, floorplanXStart, floorplanYStart, floorplanXEnd, floorplanYEnd);
+    //displayTilePlane(cornerVerticalTilePlane, floorplanXStart, floorplanYStart, floorplanXEnd, floorplanYEnd);
 }
 
 void testTilePlane_HorizontalTilePlane() {
-    HorizontalTilePlane *tilePlane = new HorizontalTilePlane(0, 0, 100, 100);
-    //VerticalTilePlane *tilePlane = new VerticalTilePlane(0, 0, 100, 100);
+    int floorplanXStart = 0;
+    int floorplanYStart = 0;
+    int floorplanXEnd = 100;
+    int floorplanYEnd = 100;
+    HorizontalTilePlane *tilePlane = new HorizontalTilePlane(floorplanXStart, floorplanYStart, floorplanXEnd, floorplanYEnd);
+    //VerticalTilePlane *tilePlane = new VerticalTilePlane(floorplanXStart, floorplanYStart, floorplanXEnd, floorplanYEnd);
     std::vector<Tile *> *tiles = new std::vector<Tile *>();
     //tiles->push_back(new Tile(0, 40, 50, 90, true));
     //tiles->push_back(new Tile(70, 50, 90, 100, true));
@@ -381,7 +389,7 @@ void testTilePlane_HorizontalTilePlane() {
         allTiles->at(i)->printFourNeighbors();
     }
 
-    displayTilePlane(tilePlane);
+    displayTilePlane(tilePlane, floorplanXStart, floorplanYStart, floorplanXEnd, floorplanYEnd);
 }
 
 class Box {
@@ -454,11 +462,11 @@ void testTilePlane_sortTiles() {
     std::cout << "\n";
 }
 
-void displayTilePlane(TilePlane *tilePlane) {
+void displayTilePlane(TilePlane *tilePlane, int xStart, int yStart, int xEnd, int yEnd) {
     FloorplanWindow *window = FloorplanWindow::createInstance(0);
     window->setWindowSize(1024, 768);
     window->setTilePlane(tilePlane);
-    window->setXYRange(0, 0, 100, 100);
+    window->setXYRange(xStart, yStart, xEnd, yEnd);
     window->initialize();
     window->runMainLoop();
 }

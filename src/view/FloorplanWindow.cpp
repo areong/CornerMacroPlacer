@@ -14,6 +14,7 @@ void displayFunc() {
 FloorplanWindow *FloorplanWindow::createInstance(Floorplan *floorplan) {
     delete floorplanWindow;
     floorplanWindow = new FloorplanWindow(floorplan);
+    return floorplanWindow;
 }
 
 FloorplanWindow *FloorplanWindow::getInstance() {
