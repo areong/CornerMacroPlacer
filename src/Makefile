@@ -3,6 +3,7 @@ INC = -I ./
 HEADERS_MAIN = \
 	./cornersequence/CornerSequence_test.h\
 	./cornerstitching/TilePlane_test.h\
+	./floorplan/Floorplan_test.h\
 	./quadtree/Quadtree_test.h\
 	./sa/SimulatedAnnealing_test.h\
 	./utils/Utils.h

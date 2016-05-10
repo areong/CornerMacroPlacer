@@ -6,6 +6,7 @@
 
 class Cell;
 class Macro;
+class Matrix2d;
 class Net;
 class Terminal;
 
@@ -51,6 +52,19 @@ public:
     std::vector<Cell *> *getCells();
     std::vector<Terminal *> *getTerminals();
     std::vector<Net *> *getNets();
+    /*
+    Create a density map whose values are all zero.
+    */
+    void createEmptyDensityMap(int numCols, int numRows);
+    void clearDensityMap();
+    void addFixedMacrosToDensityMap();
+    void addMovableMacrosToDensityMap();
+    /*
+    Update the position of Pins of movableMacros.
+    */
+    void updatePinsPosition();
+    double calculateTotalWirelength();
+    double calculateTotalRoutabilityWirelength(double routabilityWeight);
 
 private:
     int floorplanXStart;
@@ -67,6 +81,24 @@ private:
     std::map<std::string, Cell *> *cellsByName;
     std::map<std::string, Terminal *> *terminalsByName;
     std::map<std::string, Net *> *netsByName;
+
+    Matrix2d *densityMap;
+    int densityMapNumCols;
+    int densityMapNumRows;
+    double densityMapGridWidth;
+    double densityMapGridHeight;
+    double densityMapGridArea;
+
+    void addMacroToDensityMap(Macro *macro);
+    /*
+    Create a Matrix2d with size matching the input range,
+    and largest value being density.
+    Assume xStart < xEnd and yStart < yEnd.
+    Please delete the returned Matrix2d.
+    @param iStart, jStart
+        They serves as return values which are (xStart, yStart)'s indices in densityMap.
+    */
+    Matrix2d *createSubDensityMap(double xStart, double yStart, double xEnd, double yEnd, double density, int &iStart, int &jStart);
 };
 
 #endif

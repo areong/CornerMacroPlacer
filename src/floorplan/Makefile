@@ -11,7 +11,14 @@ HEADERS_FLOORPLAN = \
 	./../floorplan/Net.h\
 	./../floorplan/Pin.h\
 	./../floorplan/Terminal.h\
+	./../utils/Matrix2d.h\
 	./../utils/Utils.h
+
+HEADERS_FLOORPLAN_TEST = \
+	./../floorplan/Floorplan.h\
+	./../floorplan/Floorplan_test.h\
+	./../floorplan/Macro.h\
+	./../floorplan/Module.h
 
 HEADERS_MACRO = \
 	./../floorplan/Macro.h\
@@ -42,6 +49,7 @@ HEADERS_TERMINAL = \
 all:
 	make Cell.o
 	make Floorplan.o
+	make Floorplan_test.o
 	make Macro.o
 	make Module.o
 	make Net.o
@@ -52,6 +60,8 @@ Cell.o: Cell.cpp $(HEADERS_CELL)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c Cell.cpp $(INC)
 Floorplan.o: Floorplan.cpp $(HEADERS_FLOORPLAN)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c Floorplan.cpp $(INC)
+Floorplan_test.o: Floorplan_test.cpp $(HEADERS_FLOORPLAN_TEST)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c Floorplan_test.cpp $(INC)
 Macro.o: Macro.cpp $(HEADERS_MACRO)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c Macro.cpp $(INC)
 Module.o: Module.cpp $(HEADERS_MODULE)

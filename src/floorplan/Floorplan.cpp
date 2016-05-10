@@ -7,6 +7,7 @@
 #include "floorplan/Net.h"
 #include "floorplan/Pin.h"
 #include "floorplan/Terminal.h"
+#include "utils/Matrix2d.h"
 #include "utils/Utils.h"
 
 Floorplan *Floorplan::createFromBookshelfFiles(const char *auxFilename) {
@@ -278,11 +279,34 @@ Floorplan::Floorplan(int xStart, int yStart, int xEnd, int yEnd) {
     floorplanYStart = yStart;
     floorplanXEnd = xEnd;
     floorplanYEnd = yEnd;
+
+    densityMap = 0;
+    densityMapNumCols = 1;
+    densityMapNumRows = 1;
+    densityMapGridWidth = 1;
+    densityMapGridHeight = 1;
+    densityMapGridArea = 1;
 }
 
 Floorplan::~Floorplan() {
+    // Delete all components.
+    // Pins are deleted by Modules.
+    for (int i = 0; i < fixedMacros->size(); ++i) delete fixedMacros->at(i);
     delete fixedMacros;
+    for (int i = 0; i < movableMacros->size(); ++i) delete movableMacros->at(i);
     delete movableMacros;
+    for (int i = 0; i < cells->size(); ++i) delete cells->at(i);
+    delete cells;
+    for (int i = 0; i < terminals->size(); ++i) delete terminals->at(i);
+    delete terminals;
+    for (int i = 0; i < nets->size(); ++i) delete nets->at(i);
+    delete nets;
+    delete macrosByName;
+    delete cellsByName;
+    delete terminalsByName;
+    delete netsByName;
+
+    delete densityMap;
 }
 
 int Floorplan::getFloorplanXStart() {
@@ -375,4 +399,133 @@ std::vector<Terminal *> *Floorplan::getTerminals() {
 
 std::vector<Net *> *Floorplan::getNets() {
     return nets;
+}
+
+void Floorplan::createEmptyDensityMap(int numCols, int numRows) {
+    densityMapNumCols = numCols;
+    densityMapNumRows = numRows;
+    densityMapGridWidth = (double) (floorplanXEnd - floorplanXStart) / (double) numCols;
+    densityMapGridHeight = (double) (floorplanYEnd - floorplanYStart) / (double) numRows;
+    densityMapGridArea = densityMapGridWidth * densityMapGridHeight;
+    densityMap = new Matrix2d(numRows, numCols, 0);
+}
+
+void Floorplan::clearDensityMap() {
+    densityMap->setAllValues(0);
+}
+
+void Floorplan::addFixedMacrosToDensityMap() {
+    for (int i = 0; i < fixedMacros->size(); ++i) {
+        addMacroToDensityMap(fixedMacros->at(i));
+    }
+}
+
+void Floorplan::addMovableMacrosToDensityMap() {
+    for (int i = 0; i < movableMacros->size(); ++i) {
+        addMacroToDensityMap(movableMacros->at(i));
+    }
+}
+
+void Floorplan::updatePinsPosition() {
+    for (int i = 0; i < movableMacros->size(); ++i) {
+        movableMacros->at(i)->updatePinsPosition();
+    }
+}
+
+double Floorplan::calculateTotalWirelength() {
+    double totalWirelength = 0;
+    for (int i = 0; i < nets->size(); ++i) {
+        totalWirelength += nets->at(i)->calculateWirelength();
+    }
+    return totalWirelength;
+}
+
+double Floorplan::calculateTotalRoutabilityWirelength(double routabilityWeight) {
+    double totalRoutabilityWirelength = 0;
+    for (int i = 0; i < nets->size(); ++i) {
+        Net *net = nets->at(i);
+        double wirelength = net->calculateWirelength();
+        if (wirelength == 0) continue;
+        double minPinsX = net->getMinPinsX();
+        double minPinsY = net->getMinPinsY();
+        double maxPinsX = net->getMaxPinsX();
+        double maxPinsY = net->getMaxPinsY();
+
+        // Make net's area larger than zero.
+        if (minPinsX == maxPinsX) {
+            if (minPinsX > floorplanXStart) minPinsX -= 1;
+            else maxPinsX += 1;
+        } else if (minPinsY == maxPinsY) {  // Use else if because wirelength > 0.
+            if (minPinsY > floorplanYStart) minPinsY -= 1;
+            else maxPinsY += 1;
+        }
+        
+        int iStart = 0;
+        int jStart = 0;
+        Matrix2d *netDensityMap = createSubDensityMap(minPinsX, minPinsY,
+            maxPinsX, maxPinsY, 1, iStart, jStart);
+        double netNumGrids = (maxPinsX - minPinsX) * (maxPinsY - minPinsY) / densityMapGridArea;
+        double macrosCoverage = densityMap->dot(netDensityMap, iStart, jStart) / netNumGrids;
+        totalRoutabilityWirelength += (1 + routabilityWeight * macrosCoverage) * wirelength;
+        delete netDensityMap;
+    }
+    return totalRoutabilityWirelength;
+}
+
+// private
+
+void Floorplan::addMacroToDensityMap(Macro *macro) {
+    int xStart = macro->getXStart();
+    int yStart = macro->getYStart();
+    int xEnd = macro->getXEnd();
+    int yEnd = macro->getYEnd();
+    int iStart = 0;
+    int jStart = 0;
+    Matrix2d *subDensityMap = createSubDensityMap(xStart, yStart, xEnd, yEnd, 1, iStart, jStart);
+    densityMap->add(subDensityMap, iStart, jStart);
+    delete subDensityMap;
+}
+
+Matrix2d *Floorplan::createSubDensityMap(double xStart, double yStart, double xEnd, double yEnd, double density, int &iStart, int &jStart) {
+    iStart = (int) ((yStart - floorplanYStart) / densityMapGridHeight);
+    jStart = (int) ((xStart - floorplanXStart) / densityMapGridWidth);
+    int iEnd = (int) ((yEnd - floorplanYStart) / densityMapGridHeight) + 1;
+    int jEnd = (int) ((xEnd - floorplanXStart) / densityMapGridWidth) + 1;
+    if (iEnd > densityMapNumRows) iEnd = densityMapNumRows;
+    if (jEnd > densityMapNumCols) jEnd = densityMapNumCols;
+    int numRows = (iEnd > iStart) ? (iEnd - iStart) : 1;
+    int numCols = (jEnd > jStart) ? (jEnd - jStart) : 1;
+    Matrix2d *subDensityMap = new Matrix2d(numRows, numCols, density);
+
+    // Adjust row i == iStart and row i == iEnd - 1.
+    if (iStart < iEnd - 1) {
+        double yStartCoverage = ((iStart + 1) * densityMapGridHeight + floorplanYStart - yStart) / densityMapGridHeight;
+        double yEndCoverage = (yEnd - (iEnd - 1) * densityMapGridHeight - floorplanYStart) / densityMapGridHeight;
+        for (int j = 0; j < numCols; ++j) {
+            subDensityMap->multiplyAt(0, j, yStartCoverage);
+            subDensityMap->multiplyAt(numRows - 1, j, yEndCoverage);
+        }
+    } else {    // iStart == iEnd - 1
+        double yCoverage = (yEnd - yStart) / densityMapGridHeight;
+        for (int j = 0; j < numCols; ++j) {
+            subDensityMap->multiplyAt(0, j, yCoverage);
+        }
+    }
+
+    // Adjust row j == jStart and row j == jEnd - 1.
+    if (jStart < jEnd - 1) {
+        double xStartCoverage = ((jStart + 1) * densityMapGridWidth + floorplanXStart - xStart) / densityMapGridWidth;
+        double xEndCoverage = (xEnd - (jEnd - 1) * densityMapGridWidth - floorplanXStart) / densityMapGridWidth;
+        for (int i = 0; i < numRows; ++i) {
+            subDensityMap->multiplyAt(i, 0, xStartCoverage);
+            subDensityMap->multiplyAt(i, numCols - 1, xEndCoverage);
+        }
+    } else {    // jStart == jEnd - 1
+        double xCoverage = (xEnd - xStart) / densityMapGridWidth;
+        for (int i = 0; i < numRows; ++i) {
+            subDensityMap->multiplyAt(i, 0, xCoverage);
+        }
+    }
+
+    return subDensityMap;
 }

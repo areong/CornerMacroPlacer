@@ -48,7 +48,7 @@ std::vector<Pin *> *Net::getTerminalPins() {
     return terminalPins;
 }
 
-double Net::calculateHpwl() {
+double Net::calculateWirelength() {
     minPinsX = 1e9;
     minPinsY = 1e9;
     maxPinsX = -1e9;
@@ -74,4 +74,20 @@ double Net::calculateHpwl() {
     } else {
         return maxPinsX - minPinsX + maxPinsY - minPinsY;
     }
+}
+
+double Net::getMinPinsX() {
+    return minPinsX;
+}
+
+double Net::getMinPinsY() {
+    return minPinsY;
+}
+
+double Net::getMaxPinsX() {
+    return maxPinsX;
+}
+
+double Net::getMaxPinsY() {
+    return maxPinsY;
 }

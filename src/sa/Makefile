@@ -17,6 +17,7 @@ HEADERS_CHANGECORNER = \
 HEADERS_FLOORPLANSTATE = \
 	./../cornersequence/CornerSequence.h\
 	./../cornerstitching/Corner.h\
+	./../floorplan/Floorplan.h\
 	./../floorplan/Macro.h\
 	./../floorplan/Module.h\
 	./../quadtree/Point.h\
@@ -79,6 +80,7 @@ HEADERS_SIMULATEDANNEALING_TEST = \
 	./../sa/State.h\
 	./../sa/SwapMacros.h\
 	./../sa/TemperatureListener.h\
+	./../sa/TotalWirelength.h\
 	./../utils/Utils.h\
 	./../view/FloorplanWindow.h\
 	./../view/Window.h
@@ -97,6 +99,13 @@ HEADERS_SWAPMACROS = \
 HEADERS_TEMPERATURELISTENER = \
 	./../sa/TemperatureListener.h
 
+HEADERS_TOTALWIRELENGTH = \
+	./../floorplan/Floorplan.h\
+	./../sa/CostFunction.h\
+	./../sa/FloorplanState.h\
+	./../sa/State.h\
+	./../sa/TotalWirelength.h
+
 all:
 	make AnnealingSchedule.o
 	make AnnealingScheduleRatioDecrease.o
@@ -110,6 +119,7 @@ all:
 	make State.o
 	make SwapMacros.o
 	make TemperatureListener.o
+	make TotalWirelength.o
 AnnealingSchedule.o: AnnealingSchedule.cpp $(HEADERS_ANNEALINGSCHEDULE)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c AnnealingSchedule.cpp $(INC)
 AnnealingScheduleRatioDecrease.o: AnnealingScheduleRatioDecrease.cpp $(HEADERS_ANNEALINGSCHEDULERATIODECREASE)
@@ -134,5 +144,7 @@ SwapMacros.o: SwapMacros.cpp $(HEADERS_SWAPMACROS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c SwapMacros.cpp $(INC)
 TemperatureListener.o: TemperatureListener.cpp $(HEADERS_TEMPERATURELISTENER)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c TemperatureListener.cpp $(INC)
+TotalWirelength.o: TotalWirelength.cpp $(HEADERS_TOTALWIRELENGTH)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c TotalWirelength.cpp $(INC)
 clean: 
 	rm *.o

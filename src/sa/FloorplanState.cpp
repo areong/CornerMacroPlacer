@@ -1,6 +1,7 @@
 #include "sa/FloorplanState.h"
 #include <iostream>
 #include <vector>
+#include "floorplan/Floorplan.h"
 #include "floorplan/Macro.h"
 #include "cornersequence/CornerSequence.h"
 #include "cornerstitching/Corner.h"
@@ -41,6 +42,10 @@ bool FloorplanState::doAfterBeingOperatedWithIncrementalUpdate() {
 
 void FloorplanState::doBeforeCalculatingCost() {
     cornerSequence->calculateEmptySpaceAreas();
+    floorplan->clearDensityMap();
+    floorplan->addFixedMacrosToDensityMap();
+    floorplan->addMovableMacrosToDensityMap();
+    floorplan->updatePinsPosition();
 }
 
 void FloorplanState::print() {

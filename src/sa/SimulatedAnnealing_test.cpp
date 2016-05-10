@@ -13,6 +13,7 @@
 #include "sa/RefreshFloorplanWindow.h"
 #include "sa/SimulatedAnnealing.h"
 #include "sa/SwapMacros.h"
+#include "sa/TotalWirelength.h"
 #include "utils/Utils.h"
 #include "view/FloorplanWindow.h"
 
@@ -51,6 +52,9 @@ void testSimulatedAnnealing_annealCornerSequence(int argc, char **argv) {
     // Floorplan
     //Floorplan *floorplan = testSimulatedAnnealing_createFloorplan();
     Floorplan *floorplan = Floorplan::createFromBookshelfFiles(argv[1]);
+    int densityMapNumRows = 10;
+    int densityMapNumCols = 10;
+    floorplan->createEmptyDensityMap(densityMapNumCols, densityMapNumRows);
     int floorplanXStart = floorplan->getFloorplanXStart();
     int floorplanYStart = floorplan->getFloorplanYStart();
     int floorplanXEnd = floorplan->getFloorplanXEnd();
@@ -87,7 +91,8 @@ void testSimulatedAnnealing_annealCornerSequence(int argc, char **argv) {
     sa->addOperation(new SwapMacros(macros->size()));
     sa->addOperation(new ChangeCorner(macros->size()));
     sa->addCostFunction(new MacrosOccupiedRegionArea(), 10);
-    sa->addCostFunction(new LargestEmptySpaceShape(), 1);
+    //sa->addCostFunction(new LargestEmptySpaceShape(), 1);
+    sa->addCostFunction(new TotalWirelength(1), 10);
     sa->normalizeCostFunctionWeights();
     sa->calculateCostFunctionAverageCosts(state, 1000);
     sa->setAnnealingSchedule(new AnnealingScheduleRatioDecrease(0.9));

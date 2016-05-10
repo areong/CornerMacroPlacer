@@ -22,10 +22,15 @@ public:
     std::vector<Pin *> *getCellPins();
     std::vector<Pin *> *getTerminalPins();
     /*
+    Calculate minPinsX, minPinsY, maxPinsX and maxPinsY.
     Calculate hpwl of macroPins and terminalPins. The cellPins are ignored.
     If there are no macroPins nor terminalPins, return 0.
     */
-    double calculateHpwl();
+    double calculateWirelength();
+    double getMinPinsX();
+    double getMinPinsY();
+    double getMaxPinsX();
+    double getMaxPinsY();
 
 private:
     Floorplan *floorplan;
