@@ -1,5 +1,6 @@
 #include "floorplan/Floorplan.h"
 #include <cstdlib>
+#include <algorithm>
 #include <fstream>
 #include "floorplan/Cell.h"
 #include "floorplan/Macro.h"
@@ -50,10 +51,11 @@ Floorplan *Floorplan::createFromBookshelfFiles(const char *auxFilename) {
     }
 
     // Read scl to know the range of flooplan.
-    int floorplanXStart;
-    int floorplanYStart;
-    int floorplanXEnd;
-    int floorplanYEnd;
+    int floorplanXStart = 0;
+    int floorplanYStart = 0;
+    int floorplanXEnd = 0;
+    int floorplanYEnd = 0;
+    std::vector<Macro *> *fixedMacrosForInvalidRegions = new std::vector<Macro *>();
     std::ifstream sclFile(sclFilename.c_str());
     if (sclFile.is_open()) {
         std::string line;
@@ -69,10 +71,20 @@ Floorplan *Floorplan::createFromBookshelfFiles(const char *auxFilename) {
                 break;
             }
         }
-        // Get xStart, yStart, rowHeight, siteWidth and numSites.
+        // Get rowXStart, rowYStart, rowXEnd and rowYEnd.
+        // Update leftBoundaryXs, leftBoundaryYs, rightBoundaryXs and rightBoundaryYs.
+        int countRows = 1;
+        int rowXStart = 0;
+        int rowYStart = 0;
+        int rowXEnd = 0;
+        int rowYEnd = 0;
         int rowHeight = 0;
         int siteWidth = 0;
         int numSites = 0;
+        std::vector<int> *leftBoundaryXs = new std::vector<int>();
+        std::vector<int> *leftBoundaryYs = new std::vector<int>();
+        std::vector<int> *rightBoundaryXs = new std::vector<int>();
+        std::vector<int> *rightBoundaryYs = new std::vector<int>();
         while (true) {
             std::getline(sclFile, line);
             std::vector<std::string> *tokens = Utils::splitString(line, "\t :\n\r");
@@ -81,27 +93,87 @@ Floorplan *Floorplan::createFromBookshelfFiles(const char *auxFilename) {
                 continue;
             }
             if (tokens->at(0) == "Coordinate") {
-                floorplanYStart = atoi(tokens->at(1).c_str());
+                rowYStart = atoi(tokens->at(1).c_str());
             } else if (tokens->at(0) == "Height") {
                 rowHeight = atoi(tokens->at(1).c_str());
             } else if (tokens->at(0) == "Sitewidth") {
                 siteWidth = atoi(tokens->at(1).c_str());
             } else if (tokens->at(0) == "SubrowOrigin") {
-                floorplanXStart = atoi(tokens->at(1).c_str());
+                rowXStart = atoi(tokens->at(1).c_str());
                 numSites = atoi(tokens->at(3).c_str());
             } else if (tokens->at(0) == "End") {
-                break;
+                rowYEnd = rowYStart + rowHeight;
+                rowXEnd = rowXStart + numSites * siteWidth;
+                if (countRows == 1) {
+                    // At the first row, initialize the vectors.
+                    leftBoundaryXs->push_back(rowXStart);
+                    leftBoundaryYs->push_back(rowYStart);
+                    rightBoundaryXs->push_back(rowXEnd);
+                    rightBoundaryYs->push_back(rowYStart);
+                } else {
+                    if (rowXStart != leftBoundaryXs->back()) {
+                        // This row starts at different x.
+                        leftBoundaryXs->push_back(rowXStart);
+                        leftBoundaryYs->push_back(rowYStart);
+                    }
+                    if (rowXEnd != rightBoundaryXs->back()) {
+                        // This row ends at different x.
+                        rightBoundaryXs->push_back(rowXEnd);
+                        rightBoundaryYs->push_back(rowYStart);
+                    }
+                    if (countRows == numRows) {
+                        // At the last row, calculate floorplan range
+                        // and create fixed Macros for invalid regions.
+                        floorplanYStart = leftBoundaryYs->front();
+                        floorplanYEnd = rowYEnd;
+                        floorplanXStart = *std::min_element(leftBoundaryXs->begin(), leftBoundaryXs->end());
+                        floorplanXEnd = *std::max_element(rightBoundaryXs->begin(), rightBoundaryXs->end());
+                        // Push the last points to the vectors.
+                        leftBoundaryXs->push_back(rowXStart);
+                        leftBoundaryYs->push_back(rowYEnd);
+                        rightBoundaryXs->push_back(rowXEnd);
+                        rightBoundaryYs->push_back(rowYEnd);
+                        // Create fixed Macros to represent the invalid regions.
+                        for (int i = 0; i < leftBoundaryXs->size() - 1; ++i) {
+                            int macroWidth = leftBoundaryXs->at(i) - floorplanXStart;
+                            if (macroWidth > 0) {
+                                int macroHeight = leftBoundaryYs->at(i + 1) - leftBoundaryYs->at(i);
+                                fixedMacrosForInvalidRegions->push_back(new Macro(
+                                    macroWidth, macroHeight, floorplanXStart, leftBoundaryYs->at(i)));
+                            }
+                        }
+                        for (int i = 0; i < rightBoundaryXs->size() - 1; ++i) {
+                            int macroWidth = floorplanXEnd - rightBoundaryXs->at(i);
+                            if (macroWidth > 0) {
+                                int macroHeight = rightBoundaryYs->at(i + 1) - rightBoundaryYs->at(i);
+                                fixedMacrosForInvalidRegions->push_back(new Macro(
+                                    macroWidth, macroHeight, rightBoundaryXs->at(i), rightBoundaryYs->at(i)));
+                            }
+                        }
+                        // End.
+                        delete tokens;
+                        break;
+                    }
+                }
+                countRows += 1;
             }
             delete tokens;
         }
-        floorplanXEnd = floorplanXStart + numSites * siteWidth;
-        floorplanYEnd = floorplanYStart + numRows * rowHeight;
+        delete leftBoundaryXs;
+        delete leftBoundaryYs;
+        delete rightBoundaryXs;
+        delete rightBoundaryYs;
         sclFile.close();
     } else {
         return 0;
     }
 
     floorplan = new Floorplan(floorplanXStart, floorplanYStart, floorplanXEnd, floorplanYEnd);
+    // Add fixed Macros which represents invalid regions.
+    for (int i = 0; i < fixedMacrosForInvalidRegions->size(); ++i) {
+        floorplan->addFixedMacro(fixedMacrosForInvalidRegions->at(i));
+    }
+    delete fixedMacrosForInvalidRegions;
 
     // Read nodes.
     std::ifstream nodesFile(nodesFilename.c_str());

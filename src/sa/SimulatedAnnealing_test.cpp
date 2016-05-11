@@ -67,6 +67,8 @@ void testSimulatedAnnealing_annealCornerSequence(int argc, char **argv) {
         area += (double) macros->at(i)->getWidth() * (double) macros->at(i)->getHeight();
     }
     std::cout << "sum Macros area: " << area << "\n";
+    std::cout << "num movable Macros: " << macros->size() << "\n";
+    std::cout << "num fixed Macros: " << fixedMacros->size() << "\n";
 
     // CornerSequence
     SortedMacros *initialWidthSortedMacros = new SortedMacros(true);
@@ -108,7 +110,7 @@ void testSimulatedAnnealing_annealCornerSequence(int argc, char **argv) {
     sa->addTemperatureListener(new RefreshFloorplanWindow(window, floorplan));
 
     // Anneal
-    sa->annealWithoutIncrementalUpdate(state, 1000, 0.001, 0.9, 300);
+    sa->annealWithoutIncrementalUpdate(state, 1000, 0.001, 0.9, 700);
 }
 
 void testSimulatedAnnealing(int argc, char **argv) {
