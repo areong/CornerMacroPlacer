@@ -107,7 +107,7 @@ void CornerSequence::changeCorner(int i) {
 }
 
 void CornerSequence::placeFixedMacros() {
-    for (int i = 0; i < fixedMacros->size(); ++i) {
+    for (int i = 23; i < fixedMacros->size(); ++i) {
         Macro *macro = fixedMacros->at(i);
         int tileXStart = macro->getXStart();
         int tileYStart = macro->getYStart();

@@ -1,8 +1,8 @@
 #ifndef FLOORPLAN_FLOORPLAN_H_
 #define FLOORPLAN_FLOORPLAN_H_
 
-#include <vector>
 #include <map>
+#include <vector>
 
 class Cell;
 class Macro;
@@ -17,6 +17,12 @@ public:
     If read unsuccessful, return 0.
     */
     static Floorplan *createFromBookshelfFiles(const char *auxFilename);
+    /*
+    Create a Floorplan from a .aux file in LEF/DEF format.
+    Convert distance to nanometers.
+    If read unsuccessful, return 0.
+    */
+    static Floorplan *createFromLefDefFiles(const char *auxFilename);
     /*
     Input the boundary of the Floorplan.
     */
@@ -99,6 +105,11 @@ private:
         They serves as return values which are (xStart, yStart)'s indices in densityMap.
     */
     Matrix2d *createSubDensityMap(double xStart, double yStart, double xEnd, double yEnd, double density, int &iStart, int &jStart);
+    /*
+    Read lines until the last token is ";".
+    Used in reading lines in LEF/DEF files.
+    */
+    static void extendTokensUntilSemicolon(std::vector<std::string> *tokens, std::ifstream &file);
 };
 
 #endif

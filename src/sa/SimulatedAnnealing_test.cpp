@@ -18,7 +18,7 @@
 #include "view/FloorplanWindow.h"
 
 Floorplan *testSimulatedAnnealing_createFloorplan() {
-    int numMacros = 120;
+    int numMacros = 40;
     int floorplanXStart = 0;
     int floorplanYStart = 0;
     int floorplanXEnd = 2000;
@@ -51,7 +51,9 @@ Floorplan *testSimulatedAnnealing_createFloorplan() {
 void testSimulatedAnnealing_annealCornerSequence(int argc, char **argv) {
     // Floorplan
     //Floorplan *floorplan = testSimulatedAnnealing_createFloorplan();
-    Floorplan *floorplan = Floorplan::createFromBookshelfFiles(argv[1]);
+    //Floorplan *floorplan = Floorplan::createFromBookshelfFiles(argv[1]);
+    Floorplan *floorplan = Floorplan::createFromLefDefFiles(argv[1]);
+    //return;
     int densityMapNumRows = 10;
     int densityMapNumCols = 10;
     floorplan->createEmptyDensityMap(densityMapNumCols, densityMapNumRows);
@@ -94,7 +96,7 @@ void testSimulatedAnnealing_annealCornerSequence(int argc, char **argv) {
     sa->addOperation(new ChangeCorner(macros->size()));
     sa->addCostFunction(new MacrosOccupiedRegionArea(), 10);
     //sa->addCostFunction(new LargestEmptySpaceShape(), 1);
-    sa->addCostFunction(new TotalWirelength(1), 10);
+    //sa->addCostFunction(new TotalWirelength(1), 10);
     sa->normalizeCostFunctionWeights();
     sa->calculateCostFunctionAverageCosts(state, 1000);
     sa->setAnnealingSchedule(new AnnealingScheduleRatioDecrease(0.9));

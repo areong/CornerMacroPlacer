@@ -15,7 +15,7 @@ Floorplan *Floorplan::createFromBookshelfFiles(const char *auxFilename) {
     Floorplan *floorplan = 0;
 
     // Save filenames to a map.
-    std::map<std::string, std::string> filenamesByType;
+    std::map<std::string, std::string> filenamesByExtension;
 
     // Aux file, one line:
     //   RowBasedPlacement :  adaptec1.nodes  adaptec1.nets  adaptec1.wts
@@ -27,8 +27,8 @@ Floorplan *Floorplan::createFromBookshelfFiles(const char *auxFilename) {
         std::vector<std::string> *tokens = Utils::splitString(line, " :\n\r\t");
         for (int i = 1; i < tokens->size(); ++i) {
             int iDot = tokens->at(i).find('.');
-            std::string type = tokens->at(i).substr(iDot + 1, tokens->at(i).length() - iDot - 1);
-            filenamesByType[type] = tokens->at(i);
+            std::string extension = tokens->at(i).substr(iDot + 1, tokens->at(i).length() - iDot - 1);
+            filenamesByExtension[extension] = tokens->at(i);
         }
         delete tokens;
         auxFile.close();
@@ -42,10 +42,10 @@ Floorplan *Floorplan::createFromBookshelfFiles(const char *auxFilename) {
     std::string plFilename;
     std::string netsFilename;
     try {
-        sclFilename = filenamesByType.at("scl");
-        nodesFilename = filenamesByType.at("nodes");
-        plFilename = filenamesByType.at("pl");
-        netsFilename = filenamesByType.at("nets");
+        sclFilename = filenamesByExtension.at("scl");
+        nodesFilename = filenamesByExtension.at("nodes");
+        plFilename = filenamesByExtension.at("pl");
+        netsFilename = filenamesByExtension.at("nets");
     } catch (const std::out_of_range& oor) {
         return 0;
     }
@@ -199,7 +199,7 @@ Floorplan *Floorplan::createFromBookshelfFiles(const char *auxFilename) {
             if (tokens->size() == 3) {
                 if (width == 0 && height == 0) {
                     // A Terminal
-                    Terminal *terminal = new Terminal(name);
+                    Terminal *terminal = new Terminal(0, 0, name);
                     floorplan->addTerminal(terminal);
                 } else {
                     // A Cell
@@ -335,6 +335,407 @@ Floorplan *Floorplan::createFromBookshelfFiles(const char *auxFilename) {
     return floorplan;
 }
 
+Floorplan *Floorplan::createFromLefDefFiles(const char *auxFilename) {
+    Floorplan *floorplan = 0;
+
+    // Save filenames.
+    std::vector<std::string> *lefFilenames = new std::vector<std::string>();
+    std::string defFilename;
+
+    // Read aux file, whose content is
+    //  LEFDEF : *.lef *.vclef *.ant *.def ...
+    std::ifstream auxFile(auxFilename);
+    if (auxFile.is_open()) {
+        std::string line;
+        std::getline(auxFile, line);
+        std::vector<std::string> *tokens = Utils::splitString(line, " \n\r\t");
+        for (int i = 2; i < tokens->size(); ++i) {
+            int iDot = tokens->at(i).find('.');
+            std::string extension = tokens->at(i).substr(iDot + 1, tokens->at(i).length() - iDot - 1);
+            if (extension == "def") {
+                defFilename = tokens->at(i);
+            } else if (extension == "lef" || extension == "vclef" || extension == "ant") {
+                lefFilenames->push_back(tokens->at(i));
+            }
+        }
+        delete tokens;
+        auxFile.close();
+    } else {
+        return 0;
+    }
+
+    // Read lef files and create templates of Macros and Cells.
+    std::vector<Macro *> *macroTemplates = new std::vector<Macro *>();
+    std::vector<Cell *> *cellTemplates = new std::vector<Cell *>();
+    std::map<std::string, Macro *> macroTemplatesByName;
+    std::map<std::string, Cell *> cellTemplatesByName;
+    std::map<std::string, Macro *> sitesByName; // Use Macros to store sites.
+    for (int iFile = 0; iFile < lefFilenames->size(); ++iFile) {
+        std::ifstream lefFile(lefFilenames->at(iFile));
+        if (lefFile.is_open()) {
+            std::string line;
+
+            // 0:   Others
+            // 1:   UNITS
+            // 2:   SITE
+            // 3:   MACRO
+            int state = 0;
+            // 0:   Others
+            // 1:   PIN
+            int macroState = 0;
+            std::string siteName = "";
+            int siteWidth = 1;
+            int siteHeight = 1;
+            std::string macroName = "";
+            std::string macroClass = "";
+            int macroWidth = 1;
+            int macroHeight = 1;
+            std::string pinName = "";
+            std::vector<Pin *> *pins = new std::vector<Pin *>();
+            std::vector<double> *rectsCenterX = new std::vector<double>();
+            std::vector<double> *rectsCenterY = new std::vector<double>();
+            std::vector<double> *rectsArea = new std::vector<double>();
+            double sumRectsArea = 0;
+
+            int lefUnit = 1000;
+
+            while (std::getline(lefFile, line)) {
+                std::vector<std::string> *tokens = Utils::splitString(line, " \n\r\t");
+                if (tokens->size() == 0) {
+                    delete tokens;
+                    continue;
+                }
+                switch (state) {
+                case 0: // Others
+                    if (tokens->at(0) == "UNITS") {
+                        state = 1;
+                    } else if (tokens->at(0) == "SITE") {
+                        state = 2;
+                        siteName = tokens->at(1);
+                    } else if (tokens->at(0) == "MACRO") {
+                        state = 3;
+                        macroName = tokens->at(1);
+                    }
+                    break;
+                case 1: // UNITS
+                    if (tokens->at(0) == "DATABASE") {
+                        lefUnit = atoi(tokens->at(2).c_str());
+                    } else if (tokens->at(0) == "END" && tokens->size() == 2 && tokens->at(1) == "UNITS") {
+                        state = 0;
+                    }
+                    break;
+                case 2: // SITE
+                    if (tokens->at(0) == "SIZE") {
+                        siteWidth = (int) (atof(tokens->at(1).c_str()) * lefUnit);
+                        siteHeight = (int) (atof(tokens->at(3).c_str()) * lefUnit);
+                    } else if (tokens->at(0) == "END" && tokens->size() == 2 && tokens->at(1) == siteName) {
+                        Macro *site = new Macro(siteWidth, siteHeight, 0, 0, siteName);
+                        sitesByName[siteName] = site;
+                        state = 0;
+                    }
+                    break;
+                case 3: // MACRO
+                    switch (macroState) {
+                    case 0: // Others
+                        if (tokens->at(0) == "CLASS") {
+                            macroClass = tokens->at(1);
+                        } else if (tokens->at(0) == "SIZE") {
+                            macroWidth = (int) (atof(tokens->at(1).c_str()) * lefUnit);
+                            macroHeight = (int) (atof(tokens->at(3).c_str()) * lefUnit);
+                        } else if (tokens->at(0) == "PIN") {
+                            macroState = 1;
+                            pinName = tokens->at(1);
+                        } else if (tokens->at(0) == "END" && tokens->size() == 2 && tokens->at(1) == macroName) {
+                            Module *module;
+                            if (macroClass == "CORE") {
+                                module = new Cell(macroWidth, macroHeight, macroName);
+                            } else {
+                                module = new Macro(macroWidth, macroHeight, 0, 0, macroName);
+                            }
+                            for (int i = 0; i < pins->size(); ++i) {
+                                module->addPin(pins->at(i));
+                            }
+                            pins->clear();
+                            if (macroClass == "CORE") {
+                                Cell *cell = static_cast<Cell *>(module);
+                                cellTemplates->push_back(cell);
+                                cellTemplatesByName[macroName] = cell;
+                            } else {
+                                Macro *macro = static_cast<Macro *>(module);
+                                macroTemplates->push_back(macro);
+                                macroTemplatesByName[macroName] = macro;
+                            }
+                            state = 0;
+                        }
+                        break;
+                    case 1: // PIN
+                        if (tokens->at(0) == "RECT") {
+                            double xStart = atof(tokens->at(1).c_str());
+                            double yStart = atof(tokens->at(2).c_str());
+                            double xEnd = atof(tokens->at(3).c_str());
+                            double yEnd = atof(tokens->at(4).c_str());
+                            rectsCenterX->push_back((xStart + xEnd) / 2);
+                            rectsCenterY->push_back((yStart + yEnd) / 2);
+                            rectsArea->push_back((xEnd - xStart) * (yEnd - yStart));
+                            sumRectsArea += rectsArea->back();
+                        } else if (tokens->at(0) == "END" && tokens->size() == 2 && tokens->at(1) == pinName) {
+                            double pinOffsetX = 0;
+                            double pinOffsetY = 0;
+                            for (int i = 0; i < rectsCenterX->size(); ++i) {
+                                pinOffsetX += rectsArea->at(i) * rectsCenterX->at(i);
+                                pinOffsetY += rectsArea->at(i) * rectsCenterY->at(i);
+                            }
+                            pinOffsetX /= sumRectsArea; // sumRectsArea > 0.
+                            pinOffsetY /= sumRectsArea;
+                            pinOffsetX *= lefUnit;
+                            pinOffsetY *= lefUnit;
+                            pins->push_back(new Pin(pinOffsetX, pinOffsetY, pinName));
+                            rectsCenterX->clear();
+                            rectsCenterY->clear();
+                            rectsArea->clear();
+                            sumRectsArea = 0;
+                            macroState = 0;
+                        }
+                        break;
+                    }
+                    break;
+                }
+                delete tokens;
+            }
+            delete pins;
+            delete rectsCenterX;
+            delete rectsCenterY;
+            delete rectsArea;
+
+            lefFile.close();
+        } else {
+            return 0;
+        }
+    }
+
+    int numMacroTemplates = macroTemplates->size();
+    int numCellTemplates = cellTemplates->size();
+    for (int i = 0; i < cellTemplates->at(0)->getPins()->size(); ++i) {
+        cellTemplates->at(0)->getPins()->at(i)->print();
+    }
+
+    // Read def file.
+    int floorplanXStart = 0;
+    int floorplanYStart = 0;
+    int floorplanXEnd = 1;
+    int floorplanYEnd = 1;
+    std::string orientations[] = {"N", "W", "S", "E", "FN", "FW", "FS", "FE"};
+    std::ifstream defFile(defFilename);
+    if (defFile.is_open()) {
+        std::string line;
+
+        // 0:   Others
+        // 1:   COMPONENTS
+        // 2:   PINS
+        // 3:   BLOCKAGES
+        // 4:   NETS
+        int state = 0;
+        while (std::getline(defFile, line)) {
+            std::vector<std::string> *tokens = Utils::splitString(line, " \n\r\t");
+            if (tokens->size() == 0) {
+                delete tokens;
+                continue;
+            }
+            switch (state) {
+            case 0: // Others
+                if (tokens->at(0) == "DIEAREA") {
+                    floorplanXStart = atoi(tokens->at(2).c_str());
+                    floorplanYStart = atoi(tokens->at(3).c_str());
+                    floorplanXEnd = atoi(tokens->at(6).c_str());
+                    floorplanYEnd = atoi(tokens->at(7).c_str());
+                    floorplan = new Floorplan(floorplanXStart, floorplanYStart, floorplanXEnd, floorplanYEnd);
+                } else if (tokens->at(0) == "COMPONENTS") {
+                    state = 1;
+                } else if (tokens->at(0) == "PINS") {
+                    state = 2;
+                } else if (tokens->at(0) == "BLOCKAGES") {
+                    // Ignore BLOCKAGES because they seems to represent
+                    // the regions of fixed Macros.
+                    //state = 3;
+                } else if (tokens->at(0) == "NETS") {
+                    state = 4;
+                }
+                break;
+            case 1: // COMPONENTS
+                if (tokens->at(0) == "-") {
+                    extendTokensUntilSemicolon(tokens, defFile);
+                    std::string componentName = tokens->at(1);
+                    std::string templateName = tokens->at(2);
+                    // Find whether it is a Cell or a Macro.
+                    bool isCell = true;
+                    Cell *cellTemplate = 0;
+                    Macro *macroTemplate = 0;
+                    try {
+                        cellTemplate = cellTemplatesByName.at(templateName);
+                    } catch (const std::out_of_range& oor) {
+                        try {
+                            isCell = false;
+                            macroTemplate = macroTemplatesByName.at(templateName);
+                        } catch (const std::out_of_range& oor) {
+                            // name belongs to either a Cell template or a Macro template.
+                        }
+                    }
+                    if (isCell) {
+                        Cell *cell = static_cast<Cell *>(cellTemplate->copy());
+                        cell->setName(componentName);
+                        floorplan->addCell(cell);
+                    } else {
+                        Macro *macro = static_cast<Macro *>(macroTemplate->copy());
+                        macro->setName(componentName);
+                        // Find whether macro has fixed position.
+                        std::vector<std::string>::iterator it = std::find(tokens->begin(), tokens->end(), "FIXED");
+                        if (it != tokens->end()) {
+                            // A fixed Macro
+                            it += 2;
+                            int xStart = atoi((*it).c_str());
+                            it += 1;
+                            int yStart = atoi((*it).c_str());
+                            macro->setXStart(xStart);
+                            macro->setYStart(yStart);
+                            floorplan->addFixedMacro(macro);
+                            // Set orientation.
+                            it += 2;
+                            std::string orientation = *it;
+                            int ithOrientation = std::find(orientations, orientations + 8, orientation) - orientations;
+                            if (ithOrientation > 3) {
+                                macro->setFlipping(true);
+                                ithOrientation -= 4;
+                            }
+                            macro->setRotation(ithOrientation);
+                        } else {
+                            // A movable Macro
+                            floorplan->addMovableMacro(macro);
+                        }
+                    }
+                } else if (tokens->at(0) == "END") {
+                    state = 0;
+                }
+                break;
+            case 2: // PINS
+                if (tokens->at(0) == "-") {
+                    extendTokensUntilSemicolon(tokens, defFile);
+                    std::string terminalName = tokens->at(1);
+                    // Find position.
+                    bool positionFound = false;
+                    std::vector<std::string>::iterator it;
+                    std::vector<std::string>::iterator it0 = std::find(tokens->begin(), tokens->end(), "PLACED");
+                    std::vector<std::string>::iterator it1 = std::find(tokens->begin(), tokens->end(), "FIXED");
+                    if (it0 != tokens->end()) {
+                        it = it0;
+                        positionFound = true;
+                    } else if (it1 != tokens->end()) {
+                        it = it1;
+                        positionFound = true;
+                    }
+                    if (positionFound) {
+                        it += 2;
+                        int x = atoi((*it).c_str());
+                        it += 1;
+                        int y = atoi((*it).c_str());
+                        floorplan->addTerminal(new Terminal(x, y, terminalName));
+                    }
+                } else if (tokens->at(0) == "END") {
+                    state = 0;
+                }
+                break;
+            case 3: // BLOCKAGE
+                if (tokens->at(0) == "-" && tokens->at(1) == "PLACEMENT") {
+                    extendTokensUntilSemicolon(tokens, defFile);
+                    std::vector<std::string>::iterator it = std::find(tokens->begin(), tokens->end(), "RECT");
+                    it += 2;
+                    int blockageXStart = atoi((*it).c_str());
+                    it += 1;
+                    int blockageYStart = atoi((*it).c_str());
+                    it += 3;
+                    int blockageXEnd = atoi((*it).c_str());
+                    it += 1;
+                    int blockageYEnd = atoi((*it).c_str());
+                    if (blockageXStart < floorplanXStart) blockageXStart = floorplanXStart;
+                    if (blockageYStart < floorplanYStart) blockageYStart = floorplanYStart;
+                    if (blockageXEnd > floorplanXEnd) blockageXEnd = floorplanXEnd;
+                    if (blockageYEnd > floorplanYEnd) blockageYEnd = floorplanYEnd;
+                    int blockageWidth = blockageXEnd - blockageXStart;
+                    int blockageHeight = blockageYEnd - blockageYStart;
+                    if (blockageWidth > 0 && blockageHeight > 0) {
+                        floorplan->addFixedMacro(new Macro(blockageWidth, blockageHeight,
+                            blockageXStart, blockageYStart, ""));
+                    }
+                } else if (tokens->at(0) == "END") {
+                    state = 0;
+                }
+                break;
+            case 4: // NETS
+                if (tokens->at(0) == "-") {
+                    extendTokensUntilSemicolon(tokens, defFile);
+                    std::string netName = tokens->at(1);
+                    Net *net = new Net(floorplan, netName);
+                    // Find Pins.
+                    int i = 2;
+                    while (i < tokens->size()) {
+                        if (tokens->at(i) != "(") {
+                            i += 1;
+                            continue;
+                        }
+                        std::string componentName = tokens->at(i + 1);
+                        std::string pinName = tokens->at(i + 2);
+                        if (componentName == "PIN") {
+                            // A Terminal.
+                            Terminal *terminal = floorplan->getTerminalByName(pinName);
+                            if (terminal != 0) {
+                                net->addTerminalPin(terminal->getPin());
+                            }
+                        } else {
+                            Module *module = floorplan->getCellByName(componentName);
+                            if (module != 0) {
+                                net->addCellPin(module->getPinByName(pinName));
+                            } else {
+                                module = floorplan->getMacroByName(componentName);
+                                net->addMacroPin(module->getPinByName(pinName));
+                            }
+                        }
+                        i += 4;
+                    }
+                    floorplan->addNet(net);
+                } else if (tokens->at(0) == "END") {
+                    state = 0;
+                }
+                break;
+            }
+            delete tokens;
+        }
+        defFile.close();
+    } else {
+        return 0;
+    }
+
+    int numTerminals = floorplan->getTerminals()->size();
+    int numNets = floorplan->getNets()->size();
+    int numFixedMacros = floorplan->getFixedMacros()->size();
+    int numMovableMacros = floorplan->getMovableMacros()->size();
+    int numCells = floorplan->getCells()->size();
+    for (int i = 0; i < floorplan->getFixedMacros()->size(); ++i) {
+        floorplan->getFixedMacros()->at(i)->print();
+    }
+
+    for (int i = 0; i < macroTemplates->size(); ++i) {
+        delete macroTemplates->at(i);
+    }
+    for (int i = 0; i < cellTemplates->size(); ++i) {
+        delete cellTemplates->at(i);
+    }
+    delete macroTemplates;
+    delete cellTemplates;
+
+    delete lefFilenames;
+
+    return floorplan;
+}
+
 Floorplan::Floorplan(int xStart, int yStart, int xEnd, int yEnd) {
     fixedMacros = new std::vector<Macro *>();
     movableMacros = new std::vector<Macro *>();
@@ -399,6 +800,7 @@ int Floorplan::getFloorplanYEnd() {
 
 void Floorplan::addFixedMacro(Macro *macro) {
     fixedMacros->push_back(macro);
+    (*macrosByName)[macro->getName()] = macro;
 }
 
 void Floorplan::addMovableMacro(Macro *macro) {
@@ -600,4 +1002,15 @@ Matrix2d *Floorplan::createSubDensityMap(double xStart, double yStart, double xE
     }
 
     return subDensityMap;
+}
+
+void Floorplan::extendTokensUntilSemicolon(std::vector<std::string> *tokens, std::ifstream &file) {
+    while (tokens->back() != ";") {
+        std::string line;
+        std::getline(file, line);
+        std::vector<std::string> *nextTokens = Utils::splitString(line, " \n\r\t");
+        tokens->reserve(tokens->size() + nextTokens->size());
+        tokens->insert(tokens->end(), nextTokens->begin(), nextTokens->end());
+        delete nextTokens;
+    }
 }

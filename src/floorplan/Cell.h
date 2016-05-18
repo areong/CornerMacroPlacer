@@ -5,16 +5,14 @@
 
 class Cell : public Module {
 public:
-    Cell(int width, int height, std::string name);
+    Cell(int width=1, int height=1, std::string name="");
     ~Cell();
-    int getWidth();
-    int getHeight();
-    double getPinsOriginX() override;
-    double getPinsOriginY() override;
     
 private:
-    int width;
-    int height;
+    /*
+    Copy width and height.
+    */
+    Module *copyModule() override;
 };
 
 #endif

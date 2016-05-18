@@ -5,32 +5,18 @@
 
 class Macro : public Module {
 public:
-    Macro(int width, int height, int xStart=0, int yStart=0, std::string name="");
+    Macro(int width=1, int height=1, int xStart=0, int yStart=0, std::string name="");
     ~Macro();
-    int getWidth() const;
-    int getHeight() const;
-    void setXStart(int xStart);
-    int getXStart();
-    void setYStart(int yStart);
-    int getYStart();
-    void setXEnd(int xEnd);
-    int getXEnd();
-    void setYEnd(int yEnd);
-    int getYEnd();
-    double getPinsOriginX() override;
-    double getPinsOriginY() override;
 
     // test
 
     void print() const;
 
 private:
-    int width;
-    int height;
-    int xStart;
-    int yStart;
-    int xEnd;
-    int yEnd;
+    /*
+    Copy width, height, xStart and yStart.
+    */
+    Module *copyModule() override;
 };
 
 struct CompareMacroWidth {
