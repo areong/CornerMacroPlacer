@@ -96,7 +96,7 @@ void testSimulatedAnnealing_annealCornerSequence(int argc, char **argv) {
     sa->addOperation(new ChangeCorner(macros->size()));
     sa->addCostFunction(new MacrosOccupiedRegionArea(), 10);
     //sa->addCostFunction(new LargestEmptySpaceShape(), 1);
-    //sa->addCostFunction(new TotalWirelength(1), 10);
+    sa->addCostFunction(new TotalWirelength(1), 10);
     sa->normalizeCostFunctionWeights();
     sa->calculateCostFunctionAverageCosts(state, 1000);
     sa->setAnnealingSchedule(new AnnealingScheduleRatioDecrease(0.9));

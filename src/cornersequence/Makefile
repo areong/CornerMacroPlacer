@@ -12,6 +12,7 @@ HEADERS_CORNERSEQUENCE = \
 	./../cornerstitching/VerticalTilePlane.h\
 	./../floorplan/Macro.h\
 	./../floorplan/Module.h\
+	./../floorplan/Rectangle.h\
 	./../floorplan/SortedMacros.h\
 	./../quadtree/Point.h\
 	./../quadtree/PointValue.h\

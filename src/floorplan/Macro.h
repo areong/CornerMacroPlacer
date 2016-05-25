@@ -5,7 +5,7 @@
 
 class Macro : public Module {
 public:
-    Macro(int width=1, int height=1, int xStart=0, int yStart=0, std::string name="");
+    Macro(int width=1, int height=1, int xStart=0, int yStart=0, std::string name="", std::vector<int> *outerPoints=0);
     ~Macro();
 
     // test

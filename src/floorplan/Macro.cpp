@@ -2,8 +2,8 @@
 
 #include <iostream>
 
-Macro::Macro(int width, int height, int xStart, int yStart, std::string name)
-    : Module(width, height, xStart, yStart, name) {
+Macro::Macro(int width, int height, int xStart, int yStart, std::string name, std::vector<int> *outerPoints)
+    : Module(width, height, xStart, yStart, name, outerPoints) {
 }
 
 Macro::~Macro() {

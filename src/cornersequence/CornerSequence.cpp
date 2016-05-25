@@ -6,6 +6,7 @@
 #include "cornerstitching/CornerVerticalTilePlane.h"
 #include "cornerstitching/Tile.h"
 #include "floorplan/Macro.h"
+#include "floorplan/Rectangle.h"
 #include "quadtree/Quadtree.h"
 
 #include <iostream>
@@ -107,27 +108,30 @@ void CornerSequence::changeCorner(int i) {
 }
 
 void CornerSequence::placeFixedMacros() {
-    for (int i = 23; i < fixedMacros->size(); ++i) {
+    for (int i = 0; i < fixedMacros->size(); ++i) {
         Macro *macro = fixedMacros->at(i);
-        int tileXStart = macro->getXStart();
-        int tileYStart = macro->getYStart();
-        int tileXEnd = macro->getXEnd();
-        int tileYEnd = macro->getYEnd();
-        Tile *horizontalTile = new Tile(tileXStart, tileYStart, tileXEnd, tileYEnd, true);
-        Tile *verticalTile = new Tile(tileXStart, tileYStart, tileXEnd, tileYEnd, true);
-        Tile *startHorizontalTile = cornerHorizontalTilePlane->findTile(tileXStart, tileYStart,
-            cornerHorizontalTilePlane->getTopLeftMostTile());
-        Tile *startVerticalTile = cornerVerticalTilePlane->findTile(tileXStart, tileYStart,
-            cornerVerticalTilePlane->getTopLeftMostTile());
-        cornerHorizontalTilePlane->placeSolidTileGivenBothStartTiles(horizontalTile,
-            startHorizontalTile, startVerticalTile);
-        startHorizontalTile = horizontalTile;
-        cornerVerticalTilePlane->placeSolidTileGivenBothStartTiles(verticalTile,
-            startVerticalTile, startHorizontalTile);
+        for (int iRectangle = 0; iRectangle < macro->getRectangles()->size(); ++iRectangle) {
+            Rectangle *rectangle = macro->getRectangles()->at(iRectangle);
+            int tileXStart = rectangle->getXStart();
+            int tileYStart = rectangle->getYStart();
+            int tileXEnd = rectangle->getXEnd();
+            int tileYEnd = rectangle->getYEnd();
+            Tile *horizontalTile = new Tile(tileXStart, tileYStart, tileXEnd, tileYEnd, true);
+            Tile *verticalTile = new Tile(tileXStart, tileYStart, tileXEnd, tileYEnd, true);
+            Tile *startHorizontalTile = cornerHorizontalTilePlane->findTile(tileXStart, tileYStart,
+                cornerHorizontalTilePlane->getTopLeftMostTile());
+            Tile *startVerticalTile = cornerVerticalTilePlane->findTile(tileXStart, tileYStart,
+                cornerVerticalTilePlane->getTopLeftMostTile());
+            cornerHorizontalTilePlane->placeSolidTileGivenBothStartTiles(horizontalTile,
+                startHorizontalTile, startVerticalTile);
+            startHorizontalTile = horizontalTile;
+            cornerVerticalTilePlane->placeSolidTileGivenBothStartTiles(verticalTile,
+                startVerticalTile, startHorizontalTile);
 
-        cornerHorizontalTilePlane->calculateCurrentCornersWidthAndHeight();
-        cornerVerticalTilePlane->calculateCurrentCornersWidthAndHeight();
-        updateQuadtrees();
+            cornerHorizontalTilePlane->calculateCurrentCornersWidthAndHeight();
+            cornerVerticalTilePlane->calculateCurrentCornersWidthAndHeight();
+            updateQuadtrees();
+        }
     }
 }
 
@@ -307,6 +311,7 @@ bool CornerSequence::placeMacrosWithIncrementalUpdate(int startPosition, int bac
         // Place macro at corner.
         macro->setXStart(macroXStart);
         macro->setYStart(macroYStart);
+        macro->updateRectanglesPosition();
         Tile *horizontalTile = new Tile(macroXStart, macroYStart, macroXEnd, macroYEnd, true);
         Tile *verticalTile = new Tile(macroXStart, macroYStart, macroXEnd, macroYEnd, true);
         Tile *startHorizontalTile;
@@ -392,6 +397,7 @@ void CornerSequence::setMacrosPositionByCorners() {
             macro->setYEnd(corner->getY());
             break;
         }
+        macro->updateRectanglesPosition();
     }
 }
 

@@ -3,6 +3,7 @@ HEADERS_FLOORPLANVIEW = \
 	./../floorplan/Floorplan.h\
 	./../floorplan/Macro.h\
 	./../floorplan/Module.h\
+	./../floorplan/Rectangle.h\
 	./../view/FloorplanView.h\
 	./../view/View.h\
 	./../view/Window.h

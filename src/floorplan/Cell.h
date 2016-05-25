@@ -5,7 +5,7 @@
 
 class Cell : public Module {
 public:
-    Cell(int width=1, int height=1, std::string name="");
+    Cell(int width=1, int height=1, std::string name="", std::vector<int> *outerPoints=0);
     ~Cell();
     
 private:

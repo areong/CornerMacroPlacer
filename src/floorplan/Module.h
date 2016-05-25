@@ -6,6 +6,7 @@
 #include <vector>
 
 class Pin;
+class Rectangle;
 
 /*
 The base class of Macro, Cell and Terminal.
@@ -13,15 +14,34 @@ This class is responsible for common behaviors related to Pin.
 */
 class Module {
 public:
-    Module(int width=1, int height=1, int xStart=0, int yStart=0, std::string name="");
     /*
-    Delete all Pins.
+    For a rectilinear-shaped Module, there are two methods to specify the polygon.
+    1. Specify the points in the constructor.
+    2. Add Rectangles one by one using addRectangle(). Rectangles should not overlap
+        with each other.
+    @param outerPoints  If the Module has a rectilinear shape, list polygon points'
+        x and y as input. Points are ordered clockwise or counterclockwise around
+        the polygon.
+        The edge between the first and the second point should be a vertical edge.
+        This vector will not be deleted.
+    */
+    Module(int width=1, int height=1, int xStart=0, int yStart=0, std::string name="",
+        std::vector<int> *outerPoints=0);
+    /*
+    Delete all Rectangles and all Pins.
     */
     virtual ~Module();
+    /*
+    Modifying width or height does not modify xStart, yStart, xEnd and yEnd.
+    */
     void setWidth(int width);
     int getWidth() const;
     void setHeight(int height);
     int getHeight() const;
+    /*
+    Modifying xStart, yStart, xEnd or yEnd only shifts the Module, but does not modify
+    width and height.
+    */
     void setXStart(int xStart);
     int getXStart() const;
     void setYStart(int yStart);
@@ -32,6 +52,20 @@ public:
     int getYEnd() const;
     void setName(std::string name);
     std::string getName() const;
+    /*
+    Create the Rectangle for this rectangular Module.
+    This method works only when outerPoints in the constructor arguments is zero,
+    or when addRectangle() has never been called.
+    The Rectangle is automatically created if the above outerPoints is zero.
+    Call this method if the Module size has changed.
+    */
+    void initializeRectangleOfRectangularModule();
+    /*
+    Instead of specifying the polygon in the constructor, Rectangles
+    can be added one by one by this method.
+    */
+    void addRectangle(Rectangle *rectangle);
+    std::vector<Rectangle *> *getRectangles();
     /*
     Add Pin and call Pin.setModule(this).
     */
@@ -53,6 +87,7 @@ public:
     std::vector<Pin *> *getPins();
     /*
     0, 1, 2, 3: N, W, S, E.
+    Also change Rectangles' rotation.
     */
     void setRotation(int rotation);
     void rotate(bool counterclockwise);
@@ -60,12 +95,17 @@ public:
     void setFlipping(bool flipped);
     void flipHorizontally();
     bool isFlipped() const;
+    void updateRectanglesPosition();
     void updatePinsPosition();
     /*
-    Copy name and Pins.
+    Copy name, Rectangles and Pins.
     This method first calls Module::copyModule(), which is a pure virtual method.
     */
     Module *copy();
+
+    // test
+
+    void printRectangles();
 
 protected:
     /*
@@ -81,10 +121,19 @@ private:
     int xEnd;
     int yEnd;
     std::string name;
+    bool hasRectilinearShape;
+    std::vector<Rectangle *> *rectangles;
     std::vector<Pin *> *pins;
     std::map<std::string, Pin *> *pinsByName;
     int rotation;
     bool notFlipped;
+
+    void splitRectilinearPolygonIntoRectangles(std::vector<int> *outerPoints);
+    /*
+    Merge Rectangles by depth-first traversal.
+    Assume there is no hole in the polygon.
+    */
+    void mergeRectangles(Rectangle *start, bool mergingHorizontally);
 };
 
 #endif

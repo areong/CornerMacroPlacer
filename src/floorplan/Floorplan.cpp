@@ -7,6 +7,7 @@
 #include "floorplan/Module.h"
 #include "floorplan/Net.h"
 #include "floorplan/Pin.h"
+#include "floorplan/Rectangle.h"
 #include "floorplan/Terminal.h"
 #include "utils/Matrix2d.h"
 #include "utils/Utils.h"
@@ -377,12 +378,19 @@ Floorplan *Floorplan::createFromLefDefFiles(const char *auxFilename) {
 
             // 0:   Others
             // 1:   UNITS
-            // 2:   SITE
-            // 3:   MACRO
+            // 2:   LAYER
+            // 3:   SITE
+            // 4:   MACRO
             int state = 0;
             // 0:   Others
             // 1:   PIN
+            // 2:   OBS
             int macroState = 0;
+            // 0:   Others
+            // 1:   OVERLAP_LAYER
+            int obsState = 0;
+            std::string layerName = "";
+            std::map<std::string, std::string> layerTypesByLayerName;
             std::string siteName = "";
             int siteWidth = 1;
             int siteHeight = 1;
@@ -396,6 +404,8 @@ Floorplan *Floorplan::createFromLefDefFiles(const char *auxFilename) {
             std::vector<double> *rectsCenterY = new std::vector<double>();
             std::vector<double> *rectsArea = new std::vector<double>();
             double sumRectsArea = 0;
+            std::vector<int> *polygonPoints = 0;
+            std::vector<Rectangle *> *rectangles = new std::vector<Rectangle *>();
 
             int lefUnit = 1000;
 
@@ -409,11 +419,14 @@ Floorplan *Floorplan::createFromLefDefFiles(const char *auxFilename) {
                 case 0: // Others
                     if (tokens->at(0) == "UNITS") {
                         state = 1;
-                    } else if (tokens->at(0) == "SITE") {
+                    } else if (tokens->at(0) == "LAYER") {
                         state = 2;
+                        layerName = tokens->at(1);
+                    } else if (tokens->at(0) == "SITE") {
+                        state = 3;
                         siteName = tokens->at(1);
                     } else if (tokens->at(0) == "MACRO") {
-                        state = 3;
+                        state = 4;
                         macroName = tokens->at(1);
                     }
                     break;
@@ -424,7 +437,14 @@ Floorplan *Floorplan::createFromLefDefFiles(const char *auxFilename) {
                         state = 0;
                     }
                     break;
-                case 2: // SITE
+                case 2: // LAYER
+                    if (tokens->at(0) == "TYPE") {
+                        layerTypesByLayerName[layerName] = tokens->at(1);
+                    } else if (tokens->at(0) == "END" && tokens->size() == 2 && tokens->at(1) == layerName) {
+                        state = 0;
+                    }
+                    break;
+                case 3: // SITE
                     if (tokens->at(0) == "SIZE") {
                         siteWidth = (int) (atof(tokens->at(1).c_str()) * lefUnit);
                         siteHeight = (int) (atof(tokens->at(3).c_str()) * lefUnit);
@@ -434,7 +454,7 @@ Floorplan *Floorplan::createFromLefDefFiles(const char *auxFilename) {
                         state = 0;
                     }
                     break;
-                case 3: // MACRO
+                case 4: // MACRO
                     switch (macroState) {
                     case 0: // Others
                         if (tokens->at(0) == "CLASS") {
@@ -445,12 +465,17 @@ Floorplan *Floorplan::createFromLefDefFiles(const char *auxFilename) {
                         } else if (tokens->at(0) == "PIN") {
                             macroState = 1;
                             pinName = tokens->at(1);
+                        } else if (tokens->at(0) == "OBS") {
+                            macroState = 2;
                         } else if (tokens->at(0) == "END" && tokens->size() == 2 && tokens->at(1) == macroName) {
                             Module *module;
                             if (macroClass == "CORE") {
-                                module = new Cell(macroWidth, macroHeight, macroName);
+                                module = new Cell(macroWidth, macroHeight, macroName, polygonPoints);
                             } else {
-                                module = new Macro(macroWidth, macroHeight, 0, 0, macroName);
+                                module = new Macro(macroWidth, macroHeight, 0, 0, macroName, polygonPoints);
+                            }
+                            for (int i = 0; i < rectangles->size(); ++i) {
+                                module->addRectangle(rectangles->at(i));
                             }
                             for (int i = 0; i < pins->size(); ++i) {
                                 module->addPin(pins->at(i));
@@ -497,6 +522,45 @@ Floorplan *Floorplan::createFromLefDefFiles(const char *auxFilename) {
                             macroState = 0;
                         }
                         break;
+                    case 2: // OBS
+                        switch (obsState) {
+                        case 0: // Others
+                            if (tokens->at(0) == "LAYER" && layerTypesByLayerName[tokens->at(1)] == "OVERLAP") {
+                                // Assume there is only one overlap layer.
+                                obsState = 1;
+                            } else if (tokens->at(0) == "END") {
+                                macroState = 0;
+                            } else {
+                                obsState = 0;
+                            }
+                            break;
+                        case 1: // OVERLAP_LAYER
+                            if (tokens->at(0) == "POLYGON") {
+                                polygonPoints = new std::vector<int>();
+                                for (int ith = 1; ith < tokens->size() - 3; ++ith) {
+                                    polygonPoints->push_back((int) (atof(tokens->at(ith).c_str()) * lefUnit));
+                                }
+                                // Make the first edge a vertical edge.
+                                if (polygonPoints->at(0) != polygonPoints->at(2)) {
+                                    int point0x = polygonPoints->at(0);
+                                    int point0y = polygonPoints->at(1);
+                                    polygonPoints->erase(polygonPoints->begin());
+                                    polygonPoints->erase(polygonPoints->begin());
+                                    polygonPoints->push_back(point0x);
+                                    polygonPoints->push_back(point0y);
+                                }
+                            } else if (tokens->at(0) == "RECT") {
+                                double xStart = atof(tokens->at(1).c_str());
+                                double yStart = atof(tokens->at(2).c_str());
+                                double xEnd = atof(tokens->at(3).c_str());
+                                double yEnd = atof(tokens->at(4).c_str());
+                                rectangles->push_back(new Rectangle(xStart, yStart, xEnd, yEnd));
+                            } else if (tokens->at(0) == "END") {
+                                macroState = 0;
+                            }
+                            break;
+                        }
+                        break;
                     }
                     break;
                 }
@@ -506,6 +570,8 @@ Floorplan *Floorplan::createFromLefDefFiles(const char *auxFilename) {
             delete rectsCenterX;
             delete rectsCenterY;
             delete rectsArea;
+            delete polygonPoints;
+            delete rectangles;
 
             lefFile.close();
         } else {
@@ -515,9 +581,6 @@ Floorplan *Floorplan::createFromLefDefFiles(const char *auxFilename) {
 
     int numMacroTemplates = macroTemplates->size();
     int numCellTemplates = cellTemplates->size();
-    for (int i = 0; i < cellTemplates->at(0)->getPins()->size(); ++i) {
-        cellTemplates->at(0)->getPins()->at(i)->print();
-    }
 
     // Read def file.
     int floorplanXStart = 0;
@@ -607,6 +670,8 @@ Floorplan *Floorplan::createFromLefDefFiles(const char *auxFilename) {
                                 ithOrientation -= 4;
                             }
                             macro->setRotation(ithOrientation);
+                            macro->updateRectanglesPosition();
+                            macro->updatePinsPosition();
                         } else {
                             // A movable Macro
                             floorplan->addMovableMacro(macro);
@@ -718,9 +783,6 @@ Floorplan *Floorplan::createFromLefDefFiles(const char *auxFilename) {
     int numFixedMacros = floorplan->getFixedMacros()->size();
     int numMovableMacros = floorplan->getMovableMacros()->size();
     int numCells = floorplan->getCells()->size();
-    for (int i = 0; i < floorplan->getFixedMacros()->size(); ++i) {
-        floorplan->getFixedMacros()->at(i)->print();
-    }
 
     for (int i = 0; i < macroTemplates->size(); ++i) {
         delete macroTemplates->at(i);

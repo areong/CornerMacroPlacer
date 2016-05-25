@@ -10,6 +10,7 @@ HEADERS_FLOORPLAN = \
 	./../floorplan/Module.h\
 	./../floorplan/Net.h\
 	./../floorplan/Pin.h\
+	./../floorplan/Rectangle.h\
 	./../floorplan/Terminal.h\
 	./../utils/Matrix2d.h\
 	./../utils/Utils.h
@@ -26,7 +27,8 @@ HEADERS_MACRO = \
 
 HEADERS_MODULE = \
 	./../floorplan/Module.h\
-	./../floorplan/Pin.h
+	./../floorplan/Pin.h\
+	./../floorplan/Rectangle.h
 
 HEADERS_NET = \
 	./../floorplan/Floorplan.h\
@@ -35,6 +37,9 @@ HEADERS_NET = \
 
 HEADERS_PIN = \
 	./../floorplan/Pin.h
+
+HEADERS_RECTANGLE = \
+	./../floorplan/Rectangle.h
 
 HEADERS_SORTEDMACROS = \
 	./../floorplan/Macro.h\
@@ -54,6 +59,7 @@ all:
 	make Module.o
 	make Net.o
 	make Pin.o
+	make Rectangle.o
 	make SortedMacros.o
 	make Terminal.o
 Cell.o: Cell.cpp $(HEADERS_CELL)
@@ -70,6 +76,8 @@ Net.o: Net.cpp $(HEADERS_NET)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c Net.cpp $(INC)
 Pin.o: Pin.cpp $(HEADERS_PIN)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c Pin.cpp $(INC)
+Rectangle.o: Rectangle.cpp $(HEADERS_RECTANGLE)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c Rectangle.cpp $(INC)
 SortedMacros.o: SortedMacros.cpp $(HEADERS_SORTEDMACROS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c SortedMacros.cpp $(INC)
 Terminal.o: Terminal.cpp $(HEADERS_TERMINAL)
