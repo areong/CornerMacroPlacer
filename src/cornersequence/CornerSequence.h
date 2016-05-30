@@ -54,6 +54,7 @@ public:
     int getNumMacros();
     /*
     Swap the position of ith Macro and jth Macro on the sequence.
+    Swap orientation too.
     */
     void swapMacros(int i, int j);
     /*
@@ -61,6 +62,19 @@ public:
     If the Corner isNotFromTilePlane, it will be deleted.
     */
     void changeCorner(int i);
+    /*
+    Set the orientation of ith Macro.
+    */
+    void setOrientation(int i, int orientation);
+    /*
+    Change the orientation of ith Macro randomly.
+    */
+    void changeOrientation(int i);
+    /*
+    For indices starting at start, randomize the ordering of Macros
+    and setting Corners to zero.
+    */
+    void randomizeSequence(int start);
     void placeFixedMacros();
     /*
     Place macros from the first Macro.
@@ -78,7 +92,7 @@ public:
     */
     bool placeMacrosWithIncrementalUpdate(int startPosition, int backupPosition);
     /*
-    Set Macros' position by corners.
+    Set Macros' orientation and then set Macros' position by corners.
     TilePlanes, Quadtree and anything else are not modified.
     Assume placeMacrosWith/WithoutIncrementalUpdate has been called and it returned true.
     Thus every Corner is assumed not to be zero.
@@ -114,6 +128,7 @@ private:
     std::vector<Macro *> *fixedMacros;
     std::vector<Macro *> *macros;
     std::vector<Corner *> *corners;
+    std::vector<int> *orientations;
     CornerHorizontalTilePlane *cornerHorizontalTilePlane;
     CornerVerticalTilePlane* cornerVerticalTilePlane;
     Quadtree *sizeQuadtree;

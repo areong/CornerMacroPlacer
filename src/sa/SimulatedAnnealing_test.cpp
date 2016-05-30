@@ -10,7 +10,9 @@
 #include "sa/FloorplanState.h"
 #include "sa/LargestEmptySpaceShape.h"
 #include "sa/MacrosOccupiedRegionArea.h"
+#include "sa/RandomizeSequence.h"
 #include "sa/RefreshFloorplanWindow.h"
+#include "sa/RotateOrFlipMacro.h"
 #include "sa/SimulatedAnnealing.h"
 #include "sa/SwapMacros.h"
 #include "sa/TotalWirelength.h"
@@ -94,12 +96,14 @@ void testSimulatedAnnealing_annealCornerSequence(int argc, char **argv) {
     SimulatedAnnealing *sa = new SimulatedAnnealing();
     sa->addOperation(new SwapMacros(macros->size()));
     sa->addOperation(new ChangeCorner(macros->size()));
+    sa->addOperation(new RotateOrFlipMacro(macros->size()));
+    sa->addOperation(new RandomizeSequence(macros->size()));
     sa->addCostFunction(new MacrosOccupiedRegionArea(), 10);
     //sa->addCostFunction(new LargestEmptySpaceShape(), 1);
     sa->addCostFunction(new TotalWirelength(1), 10);
     sa->normalizeCostFunctionWeights();
     sa->calculateCostFunctionAverageCosts(state, 1000);
-    sa->setAnnealingSchedule(new AnnealingScheduleRatioDecrease(0.9));
+    sa->setAnnealingSchedule(new AnnealingScheduleRatioDecrease(0.6));
     sa->initializeTemperature(state, 1000, 0.85);
 
     // FloorplanWindow

@@ -86,6 +86,10 @@ public:
     Pin *getPinByName(std::string name);
     std::vector<Pin *> *getPins();
     /*
+    0 to 7: N, W, S, E, FN, FW, FS, FE
+    */
+    void setOrientation(int orientation);
+    /*
     0, 1, 2, 3: N, W, S, E.
     Also change Rectangles' rotation.
     */
@@ -93,6 +97,9 @@ public:
     void rotate(bool counterclockwise);
     int getRotation() const;
     void setFlipping(bool flipped);
+    /*
+    Flip Module horizontally, or flip along the y axis of N rotated Module.
+    */
     void flipHorizontally();
     bool isFlipped() const;
     void updateRectanglesPosition();

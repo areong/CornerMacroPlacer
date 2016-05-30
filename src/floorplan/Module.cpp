@@ -156,6 +156,11 @@ std::vector<Pin *> *Module::getPins() {
     return pins;
 }
 
+void Module::setOrientation(int orientation) {
+    setFlipping(orientation > 3);
+    setRotation(orientation % 4);
+}
+
 void Module::setRotation(int rotation) {
     if ((this->rotation - rotation) % 2 != 0) {
         // Swap width and height.

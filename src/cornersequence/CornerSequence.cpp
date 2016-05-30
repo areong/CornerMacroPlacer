@@ -1,4 +1,5 @@
 #include "cornersequence/CornerSequence.h"
+#include <algorithm>
 #include "cornerstitching/Corner.h"
 #include "cornerstitching/CornerPosition.h"
 #include "cornerstitching/CornerSize.h"
@@ -8,6 +9,7 @@
 #include "floorplan/Macro.h"
 #include "floorplan/Rectangle.h"
 #include "quadtree/Quadtree.h"
+#include "utils/Utils.h"
 
 #include <iostream>
 
@@ -21,6 +23,7 @@ CornerSequence::CornerSequence(int xStart, int yStart, int xEnd, int yEnd, int n
     fixedMacros = new std::vector<Macro *>();
     macros = new std::vector<Macro *>();
     corners = new std::vector<Corner *>();
+    orientations = new std::vector<int>(numMacros, 0);
     macros->reserve(numMacros);
     corners->reserve(numMacros);
     cornerHorizontalTilePlane = new CornerHorizontalTilePlane(xStart, yStart, xEnd, yEnd);
@@ -70,6 +73,7 @@ CornerSequence::~CornerSequence() {
         }
     }
     delete corners;
+    delete orientations;
     delete cornerHorizontalTilePlane;
     delete cornerVerticalTilePlane;
     delete sizeQuadtree;
@@ -92,18 +96,49 @@ int CornerSequence::getNumMacros() {
 }
 
 void CornerSequence::swapMacros(int i, int j) {
-    Macro *ithMacro = macros->at(i);
+    Macro *macro = macros->at(i);
     macros->at(i) = macros->at(j);
-    macros->at(j) = ithMacro;
+    macros->at(j) = macro;
+    int orientation = orientations->at(i);
+    orientations->at(i) = orientations->at(j);
+    orientations->at(j) = orientation;
 }
 
 void CornerSequence::changeCorner(int i) {
-    Corner *ithCorner = corners->at(i);
-    if (ithCorner != 0) {
-        if (ithCorner->isNotFromTilePlane()) {
-            delete ithCorner;
+    Corner *corner = corners->at(i);
+    if (corner != 0) {
+        if (corner->isNotFromTilePlane()) {
+            delete corner;
         }
         corners->at(i) = 0;
+    }
+}
+
+void CornerSequence::setOrientation(int i, int orientation) {
+    orientations->at(i) = orientation;
+}
+
+void CornerSequence::changeOrientation(int i) {
+    int orientation = Utils::randint(0, 8);
+    while (orientation == orientations->at(i)) {
+        orientation = Utils::randint(0, 8);
+    }
+    orientations->at(i) = orientation;
+}
+
+void CornerSequence::randomizeSequence(int start) {
+    // Macros
+    std::random_shuffle(macros->begin() + start, macros->end());
+
+    // Corners
+    for (int i = 0; i < corners->size(); ++i) {
+        Corner *corner = corners->at(i);
+        if (corner != 0) {
+            if (corner->isNotFromTilePlane()) {
+                delete corner;
+            }
+            corners->at(i) = 0;
+        }
     }
 }
 
@@ -148,6 +183,7 @@ bool CornerSequence::placeMacrosWithIncrementalUpdate(int startPosition, int bac
     for (int i = startPosition; i < macros->size(); ++i) {
         //std::cout << i << "\n";
         Macro *macro = macros->at(i);
+        macro->setOrientation(orientations->at(i));
         int macroWidth = macro->getWidth();
         int macroHeight = macro->getHeight();
         Corner *corner = corners->at(i);
@@ -378,6 +414,7 @@ bool CornerSequence::placeMacrosWithIncrementalUpdate(int startPosition, int bac
 void CornerSequence::setMacrosPositionByCorners() {
     for (int i = 0; i < macros->size(); ++i) {
         Macro *macro = macros->at(i);
+        macro->setOrientation(orientations->at(i));
         Corner *corner = corners->at(i);
         switch (corner->getDirection()) {
         case 0:
@@ -425,6 +462,7 @@ CornerSequence *CornerSequence::copy() {
             corner = corner->copyAsNotFromTilePlane();
         }
         copiedCornerSequence->addMacroCornerPair(macros->at(i), corner);
+        copiedCornerSequence->setOrientation(i, orientations->at(i));
     }
     return copiedCornerSequence;
 }

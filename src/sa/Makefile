@@ -41,6 +41,13 @@ HEADERS_MACROSOCCUPIEDREGIONAREA = \
 	./../sa/MacrosOccupiedRegionArea.h\
 	./../sa/State.h
 
+HEADERS_RANDOMIZESEQUENCE = \
+	./../cornersequence/CornerSequence.h\
+	./../sa/FloorplanState.h\
+	./../sa/Operation.h\
+	./../sa/RandomizeSequence.h\
+	./../sa/State.h
+
 HEADERS_REFRESHFLOORPLANWINDOW = \
 	./../cornersequence/CornerSequence.h\
 	./../sa/FloorplanState.h\
@@ -50,6 +57,14 @@ HEADERS_REFRESHFLOORPLANWINDOW = \
 	./../sa/TemperatureListener.h\
 	./../view/FloorplanWindow.h\
 	./../view/Window.h
+
+HEADERS_ROTATEORFLIPMACRO = \
+	./../cornersequence/CornerSequence.h\
+	./../sa/FloorplanState.h\
+	./../sa/Operation.h\
+	./../sa/RotateOrFlipMacro.h\
+	./../sa/State.h\
+	./../utils/Utils.h
 
 HEADERS_SIMULATEDANNEALING = \
 	./../sa/AnnealingSchedule.h\
@@ -74,7 +89,9 @@ HEADERS_SIMULATEDANNEALING_TEST = \
 	./../sa/LargestEmptySpaceShape.h\
 	./../sa/MacrosOccupiedRegionArea.h\
 	./../sa/Operation.h\
+	./../sa/RandomizeSequence.h\
 	./../sa/RefreshFloorplanWindow.h\
+	./../sa/RotateOrFlipMacro.h\
 	./../sa/SimulatedAnnealing.h\
 	./../sa/SimulatedAnnealing_test.h\
 	./../sa/State.h\
@@ -113,7 +130,9 @@ all:
 	make FloorplanState.o
 	make LargestEmptySpaceShape.o
 	make MacrosOccupiedRegionArea.o
+	make RandomizeSequence.o
 	make RefreshFloorplanWindow.o
+	make RotateOrFlipMacro.o
 	make SimulatedAnnealing.o
 	make SimulatedAnnealing_test.o
 	make State.o
@@ -132,8 +151,12 @@ LargestEmptySpaceShape.o: LargestEmptySpaceShape.cpp $(HEADERS_LARGESTEMPTYSPACE
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c LargestEmptySpaceShape.cpp $(INC)
 MacrosOccupiedRegionArea.o: MacrosOccupiedRegionArea.cpp $(HEADERS_MACROSOCCUPIEDREGIONAREA)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c MacrosOccupiedRegionArea.cpp $(INC)
+RandomizeSequence.o: RandomizeSequence.cpp $(HEADERS_RANDOMIZESEQUENCE)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c RandomizeSequence.cpp $(INC)
 RefreshFloorplanWindow.o: RefreshFloorplanWindow.cpp $(HEADERS_REFRESHFLOORPLANWINDOW)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c RefreshFloorplanWindow.cpp $(INC)
+RotateOrFlipMacro.o: RotateOrFlipMacro.cpp $(HEADERS_ROTATEORFLIPMACRO)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c RotateOrFlipMacro.cpp $(INC)
 SimulatedAnnealing.o: SimulatedAnnealing.cpp $(HEADERS_SIMULATEDANNEALING)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c SimulatedAnnealing.cpp $(INC)
 SimulatedAnnealing_test.o: SimulatedAnnealing_test.cpp $(HEADERS_SIMULATEDANNEALING_TEST)

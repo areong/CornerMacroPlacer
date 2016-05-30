@@ -16,7 +16,8 @@ HEADERS_CORNERSEQUENCE = \
 	./../floorplan/SortedMacros.h\
 	./../quadtree/Point.h\
 	./../quadtree/PointValue.h\
-	./../quadtree/Quadtree.h
+	./../quadtree/Quadtree.h\
+	./../utils/Utils.h
 
 HEADERS_CORNERSEQUENCE_TEST = \
 	./../cornersequence/CornerSequence.h\
