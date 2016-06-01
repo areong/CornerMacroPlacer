@@ -379,7 +379,7 @@ void Module::splitRectilinearPolygonIntoRectangles(std::vector<int> *outerPoints
     // 2. Create a table of Rectangles, which link with their neighbors.
     int numRows = orderedYs.size() - 1;
     int numCols = orderedXs.size() - 1;
-    std::vector<std::vector<Rectangle *> > rectanglesTable(numRows, std::vector<Rectangle *>(numRows, 0));
+    std::vector<std::vector<Rectangle *> > rectanglesTable(numRows, std::vector<Rectangle *>(numCols, 0));
     for (int i = 0; i < numRows; ++i)
         for (int j = 0; j < numCols; ++j) {
             rectanglesTable[i][j] = new Rectangle(orderedXs[j], orderedYs[i], orderedXs[j + 1], orderedYs[i + 1]);
@@ -437,7 +437,7 @@ void Module::splitRectilinearPolygonIntoRectangles(std::vector<int> *outerPoints
     }
     removedRectangles.clear();
     // 4. Merge Rectangles horizontally and then vertically by depth-first traversal.
-    Rectangle *startRectangle = rectanglesTable[indicesByY[outerPoints->at(1)]][indicesByX[outerPoints->at(0)]];
+    Rectangle *startRectangle = rectanglesTable[0][rowsVerticalEdgesJ[0][0]];
     mergeRectangles(startRectangle, true);
     mergeRectangles(startRectangle, false);
     // Finish splitting and Rectangles are stored in this->rectangles.

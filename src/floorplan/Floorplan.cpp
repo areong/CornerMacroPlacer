@@ -344,7 +344,7 @@ Floorplan *Floorplan::createFromLefDefFiles(const char *auxFilename) {
     std::string defFilename;
 
     // Read aux file, whose content is
-    //  LEFDEF : *.lef *.vclef *.ant *.def ...
+    //  LEFDEF : *.lef *.lef_icc *.vclef *.ant *.def ...
     std::ifstream auxFile(auxFilename);
     if (auxFile.is_open()) {
         std::string line;
@@ -355,7 +355,7 @@ Floorplan *Floorplan::createFromLefDefFiles(const char *auxFilename) {
             std::string extension = tokens->at(i).substr(iDot + 1, tokens->at(i).length() - iDot - 1);
             if (extension == "def") {
                 defFilename = tokens->at(i);
-            } else if (extension == "lef" || extension == "vclef" || extension == "ant") {
+            } else if (extension == "lef" || extension == "lef_icc" ||  extension == "vclef" || extension == "ant") {
                 lefFilenames->push_back(tokens->at(i));
             }
         }
@@ -742,6 +742,9 @@ Floorplan *Floorplan::createFromLefDefFiles(const char *auxFilename) {
                     // Find Pins.
                     int i = 2;
                     while (i < tokens->size()) {
+                        if (tokens->at(i) == "+") {
+                            break;
+                        }
                         if (tokens->at(i) != "(") {
                             i += 1;
                             continue;
