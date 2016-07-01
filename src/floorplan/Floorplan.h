@@ -2,6 +2,7 @@
 #define FLOORPLAN_FLOORPLAN_H_
 
 #include <map>
+#include <string>
 #include <vector>
 
 class Cell;
@@ -71,6 +72,19 @@ public:
     void updatePinsPosition();
     double calculateTotalWirelength();
     double calculateTotalRoutabilityWirelength(double routabilityWeight);
+    /*
+    Output the lines defining Cells read from input DEF file.
+    */
+    void outputCellsInLefDef(const char *filename);
+    /*
+    Output the lines defining fixed Macros read from input DEF file.
+    */
+    void outputFixedMacrosInLefDef(const char *filename);
+    /*
+    Output the lines defining movable Macros read from input DEF file.
+    Modify position, orientation and replace "PLACED" with "FIXED".
+    */
+    void outputMovableMacrosInLefDef(const char *filename);
 
 private:
     int floorplanXStart;
@@ -87,6 +101,9 @@ private:
     std::map<std::string, Cell *> *cellsByName;
     std::map<std::string, Terminal *> *terminalsByName;
     std::map<std::string, Net *> *netsByName;
+
+    static std::string moduleOrientations[];
+    static int numModuleOrientations;
 
     Matrix2d *densityMap;
     int densityMapNumCols;

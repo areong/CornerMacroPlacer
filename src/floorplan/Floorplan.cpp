@@ -12,6 +12,9 @@
 #include "utils/Matrix2d.h"
 #include "utils/Utils.h"
 
+std::string Floorplan::moduleOrientations[] = {"N", "W", "S", "E", "FN", "FW", "FS", "FE"};
+int Floorplan::numModuleOrientations = 8;
+
 Floorplan *Floorplan::createFromBookshelfFiles(const char *auxFilename) {
     Floorplan *floorplan = 0;
 
@@ -587,7 +590,6 @@ Floorplan *Floorplan::createFromLefDefFiles(const char *auxFilename) {
     int floorplanYStart = 0;
     int floorplanXEnd = 1;
     int floorplanYEnd = 1;
-    std::string orientations[] = {"N", "W", "S", "E", "FN", "FW", "FS", "FE"};
     std::ifstream defFile(defFilename);
     if (defFile.is_open()) {
         std::string line;
@@ -646,10 +648,12 @@ Floorplan *Floorplan::createFromLefDefFiles(const char *auxFilename) {
                     if (isCell) {
                         Cell *cell = static_cast<Cell *>(cellTemplate->copy());
                         cell->setName(componentName);
+                        cell->setFileLineTokens(tokens);
                         floorplan->addCell(cell);
                     } else {
                         Macro *macro = static_cast<Macro *>(macroTemplate->copy());
                         macro->setName(componentName);
+                        macro->setFileLineTokens(tokens);
                         // Find whether macro has fixed position.
                         std::vector<std::string>::iterator it = std::find(tokens->begin(), tokens->end(), "FIXED");
                         if (it != tokens->end()) {
@@ -664,7 +668,7 @@ Floorplan *Floorplan::createFromLefDefFiles(const char *auxFilename) {
                             // Set orientation.
                             it += 2;
                             std::string orientation = *it;
-                            int ithOrientation = std::find(orientations, orientations + 8, orientation) - orientations;
+                            int ithOrientation = std::find(moduleOrientations, moduleOrientations + numModuleOrientations, orientation) - moduleOrientations;
                             if (ithOrientation > 3) {
                                 macro->setFlipping(true);
                                 ithOrientation -= 4;
@@ -844,6 +848,7 @@ Floorplan::~Floorplan() {
     delete terminalsByName;
     delete netsByName;
 
+    delete moduleOrientations;
     delete densityMap;
 }
 
@@ -1009,6 +1014,55 @@ double Floorplan::calculateTotalRoutabilityWirelength(double routabilityWeight) 
         delete netDensityMap;
     }
     return totalRoutabilityWirelength;
+}
+
+void Floorplan::outputCellsInLefDef(const char *filename) {
+    std::ofstream file(filename);
+
+    for (int i = 0; i < cells->size(); ++i) {
+        std::vector<std::string> *tokens = cells->at(i)->getFileLineTokens();
+        for (int iToken = 0; iToken < tokens->size(); ++iToken) {
+            file << " " << tokens->at(iToken);
+        }
+        file << "\n";
+    }
+
+    file.close();
+}
+
+void Floorplan::outputFixedMacrosInLefDef(const char *filename) {
+    std::ofstream file(filename);
+
+    for (int i = 0; i < fixedMacros->size(); ++i) {
+        std::vector<std::string> *tokens = fixedMacros->at(i)->getFileLineTokens();
+        for (int iToken = 0; iToken < tokens->size(); ++iToken) {
+            file << " " << tokens->at(iToken);
+        }
+        file << "\n";
+    }
+
+    file.close();
+}
+
+void Floorplan::outputMovableMacrosInLefDef(const char *filename) {
+    std::ofstream file(filename);
+
+    for (int i = 0; i < movableMacros->size(); ++i) {
+        Macro *macro = movableMacros->at(i);
+        std::vector<std::string> *tokens = macro->getFileLineTokens();
+        // Modify position, orientation and replace "PLACED" with "FIXED".
+        std::vector<std::string>::iterator it = std::find(tokens->begin(), tokens->end(), "PLACED");
+        *it = "FIXED";
+        *(it + 2) = std::to_string(macro->getXStart());
+        *(it + 3) = std::to_string(macro->getYStart());
+        *(it + 5) = moduleOrientations[macro->getRotation() + macro->isFlipped() * 4];
+        for (int iToken = 0; iToken < tokens->size(); ++iToken) {
+            file << " " << tokens->at(iToken);
+        }
+        file << "\n";
+    }
+
+    file.close();
 }
 
 // private

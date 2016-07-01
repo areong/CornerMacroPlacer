@@ -53,6 +53,12 @@ public:
     void setName(std::string name);
     std::string getName() const;
     /*
+    Set the line where the DEF file defines this Module.
+    These tokens are copied to this Module and used when outputting DEF files.
+    */
+    void setFileLineTokens(std::vector<std::string> *tokens);
+    std::vector<std::string> *getFileLineTokens();
+    /*
     Create the Rectangle for this rectangular Module.
     This method works only when outerPoints in the constructor arguments is zero,
     or when addRectangle() has never been called.
@@ -128,6 +134,10 @@ private:
     int xEnd;
     int yEnd;
     std::string name;
+    /*
+    The tokens of line where DEF defined this Module.
+    */
+    std::vector<std::string> *fileLineTokens;
     bool hasRectilinearShape;
     std::vector<Rectangle *> *rectangles;
     std::vector<Pin *> *pins;

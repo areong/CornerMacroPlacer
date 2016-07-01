@@ -74,6 +74,10 @@ void testSimulatedAnnealing_annealCornerSequence(int argc, char **argv) {
     std::cout << "num movable Macros: " << macros->size() << "\n";
     std::cout << "num fixed Macros: " << fixedMacros->size() << "\n";
 
+    //std::cout << "Output Cells and fixed Macros.\n";
+    //floorplan->outputCellsInLefDef(argv[2]);
+    //floorplan->outputFixedMacrosInLefDef(argv[3]);
+
     // CornerSequence
     SortedMacros *initialWidthSortedMacros = new SortedMacros(true);
     SortedMacros *initialHeightSortedMacros = new SortedMacros(false);
@@ -116,7 +120,12 @@ void testSimulatedAnnealing_annealCornerSequence(int argc, char **argv) {
     sa->addTemperatureListener(new RefreshFloorplanWindow(window, floorplan));
 
     // Anneal
-    sa->annealWithoutIncrementalUpdate(state, 1000, 0.001, 0.9, 700);
+    sa->annealWithoutIncrementalUpdate(state, 1000, 0.0002, 0.9, 700);
+
+    if (argv[2] != "0") {
+        std::cout << "Output movableMacros.\n";
+        floorplan->outputMovableMacrosInLefDef(argv[2]);
+    }
 }
 
 void testSimulatedAnnealing(int argc, char **argv) {

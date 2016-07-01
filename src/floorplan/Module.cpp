@@ -4,8 +4,6 @@
 #include "floorplan/Pin.h"
 #include "floorplan/Rectangle.h"
 
-#include <iostream>
-
 Module::Module(int width, int height, int xStart, int yStart, std::string name,
     std::vector<int> *outerPoints) {
     this->width = width;
@@ -13,6 +11,7 @@ Module::Module(int width, int height, int xStart, int yStart, std::string name,
     setXStart(xStart);
     setYStart(yStart);
     this->name = name;
+    fileLineTokens = new std::vector<std::string>();
     rectangles = new std::vector<Rectangle *>();
     if (outerPoints != 0) {
         hasRectilinearShape = true;
@@ -31,6 +30,7 @@ Module::Module(int width, int height, int xStart, int yStart, std::string name,
 }
 
 Module::~Module() {
+    delete fileLineTokens;
     for (int i = 0; i < rectangles->size(); ++i) {
         delete rectangles->at(i);
     }
@@ -100,6 +100,15 @@ void Module::setName(std::string name) {
 
 std::string Module::getName() const {
     return name;
+}
+
+void Module::setFileLineTokens(std::vector<std::string> *tokens) {
+    fileLineTokens->clear();
+    fileLineTokens->insert(fileLineTokens->begin(), tokens->begin(), tokens->end());
+}
+
+std::vector<std::string> *Module::getFileLineTokens() {
+    return fileLineTokens;
 }
 
 void Module::initializeRectangleOfRectangularModule() {
